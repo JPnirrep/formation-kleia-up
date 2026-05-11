@@ -32,6 +32,7 @@ export default function Loading({ size = 'md', className, text }: LoadingProps) 
           strokeLinecap="round"
         />
         <defs>
+          {/* Thème Kleia-up : burgundy + gold */}
           <linearGradient id="spinner-gradient" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#8B1D3D" />
             <stop offset="100%" stopColor="#D4AF37" />

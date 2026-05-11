@@ -45,14 +45,6 @@ class VideoAssetRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
-class VideoAssetStatus(BaseModel):
-    id: uuid.UUID
-    status: str
-    playback_manifest_url: str | None = None
-    thumbnail_url: str | None = None
-    duration_seconds: int
-
-
 class VideoTrackCreate(BaseModel):
     video_asset_id: str
     kind: str

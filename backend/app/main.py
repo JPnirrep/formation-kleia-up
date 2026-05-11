@@ -26,6 +26,14 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
 
 
 def create_app() -> FastAPI:
+    if settings.JWT_SECRET == "" or settings.JWT_SECRET == "change-me-in-production":
+        import warnings
+
+        warnings.warn(
+            "\u26a0\ufe0f JWT_SECRET not configured! Using default insecure key.",
+            RuntimeWarning,
+        )
+
     app = FastAPI(
         title=settings.APP_NAME,
         version=settings.VERSION,

@@ -7,7 +7,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.database import get_db
 from app.models.user import User
-from app.schemas.auth import LoginRequest, GoogleAuthRequest, TokenResponse, UserProfile
+from app.middleware.rate_limit import auth_limiter
+from app.schemas.auth import (
+    LoginRequest,
+    GoogleAuthRequest,
+    RefreshRequest,
+    TokenResponse,
+    UserProfile,
+)
 from app.schemas.user import UserCreate
 from app.services.auth import (
     create_access_token,
@@ -21,12 +28,21 @@ from app.services.auth import (
 router = APIRouter()
 
 
+def _check_rate_limit(key: str):
+    if auth_limiter.is_rate_limited(key):
+        raise HTTPException(
+            status_code=429,
+            detail="Trop de tentatives. Réessayez dans une minute.",
+        )
+
+
 @router.post("/google", response_model=TokenResponse)
 async def google_auth(data: GoogleAuthRequest, db: AsyncSession = Depends(get_db)):
     """
     Authentification via Google OAuth2.
     Reçoit un ID token Google, le vérifie, trouve ou crée l'utilisateur, retourne un JWT.
     """
+    _check_rate_limit("google_auth")
     user_info = await verify_google_token(data.id_token)
     if user_info is None:
         raise HTTPException(
@@ -74,6 +90,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     Inscription par email/mot de passe (pour les tests, pas l'auth principale).
     """
+    _check_rate_limit("register")
     if not data.password or len(data.password) < 6:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -118,6 +135,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     """
     Connexion par email/mot de passe (pour les tests).
     """
+    _check_rate_limit("login")
     stmt = select(User).where(User.email == data.email)
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
@@ -151,3 +169,61 @@ async def get_profile(
 ):
     """Récupère le profil de l'utilisateur connecté."""
     return UserProfile.model_validate(current_user)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
+    """
+    Rafraîchit les tokens JWT à partir d'un refresh token valide.
+    """
+    _check_rate_limit("refresh")
+    payload = decode_token(data.refresh_token)
+    if payload is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token invalide ou expiré.",
+        )
+    if payload.get("type") != "refresh":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token de type incorrect.",
+        )
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide.",
+        )
+    try:
+        from uuid import UUID as _UUID
+
+        _UUID(user_id)
+    except (ValueError, AttributeError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalide.",
+        )
+
+    stmt = select(User).where(User.id == user_id)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Utilisateur non trouvé.",
+        )
+    if not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Compte désactivé.",
+        )
+
+    access_token = create_access_token(data={"sub": str(user.id)})
+    refresh_token = create_refresh_token(data={"sub": str(user.id)})
+
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        user=UserProfile.model_validate(user),
+    )

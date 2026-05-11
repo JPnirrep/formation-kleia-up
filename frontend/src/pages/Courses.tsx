@@ -5,6 +5,7 @@ import CourseCard from '@/components/course/CourseCard';
 import Loading from '@/components/ui/Loading';
 import { useApi } from '@/hooks/useApi';
 import { getCourses } from '@/api/courses';
+import { formatDuration, getCourseGradient, toCardCourse } from '@/lib/utils';
 import type { Course } from '@/api/courses';
 
 type FilterTab = 'all' | 'in_progress' | 'completed';
@@ -14,35 +15,6 @@ const tabs: { key: FilterTab; label: string }[] = [
   { key: 'in_progress', label: 'En cours' },
   { key: 'completed', label: 'Terminées' },
 ];
-
-const gradients = [
-  'from-[#7C3AED] to-[#A78BFA]',
-  'from-[#EC4899] to-[#F472B6]',
-  'from-[#F59E0B] to-[#FBBF24]',
-  'from-[#10B981] to-[#34D399]',
-];
-
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h === 0) return `${m} min`;
-  if (m === 0) return `${h}h`;
-  return `${h}h${m}`;
-}
-
-function toCardCourse(c: Course, index: number) {
-  const progress = c.progress || 0;
-  return {
-    slug: c.slug,
-    title: c.title,
-    level: c.level,
-    shortDescription: c.short_description,
-    duration: formatDuration(c.duration_seconds),
-    progress,
-    lessonCount: c.lessons,
-    thumbnailColor: gradients[index % gradients.length],
-  };
-}
 
 export default function Courses() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
@@ -103,7 +75,7 @@ export default function Courses() {
       {filtered.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6">
           {filtered.map((course, idx) => (
-            <CourseCard key={course.id} course={toCardCourse(course, idx)} />
+            <CourseCard key={course.id} course={{ ...toCardCourse(course), lessonCount: course.lessons }} />
           ))}
         </div>
       ) : (

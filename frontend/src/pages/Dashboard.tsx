@@ -9,6 +9,7 @@ import { useApi } from '@/hooks/useApi';
 import { getMyEnrollments } from '@/api/enrollments';
 import { getCourses, getCourse } from '@/api/courses';
 import { isAuthenticated } from '@/api/client';
+import { formatDuration, getCourseGradient, toCardCourse } from '@/lib/utils';
 import type { Enrollment } from '@/api/enrollments';
 import type { Course } from '@/api/courses';
 
@@ -25,35 +26,6 @@ const activityIcons: Record<string, string> = {
   certificate: '\u2605',
   quiz: '\u2699',
 };
-
-const gradients = [
-  'from-[#7C3AED] to-[#A78BFA]',
-  'from-[#EC4899] to-[#F472B6]',
-  'from-[#F59E0B] to-[#FBBF24]',
-  'from-[#10B981] to-[#34D399]',
-];
-
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h === 0) return `${m} min`;
-  if (m === 0) return `${h}h`;
-  return `${h}h${m}`;
-}
-
-function toCardCourse(c: Course, index: number) {
-  const progress = c.progress || 0;
-  return {
-    slug: c.slug,
-    title: c.title,
-    level: c.level,
-    shortDescription: c.short_description,
-    duration: formatDuration(c.duration_seconds),
-    progress,
-    lessonCount: c.lessons,
-    thumbnailColor: gradients[index % gradients.length],
-  };
-}
 
 export default function Dashboard() {
   const isAuth = isAuthenticated();
@@ -93,10 +65,10 @@ export default function Dashboard() {
     : mockTotalHours;
 
   const stats = [
-    { label: 'Formations en cours', value: inProgress.length.toString(), icon: '\uD83D\uDCDA', color: 'from-kleia-burgundy to-purple-700' },
-    { label: 'Terminées', value: completedCount.toString(), icon: '\u2714\uFE0F', color: 'from-kleia-success to-emerald-600' },
-    { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: '\uD83D\uDD52', color: 'from-kleia-gold to-amber-600' },
-    { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: '\uD83C\uDFC6', color: 'from-blue-600 to-indigo-700' },
+    { label: 'Formations en cours', value: inProgress.length.toString(), icon: '\uD83D\uDCDA', color: 'from-kleia-burgundy to-kleia-burgundy' },
+    { label: 'Terminées', value: completedCount.toString(), icon: '\u2714\uFE0F', color: 'from-kleia-success to-kleia-dark' },
+    { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: '\uD83D\uDD52', color: 'from-kleia-gold to-kleia-gold' },
+    { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: '\uD83C\uDFC6', color: 'from-blue-600 to-kleia-burgundy' },
   ];
 
   return (
@@ -146,7 +118,7 @@ export default function Dashboard() {
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
             {inProgress.map((course, idx) => (
               <div key={course.slug} className="min-w-[260px] max-w-[280px] flex-shrink-0">
-                <CourseCard course={toCardCourse(course, idx)} variant="compact" />
+                <CourseCard course={{ ...toCardCourse(course), lessonCount: course.lessons }} variant="compact" />
               </div>
             ))}
           </div>

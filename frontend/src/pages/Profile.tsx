@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import clsx from 'clsx';
+import { useAuth } from '@/context/AuthContext';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import { mockUser, mockCertificates, mockCourses, getCompletedCourses } from '@/mock';
+import Loading from '@/components/ui/Loading';
+import { mockCertificates, mockCourses, getCompletedCourses } from '@/mock';
 
 export default function Profile() {
+  const { user, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState({ email: true, progress: true });
   const completedCourses = getCompletedCourses();
   const startedCourses = mockCourses.filter(c => c.progress > 0 && c.progress < 100);
@@ -21,22 +24,28 @@ export default function Profile() {
     { label: 'Certificats', value: mockCertificates.length.toString() },
   ];
 
+  if (authLoading) return <Loading text="Chargement du profil..." />;
+  if (!user) return <Loading text="Chargement du profil..." />;
+
+  const roleLabel = user.role === 'admin' ? 'Administrateur' : user.role === 'trainer' ? 'Formateur' : 'Apprenant';
+  const roleVariant = user.role === 'admin' ? 'danger' : user.role === 'trainer' ? 'warning' : 'info';
+
   return (
     <div className="space-y-8">
       <Card>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="h-20 w-20 rounded-full gradient-burgundy flex items-center justify-center text-white text-2xl font-bold font-heading shadow-lg flex-shrink-0">
-            {mockUser.initials}
+            {user.display_name ? user.display_name.charAt(0).toUpperCase() : user.initials}
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{mockUser.name}</h1>
-            <p className="text-kleia-gray font-body">{mockUser.email}</p>
+            <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{user.display_name}</h1>
+            <p className="text-kleia-gray font-body">{user.email}</p>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-2">
-              <Badge variant={mockUser.role === 'admin' ? 'danger' : 'info'}>
-                {mockUser.role === 'admin' ? 'Administrateur' : 'Apprenant'}
+              <Badge variant={roleVariant}>
+                {roleLabel}
               </Badge>
               <span className="text-xs text-kleia-gray font-body">
-                Membre depuis {new Date(mockUser.joinedAt).toLocaleDateString('fr-FR')}
+                Membre depuis {new Date().toLocaleDateString('fr-FR')}
               </span>
             </div>
           </div>

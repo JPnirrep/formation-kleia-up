@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import Layout from '@/components/layout/Layout';
 import Dashboard from '@/pages/Dashboard';
 import Courses from '@/pages/Courses';
@@ -15,19 +17,23 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route element={<Layout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/formations" element={<Courses />} />
-            <Route path="/formation/:slug" element={<CourseDetail />} />
-            <Route path="/lecon/:lessonId" element={<LessonView />} />
-            <Route path="/quiz/:quizId" element={<QuizView />} />
-            <Route path="/profil" element={<Profile />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route element={<Layout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/formations" element={<Courses />} />
+              <Route path="/formation/:slug" element={<CourseDetail />} />
+              <Route path="/lecon/:lessonId" element={<LessonView />} />
+              <Route path="/quiz/:quizId" element={<QuizView />} />
+              <Route path="/profil" element={<Profile />} />
+              <Route element={<ProtectedRoute requiredRole="admin" />}>
+                <Route path="/admin" element={<AdminDashboard />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </ErrorBoundary>
       </BrowserRouter>
     </AuthProvider>
   );

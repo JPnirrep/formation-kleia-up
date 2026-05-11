@@ -12,7 +12,7 @@ interface BadgeProps {
 const variantStyles: Record<BadgeVariant, string> = {
   default: 'bg-kleia-dark/10 text-kleia-dark',
   success: 'bg-kleia-success/15 text-kleia-success',
-  warning: 'bg-kleia-gold/20 text-amber-800',
+  warning: 'text-kleia-gold bg-kleia-gold/10',
   danger: 'bg-kleia-error/15 text-kleia-error',
   info: 'bg-kleia-burgundy/15 text-kleia-burgundy',
 };

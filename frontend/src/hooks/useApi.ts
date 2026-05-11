@@ -1,33 +1,34 @@
-import { useState, useEffect, useCallback } from 'react';
-
-interface UseApiState<T> {
-  data: T | null;
-  loading: boolean;
-  error: string | null;
-}
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 export function useApi<T>(
-  fetcher: () => Promise<T>,
+  fetcher: (signal?: AbortSignal) => Promise<T>,
   deps: unknown[] = []
-): UseApiState<T> & { refetch: () => Promise<void> } {
-  const [state, setState] = useState<UseApiState<T>>({
-    data: null,
-    loading: true,
-    error: null,
+) {
+  const [state, setState] = useState<{ data: T | null; loading: boolean; error: string | null }>({
+    data: null, loading: true, error: null
   });
+  const mountedRef = useRef(true);
 
   const execute = useCallback(async () => {
+    const controller = new AbortController();
     setState(s => ({ ...s, loading: true, error: null }));
     try {
-      const data = await fetcher();
+      const data = await fetcher(controller.signal);
+      if (!mountedRef.current) return;
       setState({ data, loading: false, error: null });
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (!mountedRef.current) return;
       const msg = err instanceof Error ? err.message : 'Erreur inconnue';
       setState({ data: null, loading: false, error: msg });
     }
   }, deps);
 
-  useEffect(() => { execute(); }, [execute]);
+  useEffect(() => {
+    mountedRef.current = true;
+    execute();
+    return () => { mountedRef.current = false; };
+  }, [execute]);
 
   return { ...state, refetch: execute };
 }
