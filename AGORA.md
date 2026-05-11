@@ -100,16 +100,38 @@
 | Admin | `/admin` | En partie mock |
 
 ### Projet
-- 97 fichiers, 2 commits
+- 110+ fichiers, 6 commits
 - GitHub : https://github.com/JPnirrep/formation-kleia-up
 - Repo propre, pas de secrets commites
+- Design system : burgundy `#8B1D3D`, gold `#D4AF37`, cream `#FAF9F6`
+
+---
+
+## Audit de code — 3 vagues de corrections (2026-05-11)
+
+139 anomalies detectees par 3 auditeurs specialises. 43 corrigees.
+
+| Vague | Critiques | Hautes | Moyennes | Total |
+|---|---|---|---|---|
+| V1 — Crashs + incompatibilites | 17 | 0 | 0 | 17 |
+| V2 — Securite + UX | 0 | 13 | 0 | 13 |
+| V3 — Qualite + pagination | 0 | 0 | 13 | 13 |
+| **Total corrige** | **17** | **13** | **13** | **43** |
+
+### Corrections cles
+- **Backend** : refresh token, rate limiting, pagination partout, UUID dans Create schemas, validation password
+- **Frontend** : ProtectedRoute admin, ErrorBoundary, AbortController, types alignes backend, imports @/
+- **Infra** : Docker path fixe, Nginx service, CI/CD migration alembic, .env.template secure
+- **UX** : boutons "Commencer" fonctionnels, "Marquer comme termine" appelle API, 404 page, connexion Profil + Admin a l'API reelle
+
+### Lecons apprises → `LESSONS.md`
+14 patterns de bugs documentes pour ne plus les reproduire.
 
 ---
 
 ## 🔜 Prochaines etapes possibles
 
-1. **Finaliser les pages** : Profil, Admin, Lecon video avec les vraies donnees
-2. **Remonter le backend sur OVH VPS** (Docker Compose, domaine formation.kleia-up.fr)
-3. **Integrer la page login dans le site vitrine** kleia-up.fr
-4. **Ajouter le paiement Stripe** pour la V2
-5. **Contenu reel** : integrer les 4 Livrets Maitres Kleia-up
+1. **Deployer sur OVH VPS** (Docker Compose, domaine formation.kleia-up.fr)
+2. **Contenu reel** : integrer les 4 Livrets Maitres Kleia-up
+3. **Paiement Stripe** pour la V2
+4. **Tests E2E** : Playwright/Cypress sur les parcours critiques
