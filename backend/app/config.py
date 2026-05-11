@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://kleia:kleia@localhost:5432/kleia_lms"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./kleia_lms.db"
 
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"

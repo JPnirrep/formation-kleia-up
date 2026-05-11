@@ -91,7 +91,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
         auth_sub=data.email,
         is_active=True,
     )
-    user.hashed_password = get_password_hash(data.password)
+    user.password_hash = get_password_hash(data.password)
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -116,7 +116,7 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
 
-    if user is None or not verify_password(data.password, user.hashed_password):
+    if user is None or not verify_password(data.password, user.password_hash or ""):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email ou mot de passe incorrect.",

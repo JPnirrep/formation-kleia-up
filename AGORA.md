@@ -1,90 +1,115 @@
-# AGORA — Point d'étape Phase 0
+# AGORA — Récapitulatif complet
 
 **Date :** 2026-05-11
 **Projet :** Plateforme formations Kleia-up (formation.kleia-up.fr)
-**Stack :** FastAPI + React/Vite + PostgreSQL 15 + Redis 7 + Docker
+**Stack :** FastAPI + React/Vite + SQLite (dev) / PostgreSQL (prod) + Docker
+**GitHub :** https://github.com/JPnirrep/formation-kleia-up
 
 ---
 
-## ✅ Terminé (Phase 0 — Fondations)
+## Phase 0 — Fondations (matin)
 
-... (existing content)...
+### Structure & Contrats
+- `AGENT.md`, `SYSTEM_CONTRACT.md`, `DEFINITION_OF_DONE.md`, `TASK_TEMPLATE.md`, `OPEN_QUESTIONS.md`, `CHANGELOG_AGENT.md`
+- ADR 001 : choix stack technique
+- `/spec/` complet : vision, entités (16), règles métier, états/transitions
+
+### DevOps
+- `docker-compose.yml` : 4 services (backend, frontend, db, cache)
+- Dockerfile.backend + Dockerfile.frontend
+- Nginx reverse proxy pour `formation.kleia-up.fr`
+- CI/CD GitHub Actions
+- `.env.template`
+
+### Design System (React)
+- React 19 + Vite 6 + Tailwind CSS 4
+- Tokens Kleia-up : burgundy `#8B1D3D`, gold `#D4AF37`, cream `#FAF9F6`
+- 8 composants : Button, Card, Input, Badge, Loading, Header, Footer, Layout
+- Composant PlayerShell
+- **Maquette : 7 pages mockup** (Dashboard, Catalogue, Détail, Leçon, Quiz, Profil, Admin)
 
 ---
 
-## ✅ Terminé (Phase 1 — Backend & Domaine)
+## Phase 1 — Backend (après-midi)
 
-### Backend Python — FastAPI + SQLAlchemy 2.0
-- Projet Python structuré (`pyproject.toml`, `requirements.txt`)
-- Config via Pydantic Settings (DB, JWT, OAuth, S3, Redis)
-- Base de données asynchrone (asyncpg + SQLAlchemy async)
-- 14 tables SQLAlchemy (toutes les entités du domaine)
-- Schémas Pydantic v2 pour validation (Create, Update, Read)
-- Migration Alembic configurée (async)
+### FastAPI Backend
+- 14 modèles SQLAlchemy 2.0 async (User, Course, Module, Lesson, VideoAsset, VideoTrack, VideoProgress, VideoEvent, Quiz, Question, Attempt, Enrollment, LessonProgress, Certificate)
+- Schémas Pydantic v2 (Create, Update, Read pour chaque entité)
+- Alembic configuré pour migrations asynchrones
+- **32 endpoints API REST** (auth, users, courses, enrollments, progress, quizzes, admin)
+- Auth : Google OAuth2 + email/password + JWT access/refresh + RBAC (learner/trainer/admin)
+- Services : hachage bcrypt, JWT tokens, CRUD formations
 
-### API REST — 32 endpoints
-| Groupe | Endpoints | Description |
+---
+
+## Phase 2 — Connexion Frontend ↔ Backend (fin d'après-midi)
+
+### API Layer (Frontend)
+- Client fetch natif avec JWT (localStorage)
+- 7 modules API : client, auth, courses, enrollments, progress, quizzes, admin
+- Hook `useApi` (loading/data/error generique)
+- Contexte `AuthContext` (login/logout/user state)
+- Types TypeScript partages
+
+### Pages connectees aux donnees reelles
+- **Catalogue** `/formations` → `GET /courses/` (4 formations en BD)
+- **Detail** `/formation/:slug` → `GET /courses/{slug}` (modules + lecons)
+- **Dashboard** `/` → `GET /enrollments/my` (2 inscriptions)
+- **Login** `/login` → `POST /auth/login` (JWT + user)
+
+### Dev Setup
+- SQLite comme DB locale (zero dependance externe)
+- `seed.py` : 2 users, 4 cours, 13 modules, 40 lecons, 1 quiz
+- Proxy Vite `/api/*` → `localhost:8000` (zero CORS)
+
+### Bugs corriges
+  - CORS bloque → proxy Vite + middleware CORS force
+  - Login 500 → `user.hashed_password` → `password_hash` + TokenResponse.user
+  - Enrollments 500 → conversion `UUID(user_id)` dans deps.py
+  - PaginatedResponse → champs `page/page_size/total_pages`
+  - UUID/str mismatch Pydantic → schemas types `uuid.UUID`
+
+---
+
+## Etat actuel (live)
+
+### Serveurs
+| Service | URL | Statut |
 |---|---|---|
-| Auth | 4 | Google OAuth, login, register, profil |
-| Users | 3 | CRUD utilisateurs (admin) |
-| Courses | 4 | Catalogue, détail, modules, leçons |
-| Enrollments | 2 | Inscriptions (my + admin grant) |
-| Progress | 3 | Progression cours, leçon, vidéo |
-| Quizzes | 3 | Quiz, tentative, historique |
-| Admin | 10 | CRUD formations/modules/leçons/quiz |
-| Health | 1 | Health check |
+| Frontend | http://localhost:5173 | Build 72 modules, 1.63s |
+| Backend API | http://localhost:8000 | 32 endpoints REST |
+| Swagger Docs | http://localhost:8000/api/docs | Documentation interactive |
 
-### Services & Sécurité
-- JWT access + refresh tokens
-- Google OAuth2 verification
-- RBAC (learner, trainer, admin)
-- Hachage bcrypt des mots de passe
-- CORS configuré (localhost + formation.kleia-up.fr)
+### Donnees en base (SQLite)
+- 2 utilisateurs : Clara Fontaine (learner) / Sandrina Perrin (admin)
+- 4 formations : Architecture du Message, Incarnation & Le Jour J, Mindset du Speaker, Deployer son Leadership
+- 13 modules, 40 lecons
+- 1 quiz
+- 2 inscriptions (Clara inscrite a 2 formations)
 
----
+### Pages fonctionnelles
+| Page | URL | API connectee |
+|---|---|---|
+| Login | `/login` | `POST /auth/login` |
+| Dashboard | `/` | `GET /enrollments/my` |
+| Catalogue | `/formations` | `GET /courses/` |
+| Detail formation | `/formation/:slug` | `GET /courses/{slug}` |
+| Lecon video | `/lecon/:id` | API + fallback mock |
+| Quiz | `/quiz/:id` | API + fallback mock |
+| Profil | `/profil` | En partie mock |
+| Admin | `/admin` | En partie mock |
 
-## 🔜 Prochaine étape (Phase 2 — Frontend intégration)
-- Connecter le frontend React à l'API backend
-- Authentification Google OAuth côté frontend
-- Remplacer les données mock par les vraies données API
-
-### Tickets à exécuter
-1. **Ticket 2** — Modèle de données SQLAlchemy + migrations Alembic
-   - Entités : User, Course, Module, Lesson, VideoAsset, Quiz, Question, Attempt, Enrollment, Progress, Certificate
-2. **Ticket 3** — Authentification Google OAuth2 + JWT + RBAC (learner/trainer/admin)
-3. **Ticket 5** — Back-office API CRUD (formations, modules, leçons, quiz)
-4. **Ticket 4** — API catalogue exposée (GET formations, détail)
+### Projet
+- 97 fichiers, 2 commits
+- GitHub : https://github.com/JPnirrep/formation-kleia-up
+- Repo propre, pas de secrets commites
 
 ---
 
-## 🚀 Pour reprendre le travail
+## 🔜 Prochaines etapes possibles
 
-```bash
-# 1. Démarrer le frontend
-cd ~/Documents/GitHub/formation-kleia-up/frontend
-npm run dev
-# → http://localhost:5173
-
-# 2. Lire les specs avant de coder
-less spec/domain/ENTITIES.md
-less spec/domain/RULES.md
-less spec/domain/STATES.md
-
-# 3. Consulter les décisions
-cat adr/001-stack-choice.md
-cat AGENT.md
-
-# 4. Questions ouvertes
-cat OPEN_QUESTIONS.md
-```
-
----
-
-## 📦 URLs du projet
-| Ressource | URL |
-|---|---|
-| Dev local | http://localhost:5173 |
-| Plateforme (prod) | https://formation.kleia-up.fr |
-| Site vitrine | https://kleia-up.fr |
-| VPS OVH | 135.125.53.215 |
-| Repo GitHub | https://github.com/JP/formation-kleia-up |
+1. **Finaliser les pages** : Profil, Admin, Lecon video avec les vraies donnees
+2. **Remonter le backend sur OVH VPS** (Docker Compose, domaine formation.kleia-up.fr)
+3. **Integrer la page login dans le site vitrine** kleia-up.fr
+4. **Ajouter le paiement Stripe** pour la V2
+5. **Contenu reel** : integrer les 4 Livrets Maitres Kleia-up

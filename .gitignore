@@ -35,9 +35,11 @@ venv/
 # Docker
 *.log
 
-# Python venv
+# Python venv + DB
 .venv/
 backend/.venv/
+*.db
+*.db-journal
 
 # Testing
 coverage/

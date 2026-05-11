@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
+import uuid
 
 
 class VideoAssetCreate(BaseModel):
@@ -24,8 +25,8 @@ class VideoAssetUpdate(BaseModel):
 
 
 class VideoAssetRead(BaseModel):
-    id: str
-    lesson_id: str
+    id: uuid.UUID
+    lesson_id: uuid.UUID
     title: str
     description: str | None = None
     order: int
@@ -37,7 +38,7 @@ class VideoAssetRead(BaseModel):
     language: str
     visibility: str
     completion_threshold_percent: int
-    created_by: str
+    created_by: uuid.UUID
     created_at: datetime
     updated_at: datetime
 
@@ -45,7 +46,7 @@ class VideoAssetRead(BaseModel):
 
 
 class VideoAssetStatus(BaseModel):
-    id: str
+    id: uuid.UUID
     status: str
     playback_manifest_url: str | None = None
     thumbnail_url: str | None = None
@@ -62,8 +63,8 @@ class VideoTrackCreate(BaseModel):
 
 
 class VideoTrackRead(BaseModel):
-    id: str
-    video_asset_id: str
+    id: uuid.UUID
+    video_asset_id: uuid.UUID
     kind: str
     language: str
     label: str
@@ -85,9 +86,9 @@ class VideoProgressUpdate(BaseModel):
 
 
 class VideoProgressRead(BaseModel):
-    id: str
-    user_id: str
-    video_asset_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
+    video_asset_id: uuid.UUID
     last_position_seconds: float
     max_position_seconds: float
     percent_watched: float

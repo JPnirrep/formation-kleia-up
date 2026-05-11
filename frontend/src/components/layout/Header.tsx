@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import clsx from 'clsx';
-import { mockUser } from '@/mock';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavLinkItem {
   to: string;
@@ -18,9 +18,22 @@ const navLinks: NavLinkItem[] = [
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+  const { user, loading, logout } = useAuth();
   const visibleLinks = navLinks.filter(
-    (link) => !link.adminOnly || mockUser.role === 'admin',
+    (link) => !link.adminOnly || user?.role === 'admin',
   );
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-[16px] border-b border-white/20 shadow-glass">
@@ -53,10 +66,43 @@ export default function Header() {
           </nav>
 
           <div className="hidden md:flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full gradient-burgundy flex items-center justify-center text-white text-sm font-bold font-heading">
-              {mockUser.initials}
-            </div>
-            <span className="text-sm font-medium text-kleia-dark">{mockUser.name}</span>
+            {loading ? null : user ? (
+              <div ref={userMenuRef} className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center gap-3 cursor-pointer"
+                >
+                  <div className="h-9 w-9 rounded-full gradient-burgundy flex items-center justify-center text-white text-sm font-bold font-heading">
+                    {user.initials}
+                  </div>
+                  <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
+                </button>
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white/90 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-xl py-2">
+                    <NavLink
+                      to="/profil"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="block px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-burgundy/5 transition-colors"
+                    >
+                      Mon profil
+                    </NavLink>
+                    <button
+                      onClick={() => { logout(); setUserMenuOpen(false); }}
+                      className="w-full text-left px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-burgundy/5 transition-colors"
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+              >
+                Connexion
+              </Link>
+            )}
           </div>
 
           <button
@@ -95,12 +141,24 @@ export default function Header() {
                 {link.label}
               </NavLink>
             ))}
-            <div className="flex items-center gap-3 px-3 py-2 mt-2 border-t border-kleia-dark/10 pt-3">
-              <div className="h-8 w-8 rounded-full gradient-burgundy flex items-center justify-center text-white text-xs font-bold font-heading">
-                {mockUser.initials}
+            {loading ? null : user ? (
+              <div className="flex items-center gap-3 px-3 py-2 mt-2 border-t border-kleia-dark/10 pt-3">
+                <div className="h-8 w-8 rounded-full gradient-burgundy flex items-center justify-center text-white text-xs font-bold font-heading">
+                  {user.initials}
+                </div>
+                <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
               </div>
-              <span className="text-sm font-medium text-kleia-dark">{mockUser.name}</span>
-            </div>
+            ) : (
+              <div className="px-3 py-2 mt-2 border-t border-kleia-dark/10 pt-3">
+                <Link
+                  to="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="block w-full text-center py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+                >
+                  Connexion
+                </Link>
+              </div>
+            )}
           </nav>
         )}
       </div>

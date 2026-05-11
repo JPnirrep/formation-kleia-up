@@ -1,4 +1,5 @@
 from datetime import datetime
+import uuid
 
 from pydantic import BaseModel
 
@@ -16,8 +17,8 @@ class ModuleUpdate(BaseModel):
 
 
 class ModuleRead(BaseModel):
-    id: str
-    course_id: str
+    id: uuid.UUID
+    course_id: uuid.UUID
     title: str
     description: str | None = None
     order: int
@@ -45,8 +46,8 @@ class LessonUpdate(BaseModel):
 
 
 class LessonRead(BaseModel):
-    id: str
-    module_id: str
+    id: uuid.UUID
+    module_id: uuid.UUID
     title: str
     description: str | None = None
     order: int
@@ -80,7 +81,7 @@ class CourseUpdate(BaseModel):
 
 
 class CourseRead(BaseModel):
-    id: str
+    id: uuid.UUID
     title: str
     slug: str
     description: str | None = None
@@ -90,7 +91,7 @@ class CourseRead(BaseModel):
     level: str
     status: str
     category: str | None = None
-    created_by: str
+    created_by: uuid.UUID
     modules: list[ModuleRead] = []
     created_at: datetime
     updated_at: datetime
@@ -99,7 +100,7 @@ class CourseRead(BaseModel):
 
 
 class CourseList(BaseModel):
-    id: str
+    id: uuid.UUID
     title: str
     slug: str
     short_description: str | None = None

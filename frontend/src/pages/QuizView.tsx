@@ -1,18 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import Loading from '@/components/ui/Loading';
 import { mockQuiz } from '@/mock';
+import { getQuiz } from '@/api/quizzes';
+import type { Quiz } from '@/types';
+
+interface NormalizedQuestion {
+  text: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+}
+
+interface NormalizedQuiz {
+  id: string;
+  title: string;
+  passingScore: number;
+  questions: NormalizedQuestion[];
+}
+
+function normalizeQuiz(quiz: Quiz): NormalizedQuiz {
+  return {
+    id: quiz.id,
+    title: quiz.title,
+    passingScore: quiz.passing_score,
+    questions: quiz.questions.map((q) => {
+      const options = q.options.map((o) => o.text);
+      const correctIndex = q.options.findIndex((o) => o.is_correct);
+      return {
+        text: q.text,
+        options,
+        correctIndex: correctIndex >= 0 ? correctIndex : 0,
+        explanation: '',
+      };
+    }),
+  };
+}
 
 export default function QuizView() {
   const { quizId } = useParams<{ quizId: string }>();
+  const [apiQuiz, setApiQuiz] = useState<NormalizedQuiz | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  if (quizId !== mockQuiz.id) {
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchQuiz() {
+      try {
+        const raw = await getQuiz(quizId || '');
+        if (!cancelled) {
+          const normalized = normalizeQuiz(raw);
+          setApiQuiz(normalized);
+          setSelectedAnswers(new Array(normalized.questions.length).fill(undefined));
+        }
+      } catch {
+        /* fall back to mock */
+      }
+      if (!cancelled) setApiLoading(false);
+    }
+    fetchQuiz();
+    return () => { cancelled = true; };
+  }, [quizId]);
+
+  const quiz = apiQuiz || mockQuiz;
+
+  if (apiLoading) {
+    return <Loading className="py-20" text="Chargement du quiz..." />;
+  }
+
+  if (!quizId || (apiQuiz === null && quizId !== mockQuiz.id && !apiLoading)) {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Quiz introuvable</p>
@@ -23,7 +85,7 @@ export default function QuizView() {
     );
   }
 
-  const { title, questions, passingScore } = mockQuiz;
+  const { title, questions, passingScore } = quiz;
   const total = questions.length;
 
   const handleSelect = (index: number) => {
@@ -54,6 +116,8 @@ export default function QuizView() {
 
   const answeredCount = selectedAnswers.filter(a => a !== undefined).length;
   const allAnswered = answeredCount === total;
+
+  const currentQ = questions[currentQuestion];
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -102,73 +166,75 @@ export default function QuizView() {
         </div>
       )}
 
-      <Card key={currentQuestion}>
-        <div className="mb-2">
-          <span className="text-xs text-kleia-gray font-body">
-            Question {currentQuestion + 1} sur {total}
-          </span>
-        </div>
-        <h2 className="text-lg font-bold font-heading text-kleia-dark mb-4">
-          {questions[currentQuestion].text}
-        </h2>
-        <div className="space-y-3">
-          {questions[currentQuestion].options.map((option, optIndex) => {
-            const isSelected = selectedAnswers[currentQuestion] === optIndex;
-            const isCorrect = questions[currentQuestion].correctIndex === optIndex;
-            const showResult = submitted;
-
-            let optionStyle = '';
-            if (showResult) {
-              if (isCorrect) optionStyle = 'border-kleia-success bg-kleia-success/5';
-              else if (isSelected && !isCorrect) optionStyle = 'border-kleia-error bg-kleia-error/5';
-              else optionStyle = 'border-kleia-dark/10 opacity-60';
-            } else if (isSelected) {
-              optionStyle = 'border-kleia-burgundy bg-kleia-burgundy/5';
-            } else {
-              optionStyle = 'border-kleia-dark/10 hover:border-kleia-burgundy/50 hover:bg-kleia-burgundy/5';
-            }
-
-            return (
-              <button
-                key={optIndex}
-                onClick={() => handleSelect(optIndex)}
-                disabled={submitted}
-                className={clsx(
-                  'w-full text-left p-4 rounded-lg border-2 transition-all font-body',
-                  optionStyle,
-                )}
-                aria-pressed={isSelected}
-              >
-                <div className="flex items-start gap-3">
-                  <span className={clsx(
-                    'w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5',
-                    isSelected && !submitted && 'border-kleia-burgundy bg-kleia-burgundy text-white',
-                    showResult && isCorrect && 'border-kleia-success bg-kleia-success text-white',
-                    showResult && isSelected && !isCorrect && 'border-kleia-error bg-kleia-error text-white',
-                    !isSelected && 'border-kleia-dark/20 text-kleia-gray',
-                  )}>
-                    {showResult && isCorrect ? '✓' : showResult && isSelected && !isCorrect ? '✗' : String.fromCharCode(65 + optIndex)}
-                  </span>
-                  <span className={clsx(
-                    'text-sm flex-1 pt-0.5',
-                    showResult && isCorrect && 'text-kleia-success font-medium',
-                    showResult && isSelected && !isCorrect && 'text-kleia-error',
-                  )}>
-                    {option}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {submitted && (
-          <div className="mt-4 p-4 rounded-lg bg-kleia-cream border border-kleia-dark/10">
-            <p className="text-sm font-medium text-kleia-dark font-heading mb-1">Explication</p>
-            <p className="text-sm text-kleia-gray font-body">{questions[currentQuestion].explanation}</p>
+      {currentQ && (
+        <Card key={currentQuestion}>
+          <div className="mb-2">
+            <span className="text-xs text-kleia-gray font-body">
+              Question {currentQuestion + 1} sur {total}
+            </span>
           </div>
-        )}
-      </Card>
+          <h2 className="text-lg font-bold font-heading text-kleia-dark mb-4">
+            {currentQ.text}
+          </h2>
+          <div className="space-y-3">
+            {currentQ.options.map((option, optIndex) => {
+              const isSelected = selectedAnswers[currentQuestion] === optIndex;
+              const isCorrect = currentQ.correctIndex === optIndex;
+              const showResult = submitted;
+
+              let optionStyle = '';
+              if (showResult) {
+                if (isCorrect) optionStyle = 'border-kleia-success bg-kleia-success/5';
+                else if (isSelected && !isCorrect) optionStyle = 'border-kleia-error bg-kleia-error/5';
+                else optionStyle = 'border-kleia-dark/10 opacity-60';
+              } else if (isSelected) {
+                optionStyle = 'border-kleia-burgundy bg-kleia-burgundy/5';
+              } else {
+                optionStyle = 'border-kleia-dark/10 hover:border-kleia-burgundy/50 hover:bg-kleia-burgundy/5';
+              }
+
+              return (
+                <button
+                  key={optIndex}
+                  onClick={() => handleSelect(optIndex)}
+                  disabled={submitted}
+                  className={clsx(
+                    'w-full text-left p-4 rounded-lg border-2 transition-all font-body',
+                    optionStyle,
+                  )}
+                  aria-pressed={isSelected}
+                >
+                  <div className="flex items-start gap-3">
+                    <span className={clsx(
+                      'w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5',
+                      isSelected && !submitted && 'border-kleia-burgundy bg-kleia-burgundy text-white',
+                      showResult && isCorrect && 'border-kleia-success bg-kleia-success text-white',
+                      showResult && isSelected && !isCorrect && 'border-kleia-error bg-kleia-error text-white',
+                      !isSelected && 'border-kleia-dark/20 text-kleia-gray',
+                    )}>
+                      {showResult && isCorrect ? '✓' : showResult && isSelected && !isCorrect ? '✗' : String.fromCharCode(65 + optIndex)}
+                    </span>
+                    <span className={clsx(
+                      'text-sm flex-1 pt-0.5',
+                      showResult && isCorrect && 'text-kleia-success font-medium',
+                      showResult && isSelected && !isCorrect && 'text-kleia-error',
+                    )}>
+                      {option}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {submitted && currentQ.explanation && (
+            <div className="mt-4 p-4 rounded-lg bg-kleia-cream border border-kleia-dark/10">
+              <p className="text-sm font-medium text-kleia-dark font-heading mb-1">Explication</p>
+              <p className="text-sm text-kleia-gray font-body">{currentQ.explanation}</p>
+            </div>
+          )}
+        </Card>
+      )}
 
       <div className="flex items-center justify-between">
         <div className="flex gap-2">

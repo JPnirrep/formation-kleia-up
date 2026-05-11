@@ -1,17 +1,69 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
+import Loading from '@/components/ui/Loading';
 import PlayerShell from '@/components/player/PlayerShell';
 import { getLessonById, mockCourses } from '@/mock';
+import { getCourse } from '@/api/courses';
+import type { Lesson, CourseDetail } from '@/api/courses';
+
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${m}`;
+}
 
 export default function LessonView() {
   const { lessonId } = useParams<{ lessonId: string }>();
-  const lesson = getLessonById(lessonId || 'l1-1');
-  const [completed, setCompleted] = useState(lesson?.status === 'completed');
+  const [apiLesson, setApiLesson] = useState<Lesson | null>(null);
+  const [apiCourse, setApiCourse] = useState<CourseDetail | null>(null);
+  const [apiLoading, setApiLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchLesson() {
+      try {
+        const courses = await import('@/api/courses');
+        const allCourses = await courses.getCourses({ limit: 50 });
+        for (const course of allCourses.items) {
+          const detail = await courses.getCourse(course.slug);
+          for (const mod of detail.modules || []) {
+            for (const lesson of mod.lessons || []) {
+              if (lesson.id === lessonId && !cancelled) {
+                setApiLesson(lesson);
+                setApiCourse(detail);
+                setApiLoading(false);
+                return;
+              }
+            }
+          }
+        }
+      } catch {
+        /* fall back to mock */
+      }
+      if (!cancelled) setApiLoading(false);
+    }
+    fetchLesson();
+    return () => { cancelled = true; };
+  }, [lessonId]);
+
+  const mockLesson = getLessonById(lessonId || 'l1-1');
+  const lesson = apiLesson || mockLesson;
+  const [completed, setCompleted] = useState(lesson?.status === 'completed' || false);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+
+  useEffect(() => {
+    if (lesson) setCompleted(lesson.status === 'completed');
+  }, [lesson]);
+
+  if (apiLoading) {
+    return <Loading className="py-20" text="Chargement de la leçon..." />;
+  }
 
   if (!lesson) {
     return (
@@ -24,10 +76,18 @@ export default function LessonView() {
     );
   }
 
-  const allLessons = mockCourses.flatMap(c => c.modules.flatMap(m => m.lessons));
+  const allLessons = apiCourse
+    ? (apiCourse.modules || []).flatMap(m => m.lessons || [])
+    : mockCourses.flatMap(c => c.modules.flatMap(m => m.lessons));
   const currentIdx = allLessons.findIndex(l => l.id === lesson.id);
   const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
   const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
+
+  const lessonType = apiLesson
+    ? (apiLesson.lesson_type === 'video' ? 'video' : apiLesson.lesson_type === 'quiz' ? 'quiz' : 'certificate')
+    : (mockLesson?.type || 'video');
+
+  const duration = apiLesson ? formatDuration(apiLesson.duration_seconds) : (mockLesson?.duration || '');
 
   return (
     <div className="space-y-6">
@@ -55,9 +115,9 @@ export default function LessonView() {
               {lesson.title}
             </h1>
             <div className="flex items-center gap-3">
-              <Badge variant="warning">{lesson.duration}</Badge>
-              {lesson.type === 'quiz' && <Badge variant="warning">Quiz</Badge>}
-              {lesson.type === 'certificate' && <Badge variant="success">Certificat</Badge>}
+              <Badge variant="warning">{duration}</Badge>
+              {lessonType === 'quiz' && <Badge variant="warning">Quiz</Badge>}
+              {lessonType === 'certificate' && <Badge variant="success">Certificat</Badge>}
               {completed && <Badge variant="success">Terminé ✓</Badge>}
             </div>
           </div>
@@ -137,7 +197,7 @@ export default function LessonView() {
                 </Link>
               )}
             </div>
-            {lesson.quizId && (
+            {'quizId' in lesson && lesson.quizId && (
               <Link to={`/quiz/${lesson.quizId}`} className="block mt-3">
                 <Button variant="secondary" size="sm" className="w-full">Passer le quiz</Button>
               </Link>
@@ -147,8 +207,8 @@ export default function LessonView() {
           <Card>
             <h3 className="font-heading font-bold text-kleia-dark mb-2">À propos de cette leçon</h3>
             <div className="space-y-2 text-sm text-kleia-gray font-body">
-              <p>Type : {lesson.type === 'video' ? 'Vidéo' : lesson.type === 'quiz' ? 'Quiz' : 'Certificat'}</p>
-              <p>Durée : {lesson.duration}</p>
+              <p>Type : {lessonType === 'video' ? 'Vidéo' : lessonType === 'quiz' ? 'Quiz' : 'Certificat'}</p>
+              <p>Durée : {duration}</p>
               <p>Statut : {completed ? 'Terminé' : lesson.status === 'in_progress' ? 'En cours' : 'Pas commencé'}</p>
             </div>
           </Card>

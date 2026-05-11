@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
+import uuid
 
 
 class EnrollmentCreate(BaseModel):
@@ -11,11 +12,11 @@ class EnrollmentCreate(BaseModel):
 
 
 class EnrollmentRead(BaseModel):
-    id: str
-    user_id: str
-    course_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
+    course_id: uuid.UUID
     status: str
-    granted_by: str | None = None
+    granted_by: uuid.UUID | None = None
     granted_at: datetime
     completed_at: datetime | None = None
     expires_at: datetime | None = None

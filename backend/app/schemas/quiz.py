@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
+import uuid
 
 
 class QuizCreate(BaseModel):
@@ -26,8 +27,8 @@ class QuestionCreate(BaseModel):
 
 
 class QuestionRead(BaseModel):
-    id: str
-    quiz_id: str
+    id: uuid.UUID
+    quiz_id: uuid.UUID
     text: str
     order: int
     question_type: str
@@ -39,8 +40,8 @@ class QuestionRead(BaseModel):
 
 
 class QuizRead(BaseModel):
-    id: str
-    lesson_id: str
+    id: uuid.UUID
+    lesson_id: uuid.UUID
     title: str
     passing_score_percent: int
     max_attempts: int | None = None
@@ -57,9 +58,9 @@ class AttemptCreate(BaseModel):
 
 
 class AttemptRead(BaseModel):
-    id: str
-    user_id: str
-    quiz_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
+    quiz_id: uuid.UUID
     score_percent: float
     answers: list
     started_at: datetime

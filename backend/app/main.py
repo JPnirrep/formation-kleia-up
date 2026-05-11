@@ -1,10 +1,28 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
+
+
+class ForceCorsMiddleware(BaseHTTPMiddleware):
+    """Middleware qui garantit les headers CORS sur TOUTES les reponses, meme les erreurs."""
+
+    async def dispatch(self, request: Request, call_next):
+        if request.method == "OPTIONS":
+            response = Response(status_code=200)
+        else:
+            response = await call_next(request)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        response.headers["Access-Control-Allow-Methods"] = (
+            "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        )
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        return response
 
 
 def create_app() -> FastAPI:
@@ -16,12 +34,13 @@ def create_app() -> FastAPI:
         openapi_url="/api/openapi.json",
     )
 
+    # Middleware CORS forcé en premier (le plus externe)
+    app.add_middleware(ForceCorsMiddleware)
+
+    # Double couche : CORSMiddleware standard pour les réponses normales
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "http://localhost:5173",
-            "https://formation.kleia-up.fr",
-        ],
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -67,7 +86,7 @@ def create_app() -> FastAPI:
         return {
             "status": "ok",
             "version": settings.VERSION,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
     # Import et enregistrement des routers

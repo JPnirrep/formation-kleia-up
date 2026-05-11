@@ -28,7 +28,12 @@ class User(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
     courses = relationship("Course", back_populates="creator", lazy="selectin")
-    enrollments = relationship("Enrollment", back_populates="user", lazy="selectin")
+    enrollments = relationship(
+        "Enrollment",
+        back_populates="user",
+        lazy="selectin",
+        foreign_keys="Enrollment.user_id",
+    )
     lesson_progress = relationship(
         "LessonProgress", back_populates="user", lazy="selectin"
     )

@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel, EmailStr
+import uuid
 
 
 class UserCreate(BaseModel):
@@ -20,7 +21,7 @@ class UserUpdate(BaseModel):
 
 
 class UserRead(BaseModel):
-    id: str
+    id: uuid.UUID
     email: str
     display_name: str
     avatar_url: str | None = None

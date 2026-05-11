@@ -35,5 +35,10 @@ class Enrollment(Base, TimestampMixin):
         DateTime(timezone=True), nullable=True
     )
 
-    user = relationship("User", back_populates="enrollments", lazy="selectin")
+    user = relationship(
+        "User",
+        back_populates="enrollments",
+        lazy="selectin",
+        foreign_keys="Enrollment.user_id",
+    )
     course = relationship("Course", back_populates="enrollments", lazy="selectin")

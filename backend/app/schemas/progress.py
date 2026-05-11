@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from pydantic import BaseModel
+import uuid
 
 
 class LessonProgressUpdate(BaseModel):
@@ -9,9 +10,9 @@ class LessonProgressUpdate(BaseModel):
 
 
 class LessonProgressRead(BaseModel):
-    id: str
-    user_id: str
-    lesson_id: str
+    id: uuid.UUID
+    user_id: uuid.UUID
+    lesson_id: uuid.UUID
     status: str
     completed_at: datetime | None = None
     created_at: datetime

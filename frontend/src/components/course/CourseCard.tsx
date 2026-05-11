@@ -3,10 +3,19 @@ import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
-import type { MockCourse } from '@/mock';
+interface CardCourse {
+  slug: string;
+  title: string;
+  level: string;
+  shortDescription: string;
+  duration: string;
+  progress: number;
+  lessonCount: number;
+  thumbnailColor: string;
+}
 
 interface CourseCardProps {
-  course: MockCourse;
+  course: CardCourse;
   variant?: 'default' | 'compact';
 }
 

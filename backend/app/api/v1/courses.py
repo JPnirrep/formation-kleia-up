@@ -1,4 +1,5 @@
 from uuid import UUID
+import math
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -40,8 +41,9 @@ async def list_courses(
     return PaginatedResponse(
         items=[CourseRead.model_validate(c) for c in courses],
         total=total,
-        skip=skip,
-        limit=limit,
+        page=1,
+        page_size=limit,
+        total_pages=1,
     )
 
 

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr
+import uuid
 
 
 class LoginRequest(BaseModel):
@@ -10,7 +11,8 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
-    expires_in: int
+    expires_in: int | None = None
+    user: UserProfile | None = None
 
 
 class GoogleAuthRequest(BaseModel):
@@ -18,7 +20,7 @@ class GoogleAuthRequest(BaseModel):
 
 
 class UserProfile(BaseModel):
-    id: str
+    id: uuid.UUID
     email: str
     display_name: str
     avatar_url: str | None = None

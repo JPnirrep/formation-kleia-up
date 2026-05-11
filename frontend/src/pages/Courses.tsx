@@ -2,7 +2,10 @@ import { useState } from 'react';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import CourseCard from '@/components/course/CourseCard';
-import { mockCourses } from '@/mock';
+import Loading from '@/components/ui/Loading';
+import { useApi } from '@/hooks/useApi';
+import { getCourses } from '@/api/courses';
+import type { Course } from '@/api/courses';
 
 type FilterTab = 'all' | 'in_progress' | 'completed';
 
@@ -12,12 +15,59 @@ const tabs: { key: FilterTab; label: string }[] = [
   { key: 'completed', label: 'Terminées' },
 ];
 
+const gradients = [
+  'from-[#7C3AED] to-[#A78BFA]',
+  'from-[#EC4899] to-[#F472B6]',
+  'from-[#F59E0B] to-[#FBBF24]',
+  'from-[#10B981] to-[#34D399]',
+];
+
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${m}`;
+}
+
+function toCardCourse(c: Course, index: number) {
+  const progress = c.progress || 0;
+  return {
+    slug: c.slug,
+    title: c.title,
+    level: c.level,
+    shortDescription: c.short_description,
+    duration: formatDuration(c.duration_seconds),
+    progress,
+    lessonCount: c.lessons,
+    thumbnailColor: gradients[index % gradients.length],
+  };
+}
+
 export default function Courses() {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
+  const { data, loading, error } = useApi(() => getCourses({ limit: 50 }), []);
 
-  const filtered = mockCourses.filter((c) => {
-    if (activeTab === 'in_progress') return c.progress > 0 && c.progress < 100;
-    if (activeTab === 'completed') return c.progress === 100;
+  if (loading) {
+    return <Loading className="py-20" text="Chargement des formations..." />;
+  }
+
+  if (error) {
+    return (
+      <Card className="text-center py-12">
+        <p className="text-kleia-gray font-body text-lg">
+          Impossible de charger les formations. Veuillez réessayer plus tard.
+        </p>
+      </Card>
+    );
+  }
+
+  const courses = data?.items || [];
+
+  const filtered = courses.filter((c) => {
+    const progress = c.progress || 0;
+    if (activeTab === 'in_progress') return progress > 0 && progress < 100;
+    if (activeTab === 'completed') return progress === 100;
     return true;
   });
 
@@ -28,7 +78,7 @@ export default function Courses() {
           Mes formations
         </h1>
         <p className="text-kleia-gray font-body mt-1">
-          {mockCourses.length} formations disponibles
+          {courses.length} formations disponibles
         </p>
       </div>
 
@@ -52,8 +102,8 @@ export default function Courses() {
 
       {filtered.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6">
-          {filtered.map((course) => (
-            <CourseCard key={course.id} course={course} />
+          {filtered.map((course, idx) => (
+            <CourseCard key={course.id} course={toCardCourse(course, idx)} />
           ))}
         </div>
       ) : (

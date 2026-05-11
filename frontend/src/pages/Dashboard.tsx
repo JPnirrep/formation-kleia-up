@@ -1,7 +1,16 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import CourseCard from '@/components/course/CourseCard';
-import { mockUser, mockCourses, mockActivities, getStartedCourses, getCompletedCourses, getCourseBySlug } from '@/mock';
+import Loading from '@/components/ui/Loading';
+import { mockUser, mockCourses, mockActivities, getStartedCourses, getCompletedCourses } from '@/mock';
+import { useApi } from '@/hooks/useApi';
+import { getMyEnrollments } from '@/api/enrollments';
+import { getCourses, getCourse } from '@/api/courses';
+import { isAuthenticated } from '@/api/client';
+import type { Enrollment } from '@/api/enrollments';
+import type { Course } from '@/api/courses';
 
 const activityColors: Record<string, string> = {
   completed: 'bg-kleia-success',
@@ -17,16 +26,74 @@ const activityIcons: Record<string, string> = {
   quiz: '\u2699',
 };
 
+const gradients = [
+  'from-[#7C3AED] to-[#A78BFA]',
+  'from-[#EC4899] to-[#F472B6]',
+  'from-[#F59E0B] to-[#FBBF24]',
+  'from-[#10B981] to-[#34D399]',
+];
+
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h}h`;
+  return `${h}h${m}`;
+}
+
+function toCardCourse(c: Course, index: number) {
+  const progress = c.progress || 0;
+  return {
+    slug: c.slug,
+    title: c.title,
+    level: c.level,
+    shortDescription: c.short_description,
+    duration: formatDuration(c.duration_seconds),
+    progress,
+    lessonCount: c.lessons,
+    thumbnailColor: gradients[index % gradients.length],
+  };
+}
+
 export default function Dashboard() {
-  const startedCourses = getStartedCourses().slice(0, 3);
-  const completedCount = getCompletedCourses().length;
-  const totalHours = mockCourses.reduce((acc, c) => {
+  const isAuth = isAuthenticated();
+  const { data: enrollments } = useApi(() => getMyEnrollments(), [isAuth]);
+  const { data: allCourses } = useApi(() => getCourses({ limit: 50 }), []);
+  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
+  const [loadingCourses, setLoadingCourses] = useState(false);
+
+  const mockStarted = getStartedCourses().slice(0, 3);
+  const mockCompletedCount = getCompletedCourses().length;
+  const mockTotalHours = mockCourses.reduce((acc, c) => {
     const h = parseInt(c.duration);
     return acc + (isNaN(h) ? 0 : h);
   }, 0);
 
+  useEffect(() => {
+    if (enrollments && enrollments.length > 0 && allCourses) {
+      setLoadingCourses(true);
+      const courseMap = new Map(allCourses.items.map(c => [c.id, c]));
+      const enrolled: Course[] = [];
+      for (const e of enrollments) {
+        const c = courseMap.get(e.course_id);
+        if (c) enrolled.push(c);
+      }
+      setEnrolledCourses(enrolled);
+      setLoadingCourses(false);
+    }
+  }, [enrollments, allCourses]);
+
+  const displayCourses = isAuth && enrolledCourses.length > 0 ? enrolledCourses : mockStarted;
+  const inProgress = displayCourses.filter(c => (c.progress || 0) > 0 && (c.progress || 0) < 100);
+  const completedCount = isAuth
+    ? displayCourses.filter(c => (c.progress || 0) >= 100).length
+    : mockCompletedCount;
+  const totalHours = isAuth
+    ? Math.round(displayCourses.reduce((acc, c) => acc + c.duration_seconds, 0) / 3600)
+    : mockTotalHours;
+
   const stats = [
-    { label: 'Formations en cours', value: startedCourses.length.toString(), icon: '\uD83D\uDCDA', color: 'from-kleia-burgundy to-purple-700' },
+    { label: 'Formations en cours', value: inProgress.length.toString(), icon: '\uD83D\uDCDA', color: 'from-kleia-burgundy to-purple-700' },
     { label: 'Terminées', value: completedCount.toString(), icon: '\u2714\uFE0F', color: 'from-kleia-success to-emerald-600' },
     { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: '\uD83D\uDD52', color: 'from-kleia-gold to-amber-600' },
     { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: '\uD83C\uDFC6', color: 'from-blue-600 to-indigo-700' },
@@ -71,13 +138,15 @@ export default function Dashboard() {
           <h2 className="text-xl font-bold font-heading text-kleia-dark">
             Mes formations en cours
           </h2>
-          <Badge variant="info">{startedCourses.length}</Badge>
+          <Badge variant="info">{inProgress.length}</Badge>
         </div>
-        {startedCourses.length > 0 ? (
+        {loadingCourses ? (
+          <Loading className="py-8" size="sm" text="Chargement..." />
+        ) : inProgress.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
-            {startedCourses.map((course) => (
-              <div key={course.id} className="min-w-[260px] max-w-[280px] flex-shrink-0">
-                <CourseCard course={course} variant="compact" />
+            {inProgress.map((course, idx) => (
+              <div key={course.slug} className="min-w-[260px] max-w-[280px] flex-shrink-0">
+                <CourseCard course={toCardCourse(course, idx)} variant="compact" />
               </div>
             ))}
           </div>
