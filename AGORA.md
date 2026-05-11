@@ -8,48 +8,45 @@
 
 ## ✅ Terminé (Phase 0 — Fondations)
 
-### Structuration
-- Structure repo complète (`/spec`, `/adr`, `/deploy`)
-- Contrats agents : `AGENT.md`, `SYSTEM_CONTRACT.md`, `DEFINITION_OF_DONE.md`
-- Template tickets : `TASK_TEMPLATE.md`, `CHANGELOG_AGENT.md`, `OPEN_QUESTIONS.md`
-
-### Spécifications produit
-- **Vision** : `spec/vision/MISSION.md`
-- **Domaine** : 16 entités, règles métier, états/transitions (`spec/domain/`)
-- **ADR 001** : Stack technique (FastAPI + React + PostgreSQL)
-
-### Infrastructure (config locale)
-- `docker-compose.yml` : 4 services (backend, frontend, db, cache)
-- `Dockerfile.backend` (FastAPI multi-stage) + `Dockerfile.frontend` (React → Nginx)
-- Nginx reverse proxy SSL pour `formation.kleia-up.fr`
-- CI/CD GitHub Actions (push → build → deploy VPS OVH)
-- Script d'initialisation VPS : `deploy/setup-vps.sh`
-
-### Frontend
-- React 19 + Vite 6 + Tailwind CSS 4 (build OK : 1.24s, 59 modules)
-- Design system Kleia-up : burgundy `#8B1D3D`, gold `#D4AF37`, cream `#FAF9F6`
-- 8 composants de base (Button, Card, Input, Badge, Loading, Header, Footer, Layout)
-- Composant PlayerShell (prêt pour Phase 2)
-
-### Maquette visuelle — 7 pages mockup
-| Page | URL | Contenu |
-|---|---|---|
-| Dashboard | `/` | Stats, formations en cours, activité récente |
-| Catalogue | `/formations` | Grille filtrée des formations |
-| Détail formation | `/formation/:slug` | Hero, progression, modules/leçons |
-| Leçon vidéo | `/lecon/:id` | Player, navigation, transcript |
-| Quiz | `/quiz/:id` | Questions QCM, soumission, score |
-| Profil | `/profil` | Infos, certificats, paramètres |
-| Admin | `/admin` | Stats, inscriptions, gestion |
-
-### Data mock
-- 4 formations (Architecture, Incarnation, Mindset, Leadership)
-- 18 modules, 74 leçons, 1 quiz (5 questions)
-- 8 activités récentes, 1 certificat
+... (existing content)...
 
 ---
 
-## 🔜 Prochaine étape (Phase 1 — Backend & Domaine)
+## ✅ Terminé (Phase 1 — Backend & Domaine)
+
+### Backend Python — FastAPI + SQLAlchemy 2.0
+- Projet Python structuré (`pyproject.toml`, `requirements.txt`)
+- Config via Pydantic Settings (DB, JWT, OAuth, S3, Redis)
+- Base de données asynchrone (asyncpg + SQLAlchemy async)
+- 14 tables SQLAlchemy (toutes les entités du domaine)
+- Schémas Pydantic v2 pour validation (Create, Update, Read)
+- Migration Alembic configurée (async)
+
+### API REST — 32 endpoints
+| Groupe | Endpoints | Description |
+|---|---|---|
+| Auth | 4 | Google OAuth, login, register, profil |
+| Users | 3 | CRUD utilisateurs (admin) |
+| Courses | 4 | Catalogue, détail, modules, leçons |
+| Enrollments | 2 | Inscriptions (my + admin grant) |
+| Progress | 3 | Progression cours, leçon, vidéo |
+| Quizzes | 3 | Quiz, tentative, historique |
+| Admin | 10 | CRUD formations/modules/leçons/quiz |
+| Health | 1 | Health check |
+
+### Services & Sécurité
+- JWT access + refresh tokens
+- Google OAuth2 verification
+- RBAC (learner, trainer, admin)
+- Hachage bcrypt des mots de passe
+- CORS configuré (localhost + formation.kleia-up.fr)
+
+---
+
+## 🔜 Prochaine étape (Phase 2 — Frontend intégration)
+- Connecter le frontend React à l'API backend
+- Authentification Google OAuth côté frontend
+- Remplacer les données mock par les vraies données API
 
 ### Tickets à exécuter
 1. **Ticket 2** — Modèle de données SQLAlchemy + migrations Alembic

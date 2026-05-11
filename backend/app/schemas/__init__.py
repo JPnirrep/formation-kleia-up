@@ -1,0 +1,86 @@
+from app.schemas.common import MessageResponse, PaginatedResponse
+from app.schemas.auth import (
+    GoogleAuthRequest,
+    LoginRequest,
+    TokenResponse,
+    UserProfile,
+)
+from app.schemas.user import UserCreate, UserRead, UserUpdate
+from app.schemas.course import (
+    CourseCreate,
+    CourseList,
+    CourseRead,
+    CourseUpdate,
+    LessonCreate,
+    LessonRead,
+    LessonUpdate,
+    ModuleCreate,
+    ModuleRead,
+    ModuleUpdate,
+)
+from app.schemas.video import (
+    VideoAssetCreate,
+    VideoAssetRead,
+    VideoAssetStatus,
+    VideoAssetUpdate,
+    VideoEventCreate,
+    VideoProgressRead,
+    VideoProgressUpdate,
+    VideoTrackCreate,
+    VideoTrackRead,
+)
+from app.schemas.quiz import (
+    AttemptCreate,
+    AttemptRead,
+    QuestionCreate,
+    QuestionRead,
+    QuizCreate,
+    QuizRead,
+    QuizUpdate,
+)
+from app.schemas.enrollment import EnrollmentCreate, EnrollmentRead
+from app.schemas.progress import LessonProgressRead, LessonProgressUpdate
+from app.schemas.certificate import CertificateRead
+
+__all__ = [
+    "MessageResponse",
+    "PaginatedResponse",
+    "LoginRequest",
+    "GoogleAuthRequest",
+    "TokenResponse",
+    "UserProfile",
+    "UserCreate",
+    "UserUpdate",
+    "UserRead",
+    "CourseCreate",
+    "CourseUpdate",
+    "CourseRead",
+    "CourseList",
+    "ModuleCreate",
+    "ModuleUpdate",
+    "ModuleRead",
+    "LessonCreate",
+    "LessonUpdate",
+    "LessonRead",
+    "VideoAssetCreate",
+    "VideoAssetUpdate",
+    "VideoAssetRead",
+    "VideoAssetStatus",
+    "VideoTrackCreate",
+    "VideoTrackRead",
+    "VideoProgressUpdate",
+    "VideoProgressRead",
+    "VideoEventCreate",
+    "QuizCreate",
+    "QuizUpdate",
+    "QuizRead",
+    "QuestionCreate",
+    "QuestionRead",
+    "AttemptCreate",
+    "AttemptRead",
+    "EnrollmentCreate",
+    "EnrollmentRead",
+    "LessonProgressRead",
+    "LessonProgressUpdate",
+    "CertificateRead",
+]
