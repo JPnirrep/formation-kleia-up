@@ -74,6 +74,12 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
     """
     Inscription par email/mot de passe (pour les tests, pas l'auth principale).
     """
+    if not data.password or len(data.password) < 6:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Le mot de passe doit contenir au moins 6 caractères.",
+        )
+
     stmt = select(User).where(User.email == data.email)
     result = await db.execute(stmt)
     if result.scalar_one_or_none() is not None:

@@ -6,7 +6,7 @@ export async function getQuiz(quizId: string): Promise<Quiz> {
 }
 
 export async function submitAttempt(quizId: string, data: AttemptSubmit): Promise<AttemptResult> {
-  return api.request<AttemptResult>(`/quizzes/${quizId}/attempts`, {
+  return api.request<AttemptResult>(`/quizzes/${quizId}/attempt`, {
     method: 'POST',
     body: JSON.stringify(data),
   });

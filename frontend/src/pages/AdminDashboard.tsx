@@ -16,7 +16,7 @@ const statusLabel = { active: 'Actif', pending: 'En attente', completed: 'Termin
 
 export default function AdminDashboard() {
   const totalUsers = 42;
-  const totalEnrollments = mockCourses.reduce((acc, c) => acc + c.lessonCount, 0);
+  const totalEnrollments = mockCourses.reduce((acc, c) => acc + c.lessons, 0);
   const revenue = '12 450 €';
 
   const stats = [

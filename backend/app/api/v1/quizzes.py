@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -109,6 +110,7 @@ async def submit_attempt(
         quiz_id=quiz_id,
         score_percent=score_percent,
         answers=graded_answers,
+        completed_at=datetime.now(timezone.utc),
     )
     db.add(attempt)
     await db.commit()
@@ -138,7 +140,7 @@ async def get_attempts(
             Attempt.quiz_id == quiz_id,
             Attempt.user_id == current_user.id,
         )
-        .order_by(Attempt.completed_at.desc().nullslast(), Attempt.started_at.desc())
+        .order_by(Attempt.started_at.desc())
     )
     result = await db.execute(stmt)
     attempts = result.scalars().all()

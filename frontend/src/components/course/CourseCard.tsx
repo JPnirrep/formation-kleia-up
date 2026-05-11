@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
 interface CardCourse {
   slug: string;
   title: string;
@@ -83,13 +82,16 @@ export default function CourseCard({ course, variant = 'default' }: CourseCardPr
                 <span className="text-kleia-dark/20">|</span>
                 <span>{course.lessonCount} leçons</span>
               </div>
-              <Button
-                variant={course.progress > 0 ? 'secondary' : 'primary'}
-                size="sm"
-                onClick={(e) => { e.preventDefault(); window.location.href = `/formation/${course.slug}`; }}
+              <span
+                className={clsx(
+                  'inline-flex items-center justify-center rounded-kleia font-heading font-semibold text-sm transition-all px-3 py-1.5',
+                  course.progress > 0
+                    ? 'bg-kleia-cream text-kleia-burgundy border border-kleia-burgundy/20 hover:bg-kleia-burgundy/10'
+                    : 'gradient-burgundy text-white hover:opacity-90',
+                )}
               >
                 {course.progress > 0 ? 'Continuer' : 'Commencer'}
-              </Button>
+              </span>
             </div>
           )}
         </div>

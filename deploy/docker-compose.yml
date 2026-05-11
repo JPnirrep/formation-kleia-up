@@ -11,8 +11,8 @@ services:
       dockerfile: deploy/Dockerfile.backend
     container_name: kleia-backend
     restart: unless-stopped
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     env_file:
       - .env
     depends_on:
@@ -29,12 +29,25 @@ services:
       dockerfile: deploy/Dockerfile.frontend
     container_name: kleia-frontend
     restart: unless-stopped
-    ports:
-      - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - backend
     networks:
       - kleia-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/formation.kleia-up.fr.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/ssl:/etc/letsencrypt:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
 
   db:
     image: postgres:15-alpine

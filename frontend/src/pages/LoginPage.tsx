@@ -5,8 +5,8 @@ import { useAuth } from '@/context/AuthContext';
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, error, loading, user } = useAuth();
-  const [email, setEmail] = useState('clara.f@example.com');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {

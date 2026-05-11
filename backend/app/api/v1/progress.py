@@ -122,16 +122,16 @@ async def update_video_progress(
         video_progress = VideoProgress(
             user_id=current_user.id,
             video_asset_id=video_id,
-            last_position_seconds=data.position_seconds,
-            max_position_seconds=data.position_seconds,
+            last_position_seconds=data.last_position_seconds,
+            max_position_seconds=data.max_position_seconds,
             percent_watched=data.percent_watched,
             completed=data.completed,
         )
         db.add(video_progress)
     else:
-        video_progress.last_position_seconds = data.position_seconds
-        if data.position_seconds > (video_progress.max_position_seconds or 0):
-            video_progress.max_position_seconds = data.position_seconds
+        video_progress.last_position_seconds = data.last_position_seconds
+        if data.last_position_seconds > (video_progress.max_position_seconds or 0):
+            video_progress.max_position_seconds = data.last_position_seconds
         video_progress.percent_watched = data.percent_watched
         video_progress.completed = data.completed
         if data.completed:

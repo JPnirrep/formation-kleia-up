@@ -7,7 +7,7 @@ import uuid
 class UserCreate(BaseModel):
     email: EmailStr
     display_name: str
-    password: str | None = None
+    password: str
     auth_provider: str = "email"
     auth_sub: str | None = None
     avatar_url: str | None = None

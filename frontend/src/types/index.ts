@@ -49,7 +49,7 @@ export interface Quiz {
 export interface Question {
   id: string;
   text: string;
-  type: 'single' | 'multiple' | 'text';
+  type: 'mcq' | 'true_false';
   options: QuestionOption[];
   points: number;
 }
@@ -66,7 +66,7 @@ export interface AttemptSubmit {
 
 export interface Answer {
   question_id: string;
-  selected_option_ids: string[];
+  selected_option: string | null;
   text_answer?: string;
 }
 
@@ -136,6 +136,6 @@ export interface LessonCreate {
 }
 
 export interface EnrollmentGrant {
-  user_email: string;
+  user_id: string;
   course_id: string;
 }

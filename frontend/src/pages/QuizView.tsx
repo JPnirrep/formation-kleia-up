@@ -212,7 +212,7 @@ export default function QuizView() {
                       showResult && isSelected && !isCorrect && 'border-kleia-error bg-kleia-error text-white',
                       !isSelected && 'border-kleia-dark/20 text-kleia-gray',
                     )}>
-                      {showResult && isCorrect ? '✓' : showResult && isSelected && !isCorrect ? '✗' : String.fromCharCode(65 + optIndex)}
+                      {showResult && isCorrect ? '✓' : showResult && isSelected && !isCorrect ? '✗' : ['A','B','C','D','E','F'][optIndex] ?? String(optIndex + 1)}
                     </span>
                     <span className={clsx(
                       'text-sm flex-1 pt-0.5',

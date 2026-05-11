@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -5,6 +6,7 @@ import Button from '@/components/ui/Button';
 import { mockUser, mockCertificates, mockCourses, getCompletedCourses } from '@/mock';
 
 export default function Profile() {
+  const [notifications, setNotifications] = useState({ email: true, progress: true });
   const completedCourses = getCompletedCourses();
   const startedCourses = mockCourses.filter(c => c.progress > 0 && c.progress < 100);
   const totalHours = mockCourses.reduce((acc, c) => {
@@ -34,7 +36,7 @@ export default function Profile() {
                 {mockUser.role === 'admin' ? 'Administrateur' : 'Apprenant'}
               </Badge>
               <span className="text-xs text-kleia-gray font-body">
-                Membre depuis {mockUser.memberSince}
+                Membre depuis {new Date(mockUser.joinedAt).toLocaleDateString('fr-FR')}
               </span>
             </div>
           </div>
@@ -94,17 +96,18 @@ export default function Profile() {
               <div
                 className={clsx(
                   'w-12 h-6 rounded-full p-0.5 cursor-pointer transition-colors',
-                  mockUser.notifications ? 'gradient-burgundy' : 'bg-kleia-dark/20',
+                  notifications.email ? 'gradient-burgundy' : 'bg-kleia-dark/20',
                 )}
                 role="switch"
-                aria-checked={mockUser.notifications}
+                aria-checked={notifications.email}
                 aria-label="Notifications par email"
                 tabIndex={0}
+                onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
               >
                 <div
                   className={clsx(
                     'w-5 h-5 rounded-full bg-white shadow-sm transition-transform',
-                    mockUser.notifications && 'translate-x-6',
+                    notifications.email && 'translate-x-6',
                   )}
                 />
               </div>

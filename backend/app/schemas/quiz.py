@@ -52,9 +52,14 @@ class QuizRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class AnswerSubmit(BaseModel):
+    question_id: uuid.UUID
+    selected_option: str | None = None
+
+
 class AttemptCreate(BaseModel):
     quiz_id: str
-    answers: list
+    answers: list[AnswerSubmit]
 
 
 class AttemptRead(BaseModel):

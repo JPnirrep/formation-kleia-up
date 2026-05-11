@@ -9,6 +9,7 @@ import QuizView from '@/pages/QuizView';
 import Profile from '@/pages/Profile';
 import AdminDashboard from '@/pages/AdminDashboard';
 import LoginPage from '@/pages/LoginPage';
+import NotFound from '@/pages/NotFound';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
             <Route path="/quiz/:quizId" element={<QuizView />} />
             <Route path="/profil" element={<Profile />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BrowserRouter>
