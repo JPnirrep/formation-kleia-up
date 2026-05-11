@@ -1,0 +1,77 @@
+# docker-compose.yml
+# Configuration de déploiement pour la plateforme e-learning Kleia-up
+# Utilisation: docker-compose -f deploy/docker-compose.yml up -d
+
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.backend
+    container_name: kleia-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    networks:
+      - kleia-network
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.frontend
+    container_name: kleia-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - kleia-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: kleia-db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kleia-network
+
+  cache:
+    image: redis:7-alpine
+    container_name: kleia-cache
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - kleia-network
+
+volumes:
+  postgres_data:
+    name: kleia_postgres_data
+  redis_data:
+    name: kleia_redis_data
+
+networks:
+  kleia-network:
+    name: kleia-network
+    driver: bridge

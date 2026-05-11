@@ -1,0 +1,53 @@
+# Dockerfile.backend
+# Dockerfile multi-stage pour le backend FastAPI de Kleia-up
+
+# ============================================================
+# ÉTAPE 1 : Installation des dépendances
+# ============================================================
+FROM python:3.12-slim AS builder
+
+# Variables d'environnement pour Python
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+# Installation des dépendances système nécessaires
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Création du répertoire de l'application
+WORKDIR /app
+
+# Copie des fichiers de dépendances
+COPY backend/requirements.txt .
+RUN pip install --user --no-warn-script-location -r requirements.txt
+
+# ============================================================
+# ÉTAPE 2 : Image finale légère
+# ============================================================
+FROM python:3.12-slim AS runner
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/root/.local/bin:$PATH"
+
+# Installation des dépendances système d'exécution uniquement
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copie des dépendances depuis l'étape builder
+COPY --from=builder /root/.local /root/.local
+
+# Copie du code de l'application
+COPY backend/ .
+
+# Exposition du port
+EXPOSE 8000
+
+# Commande de démarrage avec Uvicorn
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--proxy-headers", "--forwarded-allow-ips", "*"]

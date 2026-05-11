@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import url('https://api.fontshare.com/v2/css?f[]=ranade@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
+
+@theme {
+  --color-kleia-burgundy: #8B1D3D;
+  --color-kleia-burgundy-light: #A8234D;
+  --color-kleia-gold: #D4AF37;
+  --color-kleia-gold-light: #E0C45A;
+  --color-kleia-cream: #FAF9F6;
+  --color-kleia-dark: #1A1A2E;
+  --color-kleia-gray: #6B7280;
+  --color-kleia-success: #059669;
+  --color-kleia-error: #DC2626;
+  --font-heading: 'Syne', sans-serif;
+  --font-body: 'Ranade', sans-serif;
+  --radius-kleia: 12px;
+  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@layer base {
+  body {
+    @apply font-body text-kleia-dark bg-kleia-cream antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/10 backdrop-blur-[12px] border border-white/20 rounded-kleia shadow-glass;
+  }
+  .glass-dark {
+    @apply bg-kleia-dark/5 backdrop-blur-[12px] border border-kleia-dark/10 rounded-kleia shadow-glass;
+  }
+  .gradient-burgundy {
+    @apply bg-gradient-to-r from-kleia-burgundy to-kleia-burgundy-light;
+  }
+  .gradient-gold {
+    @apply bg-gradient-to-r from-kleia-gold to-kleia-gold-light;
+  }
+}
