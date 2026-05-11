@@ -5,7 +5,7 @@ import uuid
 
 
 class VideoAssetCreate(BaseModel):
-    lesson_id: str
+    lesson_id: uuid.UUID
     title: str
     description: str | None = None
     order: int = 0
@@ -46,7 +46,7 @@ class VideoAssetRead(BaseModel):
 
 
 class VideoTrackCreate(BaseModel):
-    video_asset_id: str
+    video_asset_id: uuid.UUID
     kind: str
     language: str
     label: str
@@ -94,7 +94,7 @@ class VideoProgressRead(BaseModel):
 
 
 class VideoEventCreate(BaseModel):
-    video_asset_id: str
+    video_asset_id: uuid.UUID
     session_id: str
     event_type: str
     position_seconds: float

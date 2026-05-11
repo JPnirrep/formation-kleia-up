@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { api } from '../api';
-import { loginWithEmail, loginWithGoogle as googleLogin, logout as apiLogout } from '../api/auth';
-import { isAuthenticated } from '../api/client';
-import type { UserProfile } from '../types';
+import { api } from '@/api';
+import { loginWithEmail, loginWithGoogle as googleLogin, logout as apiLogout } from '@/api/auth';
+import { isAuthenticated } from '@/api/client';
+import type { UserProfile } from '@/types';
 
 interface AuthState {
   user: UserProfile | null;

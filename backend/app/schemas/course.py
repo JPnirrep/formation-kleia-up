@@ -29,7 +29,7 @@ class ModuleRead(BaseModel):
 
 
 class LessonCreate(BaseModel):
-    module_id: str
+    module_id: uuid.UUID
     title: str
     description: str | None = None
     order: int

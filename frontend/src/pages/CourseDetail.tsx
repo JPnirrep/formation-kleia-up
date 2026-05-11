@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useMemo } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -46,14 +46,11 @@ function deriveStatus(lessonId: string): 'not_started' | 'in_progress' | 'comple
   return mockLesson?.status || 'not_started';
 }
 
-function getQuizId(lesson: Lesson): string | null {
-  return null;
-}
-
 export default function CourseDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: course, loading, error } = useApi(() => getCourse(slug || ''), [slug]);
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   if (loading) {
     return <Loading className="py-20" text="Chargement de la formation..." />;
@@ -78,6 +75,20 @@ export default function CourseDetail() {
   const mockCourse = mockCourses.find(c => c.slug === slug);
   const mockProgress = slug ? getProgressForCourse(mockCourse?.id || '') : 0;
   const overallProgress = course.progress || mockProgress;
+
+  const allLessons = useMemo(() =>
+    modules.flatMap(m => m.lessons || []),
+    [modules]
+  );
+  const firstUncompleted = allLessons.find(l => {
+    const status = deriveStatus(l.id);
+    return status === 'not_started' || status === 'in_progress';
+  });
+  const allCompleted = allLessons.length > 0 && !firstUncompleted;
+
+  const handleStart = () => {
+    if (firstUncompleted) navigate(`/lecon/${firstUncompleted.id}`);
+  };
 
   const toggleModule = (modId: string) => {
     setExpandedModule(expandedModule === modId ? null : modId);
@@ -228,13 +239,16 @@ export default function CourseDetail() {
               )}
             </div>
           </Card>
-          {overallProgress > 0 && overallProgress < 100 && (
-            <Button variant="secondary" className="w-full" onClick={() => {}}>
+          {allCompleted ? (
+            <Button variant="outline" className="w-full !border-kleia-success !text-kleia-success" disabled>
+              ✓ Formation terminée
+            </Button>
+          ) : overallProgress > 0 ? (
+            <Button variant="secondary" className="w-full" onClick={handleStart}>
               Continuer la formation
             </Button>
-          )}
-          {overallProgress === 0 && (
-            <Button variant="primary" className="w-full" onClick={() => {}}>
+          ) : (
+            <Button variant="primary" className="w-full" onClick={handleStart}>
               Commencer la formation
             </Button>
           )}

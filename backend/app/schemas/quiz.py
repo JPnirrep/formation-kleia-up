@@ -5,7 +5,7 @@ import uuid
 
 
 class QuizCreate(BaseModel):
-    lesson_id: str
+    lesson_id: uuid.UUID
     title: str
     passing_score_percent: int = 70
     max_attempts: int | None = None
@@ -58,7 +58,7 @@ class AnswerSubmit(BaseModel):
 
 
 class AttemptCreate(BaseModel):
-    quiz_id: str
+    quiz_id: uuid.UUID
     answers: list[AnswerSubmit]
 
 

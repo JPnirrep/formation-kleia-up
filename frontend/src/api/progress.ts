@@ -16,4 +16,3 @@ export async function updateVideoProgress(videoId: string, data: VideoProgressUp
   });
 }
 
-export type { CourseProgress, VideoProgressUpdate };

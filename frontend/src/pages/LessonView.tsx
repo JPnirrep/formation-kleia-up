@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -8,6 +8,7 @@ import Loading from '@/components/ui/Loading';
 import PlayerShell from '@/components/player/PlayerShell';
 import { getLessonById, mockCourses } from '@/mock';
 import { getCourse } from '@/api/courses';
+import { completeLesson } from '@/api/progress';
 import type { Lesson, CourseDetail } from '@/api/courses';
 
 function formatDuration(seconds: number): string {
@@ -55,11 +56,28 @@ export default function LessonView() {
   const mockLesson = getLessonById(lessonId || 'l1-1');
   const lesson = apiLesson || mockLesson;
   const [completed, setCompleted] = useState(lesson?.status === 'completed' || false);
+  const [completing, setCompleting] = useState(false);
+  const [completeError, setCompleteError] = useState<string | null>(null);
   const [transcriptOpen, setTranscriptOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (lesson) setCompleted(lesson.status === 'completed');
   }, [lesson]);
+
+  const handleComplete = async () => {
+    if (completed || completing) return;
+    setCompleting(true);
+    setCompleteError(null);
+    try {
+      await completeLesson(lessonId || lesson.id);
+      setCompleted(true);
+    } catch (err: unknown) {
+      setCompleteError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde');
+    } finally {
+      setCompleting(false);
+    }
+  };
 
   if (apiLoading) {
     return <Loading className="py-20" text="Chargement de la leçon..." />;
@@ -92,16 +110,16 @@ export default function LessonView() {
   return (
     <div className="space-y-6">
       <div>
-        <Link
-          to={-1 as unknown as string}
-          onClick={(e) => { e.preventDefault(); window.history.back(); }}
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
           className="text-sm text-kleia-gray hover:text-kleia-burgundy font-body transition-colors inline-flex items-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
           Retour
-        </Link>
+        </button>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -136,18 +154,24 @@ export default function LessonView() {
                   <Button variant="outline" size="sm">Suivant →</Button>
                 </Link>
               ) : (
-                <Button variant="outline" size="sm" disabled>Suivant →</Button>
+                <Button variant="outline" size="sm" className="!border-kleia-success !text-kleia-success" disabled>
+                  Fin de la formation
+                </Button>
               )}
             </div>
             <Button
               variant={completed ? 'secondary' : 'primary'}
               size="sm"
-              onClick={() => setCompleted(!completed)}
-              aria-label={completed ? 'Marquer comme non terminé' : 'Marquer comme terminé'}
+              onClick={handleComplete}
+              disabled={completing || completed}
+              aria-label={completed ? 'Leçon terminée' : 'Marquer comme terminé'}
             >
-              {completed ? '✓ Terminé' : 'Marquer comme terminé'}
+              {completing ? 'Enregistrement...' : completed ? '✓ Terminé' : 'Marquer comme terminé'}
             </Button>
           </div>
+          {completeError && (
+            <p className="text-sm text-red-500 font-body">{completeError}</p>
+          )}
 
           <Card>
             <button
@@ -197,11 +221,7 @@ export default function LessonView() {
                 </Link>
               )}
             </div>
-            {'quizId' in lesson && lesson.quizId && (
-              <Link to={`/quiz/${lesson.quizId}`} className="block mt-3">
-                <Button variant="secondary" size="sm" className="w-full">Passer le quiz</Button>
-              </Link>
-            )}
+
           </Card>
 
           <Card>

@@ -1,7 +1,8 @@
+import math
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -11,6 +12,7 @@ from app.models.course import Course, Lesson, Module
 from app.models.enrollment import Enrollment
 from app.models.quiz import Quiz
 from app.models.user import User
+from app.schemas.common import PaginatedResponse
 from app.schemas.course import (
     CourseCreate,
     CourseRead,
@@ -22,7 +24,7 @@ from app.schemas.course import (
     ModuleRead,
     ModuleUpdate,
 )
-from app.schemas.enrollment import EnrollmentCreate, EnrollmentRead
+from app.schemas.enrollment import EnrollmentRead
 from app.schemas.quiz import QuizCreate, QuizRead
 from app.services.course_service import (
     create_course,
@@ -238,43 +240,32 @@ async def admin_create_quiz(
     return QuizRead.model_validate(quiz)
 
 
-@router.post(
-    "/enrollments",
-    response_model=EnrollmentRead,
-    status_code=status.HTTP_201_CREATED,
-)
-async def admin_grant_enrollment(
-    data: EnrollmentCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
-):
-    """Attribue manuellement une inscription à un utilisateur."""
-    enrollment = Enrollment(
-        user_id=data.user_id,
-        course_id=data.course_id,
-        granted_by=current_user.id,
-        status="active",
-    )
-    db.add(enrollment)
-    await db.commit()
-    await db.refresh(enrollment)
-    return EnrollmentRead.model_validate(enrollment)
-
-
-@router.get("/enrollments", response_model=list[EnrollmentRead])
+@router.get("/enrollments", response_model=PaginatedResponse)
 async def admin_list_enrollments(
-    skip: int = 0,
-    limit: int = 20,
+    page: int = 1,
+    page_size: int = 20,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_admin),
 ):
     """Liste toutes les inscriptions (administration)."""
+    count_stmt = select(func.count()).select_from(Enrollment)
+    count_result = await db.execute(count_stmt)
+    total = count_result.scalar() or 0
+
     stmt = (
         select(Enrollment)
-        .offset(skip)
-        .limit(limit)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
         .order_by(Enrollment.granted_at.desc())
     )
     result = await db.execute(stmt)
     enrollments = result.scalars().all()
-    return [EnrollmentRead.model_validate(e) for e in enrollments]
+
+    total_pages = math.ceil(total / page_size) if page_size else 0
+    return PaginatedResponse(
+        items=[EnrollmentRead.model_validate(e) for e in enrollments],
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+    )

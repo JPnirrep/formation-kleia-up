@@ -16,4 +16,3 @@ export async function getAttempts(quizId: string): Promise<Attempt[]> {
   return api.request<Attempt[]>(`/quizzes/${quizId}/attempts`);
 }
 
-export type { Quiz, AttemptSubmit, AttemptResult, Attempt };

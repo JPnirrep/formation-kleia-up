@@ -5,9 +5,9 @@ import uuid
 
 
 class EnrollmentCreate(BaseModel):
-    user_id: str
-    course_id: str
-    granted_by: str | None = None
+    user_id: uuid.UUID
+    course_id: uuid.UUID
+    granted_by: uuid.UUID | None = None
     expires_at: datetime | None = None
 
 
