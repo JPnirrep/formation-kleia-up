@@ -2,6 +2,7 @@ from app.schemas.common import MessageResponse, PaginatedResponse
 from app.schemas.auth import (
     GoogleAuthRequest,
     LoginRequest,
+    RefreshRequest,
     TokenResponse,
     UserProfile,
 )
@@ -21,7 +22,6 @@ from app.schemas.course import (
 from app.schemas.video import (
     VideoAssetCreate,
     VideoAssetRead,
-    VideoAssetStatus,
     VideoAssetUpdate,
     VideoEventCreate,
     VideoProgressRead,
@@ -30,6 +30,7 @@ from app.schemas.video import (
     VideoTrackRead,
 )
 from app.schemas.quiz import (
+    AnswerSubmit,
     AttemptCreate,
     AttemptRead,
     QuestionCreate,
@@ -65,7 +66,6 @@ __all__ = [
     "VideoAssetCreate",
     "VideoAssetUpdate",
     "VideoAssetRead",
-    "VideoAssetStatus",
     "VideoTrackCreate",
     "VideoTrackRead",
     "VideoProgressUpdate",
@@ -76,6 +76,7 @@ __all__ = [
     "QuizRead",
     "QuestionCreate",
     "QuestionRead",
+    "AnswerSubmit",
     "AttemptCreate",
     "AttemptRead",
     "EnrollmentCreate",
