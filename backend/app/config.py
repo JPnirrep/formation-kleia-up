@@ -23,8 +23,13 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = "http://localhost:5173/auth/callback"
 
+    # Uploads
+    UPLOAD_DIR: str = "./uploads"
+    MAX_UPLOAD_SIZE_MB: int = 500
+
     # S3
     S3_ENDPOINT: str = ""
+    S3_REGION: str = "fr-par"
     S3_BUCKET: str = "kleia-videos"
     S3_ACCESS_KEY: str = ""
     S3_SECRET_KEY: str = ""

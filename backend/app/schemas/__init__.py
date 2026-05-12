@@ -41,7 +41,7 @@ from app.schemas.quiz import (
 )
 from app.schemas.enrollment import EnrollmentCreate, EnrollmentRead
 from app.schemas.progress import LessonProgressRead, LessonProgressUpdate
-from app.schemas.certificate import CertificateRead
+from app.schemas.certificate import CertificateRead, CertificateWithDetails
 
 __all__ = [
     "MessageResponse",
@@ -84,4 +84,5 @@ __all__ = [
     "LessonProgressRead",
     "LessonProgressUpdate",
     "CertificateRead",
+    "CertificateWithDetails",
 ]

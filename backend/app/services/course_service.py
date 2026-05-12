@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from sqlalchemy import select, func, delete
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -99,7 +99,7 @@ async def get_lessons(db: AsyncSession, module_id: UUID) -> list[Lesson]:
 async def create_lesson(
     db: AsyncSession, module_id: UUID, data: LessonCreate
 ) -> Lesson:
-    lesson = Lesson(**data.model_dump(), module_id=module_id)
+    lesson = Lesson(**data.model_dump(exclude={"module_id"}), module_id=module_id)
     db.add(lesson)
     await db.commit()
     await db.refresh(lesson)

@@ -8,9 +8,12 @@ export function useApi<T>(
     data: null, loading: true, error: null
   });
   const mountedRef = useRef(true);
+  const abortRef = useRef<AbortController | null>(null);
 
   const execute = useCallback(async () => {
+    abortRef.current?.abort();
     const controller = new AbortController();
+    abortRef.current = controller;
     setState(s => ({ ...s, loading: true, error: null }));
     try {
       const data = await fetcher(controller.signal);
@@ -27,7 +30,10 @@ export function useApi<T>(
   useEffect(() => {
     mountedRef.current = true;
     execute();
-    return () => { mountedRef.current = false; };
+    return () => {
+      mountedRef.current = false;
+      abortRef.current?.abort();
+    };
   }, [execute]);
 
   return { ...state, refetch: execute };

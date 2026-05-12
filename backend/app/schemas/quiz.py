@@ -54,7 +54,7 @@ class QuizRead(BaseModel):
 
 class AnswerSubmit(BaseModel):
     question_id: uuid.UUID
-    selected_option: str | None = None
+    selected_option: list[str] | None = None
 
 
 class AttemptCreate(BaseModel):
@@ -70,6 +70,5 @@ class AttemptRead(BaseModel):
     answers: list
     started_at: datetime
     completed_at: datetime | None = None
-    passed: bool = False
 
     model_config = {"from_attributes": True}

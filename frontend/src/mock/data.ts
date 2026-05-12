@@ -4,7 +4,7 @@ export interface MockUser {
   email: string;
   avatar: string;
   role: 'learner' | 'admin';
-  joinedAt: string;
+  created_at: string;
 }
 
 export interface MockCourse {
@@ -96,7 +96,7 @@ export const mockUser: MockUser & { initials: string } = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#7C3AED"/><text x="40" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white">SP</text></svg>'
   )}`,
   role: 'admin',
-  joinedAt: '2023-09-01T00:00:00.000Z',
+  created_at: '2023-09-01T00:00:00.000Z',
 };
 
 export const mockUserLearner: MockUser & { initials: string } = {
@@ -108,7 +108,7 @@ export const mockUserLearner: MockUser & { initials: string } = {
     '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><rect width="80" height="80" rx="40" fill="#6366F1"/><text x="40" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white">CF</text></svg>'
   )}`,
   role: 'learner',
-  joinedAt: '2024-01-15T00:00:00.000Z',
+  created_at: '2024-01-15T00:00:00.000Z',
 };
 
 export const mockCourses: MockCourse[] = [

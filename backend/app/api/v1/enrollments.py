@@ -42,6 +42,7 @@ async def create_enrollment(
         course_id=data.course_id,
         granted_by=current_user.id,
         status="active",
+        expires_at=data.expires_at,
     )
     db.add(enrollment)
     await db.commit()

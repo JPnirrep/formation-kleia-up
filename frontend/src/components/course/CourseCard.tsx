@@ -2,16 +2,7 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
-interface CardCourse {
-  slug: string;
-  title: string;
-  level: string;
-  shortDescription: string;
-  duration: string;
-  progress: number;
-  lessonCount: number;
-  thumbnailColor: string;
-}
+import type { CardCourse } from '@/lib/utils';
 
 interface CourseCardProps {
   course: CardCourse;

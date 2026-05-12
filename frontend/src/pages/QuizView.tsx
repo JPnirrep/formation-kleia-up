@@ -5,7 +5,7 @@ import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
-import { mockQuiz } from '@/mock';
+import { mockQuiz, type MockQuiz } from '@/mock';
 import { getQuiz } from '@/api/quizzes';
 import type { Quiz } from '@/types';
 
@@ -41,6 +41,20 @@ function normalizeQuiz(quiz: Quiz): NormalizedQuiz {
   };
 }
 
+function normalizeMockQuiz(mock: MockQuiz): NormalizedQuiz {
+  return {
+    id: mock.id,
+    title: mock.title,
+    passingScore: mock.passingScore,
+    questions: mock.questions.map((q) => ({
+      text: q.text,
+      options: q.options.map((o) => o.label),
+      correctIndex: q.options.findIndex((o) => o.isCorrect),
+      explanation: q.explanation,
+    })),
+  };
+}
+
 export default function QuizView() {
   const { quizId } = useParams<{ quizId: string }>();
   const [apiQuiz, setApiQuiz] = useState<NormalizedQuiz | null>(null);
@@ -68,13 +82,24 @@ export default function QuizView() {
     return () => { cancelled = true; };
   }, [quizId]);
 
-  const quiz = apiQuiz || mockQuiz;
+  const quiz: NormalizedQuiz | null = apiQuiz || (mockQuiz ? normalizeMockQuiz(mockQuiz) : null);
 
   if (apiLoading) {
     return <Loading className="py-20" text="Chargement du quiz..." />;
   }
 
   if (!quizId || (apiQuiz === null && quizId !== mockQuiz.id && !apiLoading)) {
+    return (
+      <Card className="text-center py-12">
+        <p className="text-kleia-gray font-body text-lg">Quiz introuvable</p>
+        <Link to="/formations" className="text-kleia-burgundy font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
+          Retour aux formations
+        </Link>
+      </Card>
+    );
+  }
+
+  if (!quiz) {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Quiz introuvable</p>
@@ -108,7 +133,7 @@ export default function QuizView() {
   };
 
   const correctCount = submitted
-    ? questions.filter((q, i) => selectedAnswers[i] === q.correctIndex).length
+    ? questions.filter((q: NormalizedQuestion, i: number) => selectedAnswers[i] === q.correctIndex).length
     : 0;
 
   const score = submitted ? Math.round((correctCount / total) * 100) : 0;
@@ -177,7 +202,7 @@ export default function QuizView() {
             {currentQ.text}
           </h2>
           <div className="space-y-3">
-            {currentQ.options.map((option, optIndex) => {
+            {currentQ.options.map((option: string, optIndex: number) => {
               const isSelected = selectedAnswers[currentQuestion] === optIndex;
               const isCorrect = currentQ.correctIndex === optIndex;
               const showResult = submitted;

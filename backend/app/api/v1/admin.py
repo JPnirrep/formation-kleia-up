@@ -4,7 +4,6 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_current_admin
 from app.database import get_db
@@ -56,7 +55,6 @@ async def admin_update_course(
     course_id: UUID,
     data: CourseUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Modifie une formation existante."""
     course = await update_course(db, course_id, data)
@@ -72,7 +70,6 @@ async def admin_update_course(
 async def admin_delete_course(
     course_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Supprime une formation."""
     deleted = await delete_course(db, course_id)
@@ -92,7 +89,6 @@ async def admin_create_module(
     course_id: UUID,
     data: ModuleCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Ajoute un module à une formation."""
     course = await get_course_by_id(db, course_id)
@@ -110,7 +106,6 @@ async def admin_update_module(
     module_id: UUID,
     data: ModuleUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Modifie un module."""
     stmt = select(Module).where(Module.id == module_id)
@@ -132,7 +127,6 @@ async def admin_update_module(
 async def admin_delete_module(
     module_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Supprime un module."""
     stmt = select(Module).where(Module.id == module_id)
@@ -156,7 +150,6 @@ async def admin_create_lesson(
     module_id: UUID,
     data: LessonCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Ajoute une leçon à un module."""
     stmt = select(Module).where(Module.id == module_id)
@@ -176,7 +169,6 @@ async def admin_update_lesson(
     lesson_id: UUID,
     data: LessonUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Modifie une leçon."""
     stmt = select(Lesson).where(Lesson.id == lesson_id)
@@ -198,7 +190,6 @@ async def admin_update_lesson(
 async def admin_delete_lesson(
     lesson_id: UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Supprime une leçon."""
     stmt = select(Lesson).where(Lesson.id == lesson_id)
@@ -222,7 +213,6 @@ async def admin_create_quiz(
     lesson_id: UUID,
     data: QuizCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Ajoute un quiz à une leçon."""
     stmt = select(Lesson).where(Lesson.id == lesson_id)
@@ -233,7 +223,7 @@ async def admin_create_quiz(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Leçon non trouvée.",
         )
-    quiz = Quiz(**data.model_dump(), lesson_id=lesson_id)
+    quiz = Quiz(**data.model_dump(exclude={"lesson_id"}), lesson_id=lesson_id)
     db.add(quiz)
     await db.commit()
     await db.refresh(quiz)
@@ -245,7 +235,6 @@ async def admin_list_enrollments(
     page: int = 1,
     page_size: int = 20,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
 ):
     """Liste toutes les inscriptions (administration)."""
     count_stmt = select(func.count()).select_from(Enrollment)

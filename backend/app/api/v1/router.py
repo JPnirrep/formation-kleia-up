@@ -1,6 +1,20 @@
 from fastapi import APIRouter
 
-from app.api.v1 import admin, auth, courses, enrollments, progress, quizzes, users
+from app.api.v1 import (
+    admin,
+    admin_resource,
+    admin_stats,
+    admin_video,
+    auth,
+    certificates,
+    courses,
+    enrollments,
+    progress,
+    quizzes,
+    uploads,
+    users,
+    videos,
+)
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
@@ -12,4 +26,20 @@ api_v1_router.include_router(
 )
 api_v1_router.include_router(progress.router, prefix="/progress", tags=["Progression"])
 api_v1_router.include_router(quizzes.router, prefix="/quizzes", tags=["Quiz"])
+api_v1_router.include_router(
+    certificates.router, prefix="/certificates", tags=["Certificats"]
+)
+api_v1_router.include_router(
+    videos.router, prefix="/videos", tags=["Vidéos (apprenant)"]
+)
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Administration"])
+api_v1_router.include_router(
+    admin_video.router, prefix="/admin", tags=["Administration"]
+)
+api_v1_router.include_router(
+    admin_stats.router, prefix="/admin", tags=["Administration"]
+)
+api_v1_router.include_router(
+    admin_resource.router, prefix="/admin", tags=["Administration"]
+)
+api_v1_router.include_router(uploads.router, prefix="", tags=["Fichiers"])

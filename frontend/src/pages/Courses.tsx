@@ -5,8 +5,7 @@ import CourseCard from '@/components/course/CourseCard';
 import Loading from '@/components/ui/Loading';
 import { useApi } from '@/hooks/useApi';
 import { getCourses } from '@/api/courses';
-import { formatDuration, getCourseGradient, toCardCourse } from '@/lib/utils';
-import type { Course } from '@/api/courses';
+import { toCardCourse } from '@/lib/utils';
 
 type FilterTab = 'all' | 'in_progress' | 'completed';
 
@@ -74,8 +73,8 @@ export default function Courses() {
 
       {filtered.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-6">
-          {filtered.map((course, idx) => (
-            <CourseCard key={course.id} course={{ ...toCardCourse(course), lessonCount: course.lessons }} />
+          {filtered.map((course) => (
+            <CourseCard key={course.id} course={toCardCourse(course)} />
           ))}
         </div>
       ) : (

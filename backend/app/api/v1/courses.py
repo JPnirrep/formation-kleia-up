@@ -2,11 +2,11 @@ from uuid import UUID
 import math
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user
 from app.database import get_db
-from app.models.user import User
+from app.models.course import Course
 from app.schemas.common import PaginatedResponse
 from app.schemas.course import CourseRead, LessonRead, ModuleRead
 from app.services.course_service import (
@@ -31,19 +31,33 @@ async def list_courses(
     Liste les formations publiées (catalogue).
     Accessible sans authentification pour le catalogue public.
     """
-    courses, total = await get_courses(db, skip=skip, limit=limit, status="published")
+    query = select(Course).where(Course.status == "published")
+    count_query = select(func.count(Course.id)).where(Course.status == "published")
 
     if level:
-        courses = [c for c in courses if c.level == level]
+        query = query.where(Course.level == level)
+        count_query = count_query.where(Course.level == level)
     if category:
-        courses = [c for c in courses if c.category == category]
+        query = query.where(Course.category == category)
+        count_query = count_query.where(Course.category == category)
+
+    count_result = await db.execute(count_query)
+    total = count_result.scalar_one()
+
+    result = await db.execute(
+        query.offset(skip).limit(limit).order_by(Course.created_at.desc())
+    )
+    courses = result.scalars().all()
+
+    page = (skip // limit) + 1
+    total_pages = math.ceil(total / limit) if limit > 0 else 1
 
     return PaginatedResponse(
         items=[CourseRead.model_validate(c) for c in courses],
         total=total,
-        page=1,
+        page=page,
         page_size=limit,
-        total_pages=1,
+        total_pages=total_pages,
     )
 
 

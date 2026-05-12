@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import CourseCard from '@/components/course/CourseCard';
@@ -7,10 +7,9 @@ import Loading from '@/components/ui/Loading';
 import { mockUser, mockCourses, mockActivities, getStartedCourses, getCompletedCourses } from '@/mock';
 import { useApi } from '@/hooks/useApi';
 import { getMyEnrollments } from '@/api/enrollments';
-import { getCourses, getCourse } from '@/api/courses';
+import { getCourses } from '@/api/courses';
 import { isAuthenticated } from '@/api/client';
-import { formatDuration, getCourseGradient, toCardCourse } from '@/lib/utils';
-import type { Enrollment } from '@/api/enrollments';
+import { toCardCourse } from '@/lib/utils';
 import type { Course } from '@/api/courses';
 
 const activityColors: Record<string, string> = {
@@ -28,6 +27,10 @@ const activityIcons: Record<string, string> = {
 };
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+  const [showOnboarding, setShowOnboarding] = useState(
+    () => !localStorage.getItem('kleia-onboarding-shown'),
+  );
   const isAuth = isAuthenticated();
   const { data: enrollments } = useApi(() => getMyEnrollments(), [isAuth]);
   const { data: allCourses } = useApi(() => getCourses({ limit: 50 }), []);
@@ -61,7 +64,7 @@ export default function Dashboard() {
     ? displayCourses.filter(c => (c.progress || 0) >= 100).length
     : mockCompletedCount;
   const totalHours = isAuth
-    ? Math.round(displayCourses.reduce((acc, c) => acc + c.duration_seconds, 0) / 3600)
+    ? Math.round(displayCourses.reduce((acc, c) => acc + ((c as any).duration_seconds || parseInt((c as any).duration) * 3600 || 0), 0) / 3600)
     : mockTotalHours;
 
   const stats = [
@@ -71,8 +74,42 @@ export default function Dashboard() {
     { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: '\uD83C\uDFC6', color: 'from-blue-600 to-kleia-burgundy' },
   ];
 
+  const dismissOnboarding = () => {
+    localStorage.setItem('kleia-onboarding-shown', 'true');
+    setShowOnboarding(false);
+  };
+
   return (
     <div className="space-y-8">
+      {showOnboarding && (
+        <Card className="relative overflow-hidden border-2 border-transparent bg-gradient-to-br from-kleia-burgundy/5 via-white to-kleia-gold/5 rounded-kleia">
+          <div className="absolute inset-0 rounded-kleia bg-gradient-to-r from-kleia-burgundy to-kleia-gold p-[2px] -m-[2px] [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [mask-composite:exclude] pointer-events-none" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-extrabold font-heading text-kleia-burgundy">
+                Bienvenue sur Kleia-up !
+              </h2>
+              <p className="text-kleia-gray font-body mt-1">
+                Votre plateforme d'apprentissage pour développer votre leadership et votre communication.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <button
+                onClick={() => navigate('/formations')}
+                className="py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+              >
+                Découvrir les formations
+              </button>
+              <button
+                onClick={dismissOnboarding}
+                className="py-2 px-4 rounded-lg border border-kleia-dark/20 text-kleia-gray font-medium text-sm font-heading hover:bg-kleia-dark/5 transition-colors"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </Card>
+      )}
       <div className="glass p-6 md:p-8 bg-gradient-to-r from-kleia-burgundy/5 via-transparent to-kleia-gold/5 rounded-kleia border border-white/20">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -116,16 +153,16 @@ export default function Dashboard() {
           <Loading className="py-8" size="sm" text="Chargement..." />
         ) : inProgress.length > 0 ? (
           <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
-            {inProgress.map((course, idx) => (
+            {inProgress.map((course) => (
               <div key={course.slug} className="min-w-[260px] max-w-[280px] flex-shrink-0">
-                <CourseCard course={{ ...toCardCourse(course), lessonCount: course.lessons }} variant="compact" />
+                <CourseCard course={{ ...toCardCourse(course as any), lessonCount: course.lessons }} variant="compact" />
               </div>
             ))}
           </div>
         ) : (
           <Card>
             <p className="text-kleia-gray font-body text-center py-4">
-              Aucune formation en cours. <a href="/formations" className="text-kleia-burgundy font-medium underline underline-offset-2">Explorer les formations</a>
+              Aucune formation en cours. <Link to="/formations" className="text-kleia-burgundy font-medium underline underline-offset-2">Explorer les formations</Link>
             </p>
           </Card>
         )}

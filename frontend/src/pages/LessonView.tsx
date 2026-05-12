@@ -7,9 +7,11 @@ import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
 import PlayerShell from '@/components/player/PlayerShell';
 import { getLessonById, mockCourses } from '@/mock';
-import { getCourse } from '@/api/courses';
+import { getCourse, getCourses } from '@/api/courses';
+import { getLessonVideos } from '@/api/videos';
 import { completeLesson } from '@/api/progress';
 import type { Lesson, CourseDetail } from '@/api/courses';
+import type { VideoAssetRead } from '@/types';
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -23,21 +25,25 @@ export default function LessonView() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const [apiLesson, setApiLesson] = useState<Lesson | null>(null);
   const [apiCourse, setApiCourse] = useState<CourseDetail | null>(null);
+  const [videos, setVideos] = useState<VideoAssetRead[]>([]);
   const [apiLoading, setApiLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     async function fetchLesson() {
       try {
-        const courses = await import('@/api/courses');
-        const allCourses = await courses.getCourses({ limit: 50 });
+        const allCourses = await getCourses({ limit: 50 });
         for (const course of allCourses.items) {
-          const detail = await courses.getCourse(course.slug);
+          const detail = await getCourse(course.slug);
           for (const mod of detail.modules || []) {
             for (const lesson of mod.lessons || []) {
               if (lesson.id === lessonId && !cancelled) {
                 setApiLesson(lesson);
                 setApiCourse(detail);
+                try {
+                  const videoAssets = await getLessonVideos(lesson.id);
+                  setVideos(videoAssets);
+                } catch { /* no videos yet */ }
                 setApiLoading(false);
                 return;
               }
@@ -66,6 +72,7 @@ export default function LessonView() {
   }, [lesson]);
 
   const handleComplete = async () => {
+    if (!lesson) return;
     if (completed || completing) return;
     setCompleting(true);
     setCompleteError(null);
@@ -96,7 +103,10 @@ export default function LessonView() {
 
   const allLessons = apiCourse
     ? (apiCourse.modules || []).flatMap(m => m.lessons || [])
-    : mockCourses.flatMap(c => c.modules.flatMap(m => m.lessons));
+    : mockCourses.flatMap((c: any) => {
+        const mods = c.modules;
+        return Array.isArray(mods) ? mods.flatMap((m: any) => m.lessons || []) : [];
+      });
   const currentIdx = allLessons.findIndex(l => l.id === lesson.id);
   const prevLesson = currentIdx > 0 ? allLessons[currentIdx - 1] : null;
   const nextLesson = currentIdx < allLessons.length - 1 ? allLessons[currentIdx + 1] : null;
@@ -125,7 +135,7 @@ export default function LessonView() {
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           <div className="relative" aria-label="Lecteur vidéo">
-            <PlayerShell title={lesson.title} className="rounded-kleia" />
+            <PlayerShell video={videos[0]} className="rounded-kleia" />
           </div>
 
           <div className="space-y-1">

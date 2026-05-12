@@ -11,7 +11,7 @@ export interface Course {
   thumbnail_url: string | null;
   status: string;
   category: string | null;
-  modules: number;
+  modules?: number | Module[];
   lessons: number;
   progress?: number;
   instructor?: string;
@@ -36,6 +36,7 @@ export interface Lesson {
   order: number;
   lesson_type: string;
   duration_seconds: number;
+  status?: string;
 }
 
 export interface PaginatedResponse<T> {

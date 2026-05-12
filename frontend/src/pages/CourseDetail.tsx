@@ -7,8 +7,8 @@ import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
 import { useApi } from '@/hooks/useApi';
 import { getCourse } from '@/api/courses';
-import type { CourseDetail as CourseDetailType, Module, Lesson } from '@/api/courses';
-import { getLessonById, mockCourses, getModulesByCourse, getProgressForCourse } from '@/mock';
+import type { Lesson } from '@/api/courses';
+import { getLessonById, mockCourses, getProgressForCourse } from '@/mock';
 
 const typeIcons: Record<string, string> = {
   video: '▶',
@@ -41,10 +41,53 @@ function getGradient(level: string): string {
   return gradients[level] || 'from-[#10B981] to-[#34D399]';
 }
 
-function deriveStatus(lessonId: string): 'not_started' | 'in_progress' | 'completed' | 'locked' {
+function deriveStatus(lessonId: string, lessonsProgress?: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' | 'locked' }[]): 'not_started' | 'in_progress' | 'completed' | 'locked' {
+  if (lessonsProgress) {
+    const lp = lessonsProgress.find(p => p.lesson_id === lessonId);
+    if (lp) return lp.status;
+  }
   const mockLesson = getLessonById(lessonId);
   return mockLesson?.status || 'not_started';
 }
+
+const LessonRow = ({ lesson, lessonsProgress }: { lesson: Lesson; lessonsProgress?: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' | 'locked' }[] }) => {
+  const lessonStatus = deriveStatus(lesson.id, lessonsProgress);
+  const isLocked = lessonStatus === 'locked';
+  const statusColor = lessonStatus === 'completed' ? 'text-kleia-success' : lessonStatus === 'in_progress' ? 'text-kleia-gold' : 'text-kleia-gray';
+  const lessonType = lesson.lesson_type === 'quiz' ? 'quiz' : lesson.lesson_type === 'certificate' ? 'certificate' : 'video';
+  const typeIcon = typeIcons[lessonType] || '•';
+  const duration = formatDuration(lesson.duration_seconds);
+
+  return (
+    <Link
+      to={isLocked ? '#' : `/lecon/${lesson.id}`}
+      className={clsx(
+        'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
+        isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-kleia-dark/5',
+        lessonStatus === 'in_progress' && 'bg-kleia-gold/5 border border-kleia-gold/20',
+      )}
+      onClick={(e) => { if (isLocked) e.preventDefault(); }}
+      aria-disabled={isLocked}
+    >
+      <span className={clsx('text-sm w-6 text-center', statusColor)} aria-hidden="true">
+        {isLocked ? '🔒' : typeIcon}
+      </span>
+      <div className="flex-1 min-w-0">
+        <p className={clsx('text-sm font-medium font-body truncate', isLocked ? 'text-kleia-gray' : 'text-kleia-dark')}>
+          {lesson.title}
+        </p>
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="text-xs text-kleia-gray">{duration}</span>
+          {lesson.lesson_type === 'quiz' && <Badge variant="warning">Quiz</Badge>}
+          {lesson.lesson_type === 'certificate' && <Badge variant="success">Certificat</Badge>}
+        </div>
+      </div>
+      <Badge variant={lessonStatus === 'completed' ? 'success' : lessonStatus === 'in_progress' ? 'warning' : 'default'}>
+        {statusLabels[lessonStatus]}
+      </Badge>
+    </Link>
+  );
+};
 
 export default function CourseDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -72,16 +115,18 @@ export default function CourseDetail() {
   const totalDurationSeconds = modules.reduce((acc, m) =>
     acc + (m.lessons || []).reduce((s, l) => s + l.duration_seconds, 0), 0);
 
-  const mockCourse = mockCourses.find(c => c.slug === slug);
+  const mockCourse = slug ? mockCourses.find(c => c.slug === slug) : undefined;
   const mockProgress = slug ? getProgressForCourse(mockCourse?.id || '') : 0;
   const overallProgress = course.progress || mockProgress;
+
+  const courseLessonsProgress = (course as { progress?: { lessons_progress?: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' | 'locked' }[] } }).progress?.lessons_progress;
 
   const allLessons = useMemo(() =>
     modules.flatMap(m => m.lessons || []),
     [modules]
   );
   const firstUncompleted = allLessons.find(l => {
-    const status = deriveStatus(l.id);
+    const status = deriveStatus(l.id, courseLessonsProgress);
     return status === 'not_started' || status === 'in_progress';
   });
   const allCompleted = allLessons.length > 0 && !firstUncompleted;
@@ -92,45 +137,6 @@ export default function CourseDetail() {
 
   const toggleModule = (modId: string) => {
     setExpandedModule(expandedModule === modId ? null : modId);
-  };
-
-  const LessonRow = ({ lesson }: { lesson: Lesson }) => {
-    const lessonStatus = deriveStatus(lesson.id);
-    const isLocked = lessonStatus === 'locked';
-    const statusColor = lessonStatus === 'completed' ? 'text-kleia-success' : lessonStatus === 'in_progress' ? 'text-kleia-gold' : 'text-kleia-gray';
-    const lessonType = lesson.lesson_type === 'quiz' ? 'quiz' : lesson.lesson_type === 'certificate' ? 'certificate' : 'video';
-    const typeIcon = typeIcons[lessonType] || '•';
-    const duration = formatDuration(lesson.duration_seconds);
-
-    return (
-      <Link
-        to={isLocked ? '#' : `/lecon/${lesson.id}`}
-        className={clsx(
-          'flex items-center gap-3 px-4 py-3 rounded-lg transition-colors',
-          isLocked ? 'opacity-50 cursor-not-allowed' : 'hover:bg-kleia-dark/5',
-          lessonStatus === 'in_progress' && 'bg-kleia-gold/5 border border-kleia-gold/20',
-        )}
-        onClick={(e) => { if (isLocked) e.preventDefault(); }}
-        aria-disabled={isLocked}
-      >
-        <span className={clsx('text-sm w-6 text-center', statusColor)} aria-hidden="true">
-          {isLocked ? '🔒' : typeIcon}
-        </span>
-        <div className="flex-1 min-w-0">
-          <p className={clsx('text-sm font-medium font-body truncate', isLocked ? 'text-kleia-gray' : 'text-kleia-dark')}>
-            {lesson.title}
-          </p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-kleia-gray">{duration}</span>
-            {lesson.lesson_type === 'quiz' && <Badge variant="warning">Quiz</Badge>}
-            {lesson.lesson_type === 'certificate' && <Badge variant="success">Certificat</Badge>}
-          </div>
-        </div>
-        <Badge variant={lessonStatus === 'completed' ? 'success' : lessonStatus === 'in_progress' ? 'warning' : 'default'}>
-          {statusLabels[lessonStatus]}
-        </Badge>
-      </Link>
-    );
   };
 
   return (
@@ -177,7 +183,7 @@ export default function CourseDetail() {
           )}
           {modules.map((mod) => {
             const lessonCount = mod.lessons?.length || 0;
-            const completedCount = (mod.lessons || []).filter(l => deriveStatus(l.id) === 'completed').length;
+            const completedCount = (mod.lessons || []).filter(l => deriveStatus(l.id, courseLessonsProgress) === 'completed').length;
 
             return (
               <Card key={mod.id} className="p-0 overflow-hidden">
@@ -202,7 +208,7 @@ export default function CourseDetail() {
                 {expandedModule === mod.id && mod.lessons && (
                   <div className="border-t border-kleia-dark/10 px-2 py-2 space-y-1">
                     {mod.lessons.map((lesson) => (
-                      <LessonRow key={lesson.id} lesson={lesson} />
+                      <LessonRow key={lesson.id} lesson={lesson} lessonsProgress={courseLessonsProgress} />
                     ))}
                   </div>
                 )}

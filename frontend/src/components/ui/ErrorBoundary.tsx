@@ -6,11 +6,18 @@ interface State { hasError: boolean; error: Error | null; }
 
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false, error: null };
+  private resetCount = 0;
   
   static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
   
+  private handleReset = () => {
+    if (this.resetCount >= 3) return;
+    this.resetCount++;
+    this.setState({ hasError: false, error: null });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
@@ -23,7 +30,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             </pre>
           )}
           <div className="flex gap-4">
-            <button onClick={() => this.setState({ hasError: false, error: null })}
+            <button onClick={this.handleReset}
               className="px-4 py-2 bg-kleia-burgundy text-white rounded-kleia hover:opacity-90">
               Réessayer
             </button>

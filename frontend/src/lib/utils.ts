@@ -19,25 +19,25 @@ export function getCourseGradient(level: string): string {
 }
 
 export interface CardCourse {
-  id: string;
-  title: string;
   slug: string;
-  shortDescription: string;
+  title: string;
   level: string;
+  shortDescription: string;
   duration: string;
   progress: number;
+  lessonCount: number;
   thumbnailColor: string;
 }
 
-export function toCardCourse(course: { id: string; title: string; slug: string; short_description?: string | null; level: string; duration_seconds: number; }): CardCourse {
+export function toCardCourse(course: { id: string; title: string; slug: string; short_description?: string | null; level: string; duration_seconds: number; lessons?: number; }): CardCourse {
   return {
-    id: course.id,
-    title: course.title,
     slug: course.slug,
-    shortDescription: course.short_description || '',
+    title: course.title,
     level: course.level,
+    shortDescription: course.short_description || '',
     duration: formatDuration(course.duration_seconds),
     progress: 0,
+    lessonCount: course.lessons ?? 0,
     thumbnailColor: getCourseGradient(course.level),
   };
 }

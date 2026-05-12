@@ -1,27 +1,96 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import clsx from 'clsx';
 import { useAuth } from '@/context/AuthContext';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
+import { getMyCertificates, downloadCertificate } from '@/api/certificates';
+import { getMyEnrollments } from '@/api/enrollments';
+import type { CertificateWithDetails } from '@/api/certificates';
 import { mockCertificates, mockCourses, getCompletedCourses } from '@/mock';
 
 export default function Profile() {
   const { user, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState({ email: true, progress: true });
-  const completedCourses = getCompletedCourses();
-  const startedCourses = mockCourses.filter(c => c.progress > 0 && c.progress < 100);
-  const totalHours = mockCourses.reduce((acc, c) => {
-    const h = parseInt(c.duration);
-    return acc + (isNaN(h) ? 0 : h);
-  }, 0);
+  const [certs, setCerts] = useState<CertificateWithDetails[]>([]);
+  const [certsLoading, setCertsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getMyCertificates();
+        setCerts(data);
+      } catch {
+        // fallback mock data if API unavailable
+        setCerts(
+          mockCertificates.map((m) => ({
+            id: m.id,
+            user_id: '',
+            course_id: '',
+            certificate_number: m.certificateNumber,
+            issued_at: m.issuedAt,
+            metadata_json: null,
+            created_at: m.issuedAt,
+            user_name: user?.display_name || '',
+            course_title: m.courseName,
+            course_slug: '',
+          }))
+        );
+      } finally {
+        setCertsLoading(false);
+      }
+    })();
+  }, [user]);
+
+  const handleDownload = async (certId: string) => {
+    try {
+      const blob = await downloadCertificate(certId);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `certificat-${certId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // silent
+    }
+  };
+
+  const [enrollments, setEnrollments] = useState<{ id: string; status: string }[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getMyEnrollments();
+        setEnrollments(data);
+      } catch {
+        // API unavailable — fall back to mock below
+      }
+    })();
+  }, []);
+
+  const hasRealEnrollments = enrollments.length > 0;
+  const completedCourses = hasRealEnrollments
+    ? enrollments.filter(e => e.status === 'completed').length
+    : getCompletedCourses().length;
+  const startedCourses = hasRealEnrollments
+    ? enrollments.filter(e => e.status === 'active').length
+    : mockCourses.filter(c => c.progress > 0 && c.progress < 100).length;
+  const totalHours = hasRealEnrollments
+    ? 0 // would need per-course duration from real enrollments
+    : mockCourses.reduce((acc, c) => {
+        const h = parseInt(c.duration);
+        return acc + (isNaN(h) ? 0 : h);
+      }, 0);
 
   const stats = [
-    { label: 'Formations en cours', value: startedCourses.length.toString() },
-    { label: 'Terminées', value: completedCourses.length.toString() },
+    { label: 'Formations en cours', value: startedCourses.toString() },
+    { label: 'Terminées', value: completedCourses.toString() },
     { label: 'Heures visionnées', value: totalHours.toString() + 'h' },
-    { label: 'Certificats', value: mockCertificates.length.toString() },
+    { label: 'Certificats', value: certs.length.toString() },
   ];
 
   if (authLoading) return <Loading text="Chargement du profil..." />;
@@ -35,7 +104,7 @@ export default function Profile() {
       <Card>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="h-20 w-20 rounded-full gradient-burgundy flex items-center justify-center text-white text-2xl font-bold font-heading shadow-lg flex-shrink-0">
-            {user.display_name ? user.display_name.charAt(0).toUpperCase() : user.initials}
+            {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
           </div>
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{user.display_name}</h1>
@@ -45,7 +114,7 @@ export default function Profile() {
                 {roleLabel}
               </Badge>
               <span className="text-xs text-kleia-gray font-body">
-                Membre depuis {new Date().toLocaleDateString('fr-FR')}
+                Membre depuis {new Date(user.created_at || Date.now()).toLocaleDateString('fr-FR')}
               </span>
             </div>
           </div>
@@ -63,21 +132,23 @@ export default function Profile() {
 
       <section>
         <h2 className="text-xl font-bold font-heading text-kleia-dark mb-4">Mes certificats</h2>
-        {mockCertificates.length > 0 ? (
+        {certsLoading ? (
+          <Loading text="Chargement des certificats..." />
+        ) : certs.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-4">
-            {mockCertificates.map((cert) => (
+            {certs.map((cert) => (
               <Card key={cert.id} className="border-l-4 border-kleia-gold">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-heading font-bold text-kleia-dark">{cert.courseName}</h3>
+                    <h3 className="font-heading font-bold text-kleia-dark">{cert.course_title}</h3>
                     <p className="text-sm text-kleia-gray font-body mt-1">
-                      Délivré le {cert.issuedDate}
+                      Délivré le {new Date(cert.issued_at).toLocaleDateString('fr-FR')}
                     </p>
                     <p className="text-xs text-kleia-gray/60 font-body mt-0.5">
-                      N° {cert.certificateNumber}
+                      N° {cert.certificate_number}
                     </p>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => {}}>
+                  <Button variant="outline" size="sm" onClick={() => handleDownload(cert.id)}>
                     Télécharger
                   </Button>
                 </div>

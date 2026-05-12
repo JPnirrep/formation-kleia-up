@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from datetime import datetime
+
 from pydantic import BaseModel, EmailStr
 import uuid
 
@@ -29,5 +33,6 @@ class UserProfile(BaseModel):
     display_name: str
     avatar_url: str | None = None
     role: str
+    created_at: datetime
 
     model_config = {"from_attributes": True}

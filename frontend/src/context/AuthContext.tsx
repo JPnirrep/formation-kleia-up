@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { api } from '@/api';
-import { loginWithEmail, loginWithGoogle as googleLogin, logout as apiLogout } from '@/api/auth';
-import { isAuthenticated } from '@/api/client';
+import { loginWithEmail, loginWithGoogle as googleLogin, logout as apiLogout, getProfile } from '@/api/auth';
+import { isAuthenticated, ApiError } from '@/api/client';
 import type { UserProfile } from '@/types';
 
 interface AuthState {
@@ -28,10 +28,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     try {
-      const profile = await api.request<UserProfile>('/auth/me');
+      const profile = await getProfile();
       setUser(profile);
-    } catch {
-      api.clearTokens();
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 401) {
+        api.clearTokens();
+      }
       setUser(null);
     } finally {
       setLoading(false);

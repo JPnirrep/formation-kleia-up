@@ -4,8 +4,7 @@ export interface UserProfile {
   display_name: string;
   avatar_url?: string;
   role: 'learner' | 'trainer' | 'admin';
-  initials: string;
-  joinedAt: string;
+  created_at: string;
 }
 
 export interface AuthResponse {
@@ -23,15 +22,14 @@ export interface TokenResponse {
 
 export interface CourseProgress {
   course_id: string;
-  completed_lessons: number;
-  total_lessons: number;
-  percentage: number;
-  last_activity: string;
+  course_title: string;
+  lessons_progress: { lesson_id: string; status: string; completed_at: string | null }[];
 }
 
 export interface VideoProgressUpdate {
-  current_time: number;
-  duration: number;
+  last_position_seconds: number;
+  max_position_seconds: number;
+  percent_watched: number;
   completed: boolean;
 }
 
@@ -138,4 +136,53 @@ export interface LessonCreate {
 export interface EnrollmentGrant {
   user_id: string;
   course_id: string;
+}
+
+export interface Certificate {
+  id: string;
+  user_id: string;
+  course_id: string;
+  certificate_number: string;
+  issued_at: string;
+  metadata_json: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface CertificateWithDetails extends Certificate {
+  user_name: string;
+  course_title: string;
+  course_slug: string;
+}
+
+export interface VideoTrackRead {
+  id: string;
+  video_asset_id: string;
+  kind: string;
+  language: string;
+  label: string;
+  file_url: string;
+  is_default: boolean;
+  status: string;
+  created_at: string;
+}
+
+export interface VideoAssetRead {
+  id: string;
+  lesson_id: string;
+  title: string;
+  description: string | null;
+  order: number;
+  source_storage_key: string | null;
+  playback_manifest_url: string | null;
+  playback_url: string | null;
+  thumbnail_url: string | null;
+  duration_seconds: number;
+  status: string;
+  language: string;
+  visibility: string;
+  completion_threshold_percent: number;
+  tracks: VideoTrackRead[] | null;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
 }

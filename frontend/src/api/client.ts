@@ -46,17 +46,22 @@ async function request<T>(
   };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new ApiError(0, 'Erreur reseau. Verifiez votre connexion.');
+  }
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new ApiError(res.status, body.detail || 'Erreur serveur');
+    throw new ApiError(res.status, body.detail ?? 'Erreur serveur');
   }
 
-  if (res.status === 204) return undefined as T;
+  if (res.status === 204) throw new ApiError(204, 'Aucun contenu');
   return res.json();
 }
 

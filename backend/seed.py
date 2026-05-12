@@ -5,16 +5,21 @@ import sys
 
 os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./kleia_lms.db"
 
-from sqlalchemy import Uuid, JSON
+from sqlalchemy import Uuid, JSON, select
 from sqlalchemy.dialects import postgresql
 
-postgresql.UUID = Uuid
-postgresql.JSONB = JSON
+# SQLite compatibility: PostgreSQL-specific types don't exist in SQLite.
+# This monkey-patch is needed to run the seed script with SQLite during local dev.
+try:
+    postgresql.UUID = Uuid
+    postgresql.JSONB = JSON
+except AttributeError:
+    pass
 
 import asyncio
 
 from app.database import async_session, engine, Base
-from app.models import User, Course, Module, Lesson, Quiz, Question
+from app.models import User, Course, Module, Lesson, Quiz, Question, Certificate
 from app.services.auth import get_password_hash
 
 
@@ -40,7 +45,14 @@ async def seed():
             password_hash=get_password_hash("admin123"),
             is_active=True,
         )
-        session.add_all([clara, sandrina])
+        admin_user = User(
+            email="admin@kleia-up.com",
+            display_name="Admin",
+            role="admin",
+            password_hash=get_password_hash("admin"),
+            is_active=True,
+        )
+        session.add_all([clara, sandrina, admin_user])
         await session.flush()
         print(f"  Created: {clara.display_name} ({clara.email})")
         print(f"  Created: {sandrina.display_name} ({sandrina.email})")
@@ -55,7 +67,7 @@ async def seed():
                 "status": "published",
                 "category": "communication",
                 "duration_seconds": 5400,
-                "created_by": clara.id,
+                "created_by": sandrina.id,
                 "modules": [
                     {
                         "title": "Les Fondamentaux de la Communication",
@@ -503,6 +515,24 @@ async def seed():
         session.add_all(questions)
         await session.flush()
         print(f"  Created quiz: {quiz.title} ({len(questions)} questions)")
+
+        # Seed a sample certificate for the admin
+        first_course_result = await session.execute(select(Course).limit(1))
+        first_course = first_course_result.scalar_one_or_none()
+        if first_course:
+            admin_result = await session.execute(
+                select(User).where(User.email == "sandrina@kleia-up.com")
+            )
+            admin_user = admin_result.scalar_one_or_none()
+            if admin_user:
+                cert = Certificate(
+                    user_id=admin_user.id,
+                    course_id=first_course.id,
+                    certificate_number="KLEIA-2025-0047",
+                    metadata_json={"seed": True},
+                )
+                session.add(cert)
+                print(f"  Created certificate: {cert.certificate_number}")
 
         await session.commit()
         print("\nSeed complete!")

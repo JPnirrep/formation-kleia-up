@@ -34,6 +34,11 @@ export async function getProfile(): Promise<UserProfile> {
   return api.request<UserProfile>(`${AUTH_BASE}/auth/me`);
 }
 
-export function logout() {
+export async function logout() {
+  try {
+    await api.request(`${AUTH_BASE}/auth/logout`, { method: 'POST' });
+  } catch {
+    // Server unreachable — clear tokens locally anyway
+  }
   api.clearTokens();
 }

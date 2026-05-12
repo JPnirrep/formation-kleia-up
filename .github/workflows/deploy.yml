@@ -11,8 +11,8 @@ on:
 
 env:
   DEPLOY_PATH: /opt/kleia-up
-  VPS_HOST: 135.125.53.215
-  VPS_USER: ubuntu
+  VPS_HOST: ${{ secrets.VPS_HOST }}
+  VPS_USER: ${{ secrets.VPS_USER }}
 
 jobs:
   test:
@@ -76,11 +76,6 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-      - name: Run database migrations
-        run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes ${{ env.VPS_USER }}@${{ env.VPS_HOST }} \
-            "cd ${{ env.DEPLOY_PATH }} && docker-compose -f deploy/docker-compose.yml run --rm backend alembic upgrade head"
-
       - name: Déploiement via Docker Compose
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes ${{ env.VPS_USER }}@${{ env.VPS_HOST }} << 'DEPLOY_EOF'
@@ -93,15 +88,18 @@ jobs:
             cp deploy/.env .env 2>/dev/null || echo "⚠ .env déjà présent"
 
             echo "→ Reconstruction et redémarrage des services..."
-            docker-compose -f deploy/docker-compose.yml pull
-            docker-compose -f deploy/docker-compose.yml up -d --build
+            docker compose -f deploy/docker-compose.yml pull
+            docker compose -f deploy/docker-compose.yml up -d --build
 
             echo "→ Nettoyage des images obsolètes..."
             docker image prune -f
+
+            echo "→ Exécution des migrations de base de données..."
+            docker compose -f deploy/docker-compose.yml run --rm backend alembic upgrade head
 
             echo "✅ Déploiement terminé avec succès"
           DEPLOY_EOF
 
       - name: Vérification de l'état des services
         run: |
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "docker-compose -f ${{ env.DEPLOY_PATH }}/deploy/docker-compose.yml ps"
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes ${{ env.VPS_USER }}@${{ env.VPS_HOST }} "docker compose -f ${{ env.DEPLOY_PATH }}/deploy/docker-compose.yml ps"

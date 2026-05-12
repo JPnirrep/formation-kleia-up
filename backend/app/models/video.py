@@ -12,7 +12,8 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import JSON
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -127,7 +128,7 @@ class VideoEvent(Base, TimestampMixin):
     session_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     event_type: Mapped[str] = mapped_column(String(30), nullable=False)
     position_seconds: Mapped[float] = mapped_column(Float, nullable=False)
-    payload_json: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    payload_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     occurred_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

@@ -6,12 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.database import get_db
-from app.models.course import Course, Lesson
+from app.models.course import Course, Lesson, Module
 from app.models.progress import LessonProgress
 from app.models.user import User
 from app.models.video import VideoProgress
-from app.schemas.progress import LessonProgressRead, LessonProgressUpdate
-from app.schemas.video import VideoProgressRead, VideoProgressUpdate
+from app.schemas.video import VideoProgressUpdate
 
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -41,9 +40,7 @@ async def get_course_progress(
             LessonProgress.lesson_id.in_(
                 select(Lesson.id).where(
                     Lesson.module_id.in_(
-                        select(Lesson.module_id)
-                        .join(Course, Course.id == course_id)
-                        .distinct()
+                        select(Module.id).where(Module.course_id == course_id)
                     )
                 )
             ),

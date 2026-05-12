@@ -14,6 +14,8 @@ const navLinks: NavLinkItem[] = [
   { to: '/formations', label: 'Mes formations' },
   { to: '/profil', label: 'Mon profil' },
   { to: '/admin', label: 'Administration', adminOnly: true },
+  { to: '/admin/courses', label: 'Gérer les formations', adminOnly: true },
+  { to: '/admin/users', label: 'Gérer les utilisateurs', adminOnly: true },
 ];
 
 export default function Header() {
@@ -73,7 +75,7 @@ export default function Header() {
                   className="flex items-center gap-3 cursor-pointer"
                 >
                   <div className="h-9 w-9 rounded-full gradient-burgundy flex items-center justify-center text-white text-sm font-bold font-heading">
-                    {user.initials}
+                    {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
                 </button>
@@ -144,7 +146,7 @@ export default function Header() {
             {loading ? null : user ? (
               <div className="flex items-center gap-3 px-3 py-2 mt-2 border-t border-kleia-dark/10 pt-3">
                 <div className="h-8 w-8 rounded-full gradient-burgundy flex items-center justify-center text-white text-xs font-bold font-heading">
-                  {user.initials}
+                  {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
                 </div>
                 <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
               </div>

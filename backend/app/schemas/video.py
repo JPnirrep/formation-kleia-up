@@ -32,12 +32,14 @@ class VideoAssetRead(BaseModel):
     order: int
     source_storage_key: str | None = None
     playback_manifest_url: str | None = None
+    playback_url: str | None = None
     thumbnail_url: str | None = None
     duration_seconds: int
     status: str
     language: str
     visibility: str
     completion_threshold_percent: int
+    tracks: list["VideoTrackRead"] | None = None
     created_by: uuid.UUID
     created_at: datetime
     updated_at: datetime
