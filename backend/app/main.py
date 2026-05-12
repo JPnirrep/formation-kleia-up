@@ -1,6 +1,9 @@
+from collections.abc import Awaitable, Callable
 from datetime import datetime, timezone
+from typing import override
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -11,7 +14,10 @@ from app.config import settings
 class ForceCorsMiddleware(BaseHTTPMiddleware):
     """Middleware qui garantit les headers CORS sur TOUTES les reponses, meme les erreurs."""
 
-    async def dispatch(self, request: Request, call_next):
+    @override
+    async def dispatch(
+        self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
+    ) -> Response:
         if request.method == "OPTIONS":
             response = Response(status_code=200)
         else:
@@ -54,43 +60,48 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    # Les decorateurs FastAPI enregistrent ces fonctions aupres du routeur,
+    # donc Pyright ne les voit pas comme "accedees" — on ignore ce faux positif.
+
     @app.exception_handler(401)
-    async def unauthorized_handler(request: Request, exc):
+    async def unauthorized_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
         return JSONResponse(
             status_code=401,
             content={"detail": "Non authentifié. Veuillez vous connecter."},
         )
 
     @app.exception_handler(403)
-    async def forbidden_handler(request: Request, exc):
+    async def forbidden_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
         return JSONResponse(
             status_code=403,
             content={"detail": "Accès refusé. Vous n'avez pas les droits nécessaires."},
         )
 
     @app.exception_handler(404)
-    async def not_found_handler(request: Request, exc):
+    async def not_found_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
         return JSONResponse(
             status_code=404,
             content={"detail": "Ressource non trouvée."},
         )
 
     @app.exception_handler(422)
-    async def validation_handler(request: Request, exc):
+    async def validation_handler(  # pyright: ignore[reportUnusedFunction]
+        _request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         return JSONResponse(
             status_code=422,
-            content={"detail": exc.errors() if hasattr(exc, "errors") else str(exc)},
+            content={"detail": exc.errors()},
         )
 
     @app.exception_handler(500)
-    async def internal_handler(request: Request, exc):
+    async def internal_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
         return JSONResponse(
             status_code=500,
             content={"detail": "Erreur interne du serveur."},
         )
 
     @app.get("/api/health")
-    async def health_check():
+    async def health_check() -> dict[str, str]:  # pyright: ignore[reportUnusedFunction]
         return {
             "status": "ok",
             "version": settings.VERSION,

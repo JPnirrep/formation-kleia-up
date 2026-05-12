@@ -29,6 +29,17 @@
 - Frontend : ProtectedRoute, ErrorBoundary, AbortController, Profile API
 - Utils partagés, hardcoded colors → theme tokens
 
+## [2025-07-14] Audit V4 — Full-stack project audit + corrections infrastructure
+- Audit complet du projet : adhérence stack, dépendances, Docker, environnement
+- `Dockerfile.backend` : installation depuis `pyproject.toml` (source unique de vérité) au lieu de `requirements.txt`
+- `Dockerfile.backend` : ajout `HEALTHCHECK` via `/api/health`
+- `Dockerfile.frontend` : `HEALTHCHECK` déjà présent, validé
+- `docker-compose.yml` : toutes les conditions `depends_on` passées de `service_started` à `service_healthy`
+- `docker-compose.yml` : consolidation du `env_file` db/backend vers un unique `./deploy/.env`
+- `deploy/.env.example` : template documenté avec toutes les variables requises
+- `backend/app/main.py` : 30 warnings Pyright corrigés (annotations de type, `@override`, `RequestValidationError`, directives `pyright: ignore`)
+- Chaîne de démarrage garantie : db (healthy) → backend (healthy) → frontend (healthy) → nginx
+
 ## [2026-05-11] Audit V3 — 13 corrections qualité + pagination
 - Backend : pagination users/enrollments, UUID Create schemas
 - Frontend : AdminDashboard API, boutons fonctionnels, mark complete API

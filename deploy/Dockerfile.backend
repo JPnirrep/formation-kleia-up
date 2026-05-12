@@ -20,9 +20,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Création du répertoire de l'application
 WORKDIR /app
 
-# Copie des fichiers de dépendances
-COPY backend/requirements.txt .
-RUN pip install --user --no-warn-script-location -r requirements.txt
+# Copie des fichiers de dépendances et du package
+# pyproject.toml est la source unique de vérité pour les dépendances
+COPY backend/pyproject.toml .
+COPY backend/app/ app/
+RUN pip install --user --no-warn-script-location .
 
 # ============================================================
 # ÉTAPE 2 : Image finale légère
@@ -48,6 +50,10 @@ COPY backend/ .
 
 # Exposition du port
 EXPOSE 8000
+
+# Vérification de santé via l'endpoint /api/health
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')" || exit 1
 
 # Commande de démarrage avec Uvicorn
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--proxy-headers", "--forwarded-allow-ips", "*"]

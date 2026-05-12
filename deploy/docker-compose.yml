@@ -31,10 +31,9 @@ services:
     restart: unless-stopped
     expose:
       - "3000"
-    # TODO: add healthcheck for frontend service, then switch to condition: service_healthy
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
     networks:
       - kleia-network
 
@@ -48,9 +47,9 @@ services:
       - ./nginx/ssl:/etc/letsencrypt:ro
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       frontend:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
   db:
@@ -60,7 +59,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - .env
+      - ./deploy/.env
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
