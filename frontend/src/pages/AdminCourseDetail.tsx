@@ -50,6 +50,11 @@ export default function AdminCourseDetail() {
   const [newLessonType, setNewLessonType] = useState('video');
   const [newLessonDur, setNewLessonDur] = useState(600);
 
+  // YouTube URL form
+  const [youtubeLessonId, setYoutubeLessonId] = useState<string | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [youtubeTitle, setYoutubeTitle] = useState('');
+
   // Content editor
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -140,21 +145,46 @@ export default function AdminCourseDetail() {
     } catch { alert('Erreur suppression'); }
   };
 
-  const handleVideoUpload = async (lessonId: string, file: File) => {
-    const token = api.getToken();
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('title', file.name);
+  /** Extract YouTube video ID from various URL formats */
+  function extractYoutubeId(url: string): string | null {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /^([a-zA-Z0-9_-]{11})$/,
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  const handleAddYoutubeVideo = async () => {
+    if (!youtubeLessonId || !youtubeUrl.trim()) return;
+    const videoId = extractYoutubeId(youtubeUrl.trim());
+    if (!videoId) {
+      alert('URL YouTube invalide. Utilisez youtube.com/watch?v=XXX ou youtu.be/XXX');
+      return;
+    }
     try {
-      const res = await fetch(`/api/v1/admin/lessons/${lessonId}/videos`, {
+      const token = api.getToken();
+      const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      const res = await fetch(`/api/v1/admin/lessons/${youtubeLessonId}/videos`, {
         method: 'POST',
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-        body: fd,
+        headers: token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : {},
+        body: JSON.stringify({
+          title: youtubeTitle || 'Vidéo YouTube',
+          playback_url: embedUrl,
+          status: 'published',
+          visibility: 'published',
+        }),
       });
       if (!res.ok) throw new Error();
       const vid = await res.json();
-      setLessonVideos(prev => ({ ...prev, [lessonId]: [...(prev[lessonId] || []), vid] }));
-    } catch { alert('Erreur upload vidéo'); }
+      setLessonVideos(prev => ({ ...prev, [youtubeLessonId]: [...(prev[youtubeLessonId] || []), vid] }));
+      setYoutubeUrl('');
+      setYoutubeTitle('');
+      setYoutubeLessonId(null);
+    } catch { alert("Erreur ajout vidéo YouTube. Vérifiez l'URL."); }
   };
 
   const handleResourceUpload = async (lessonId: string, file: File) => {
@@ -315,32 +345,54 @@ export default function AdminCourseDetail() {
                             <span className="text-xs text-kleia-gray/60">{Math.round(lesson.duration_seconds / 60)} min</span>
                           </div>
 
-                          {/* Video section */}
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            <label className="text-xs text-kleia-burgundy cursor-pointer hover:underline">
-                              + Ajouter une vidéo
-                              <input type="file" accept="video/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleVideoUpload(lesson.id, f); }} />
-                            </label>
+                          {/* Video section - YouTube only */}
+                          <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <button
+                              onClick={() => { setYoutubeLessonId(lesson.id); setYoutubeUrl(''); setYoutubeTitle(''); }}
+                              className="text-xs text-kleia-burgundy cursor-pointer hover:underline"
+                            >
+                              + Ajouter une video YouTube
+                            </button>
                             <label className="text-xs text-kleia-burgundy cursor-pointer hover:underline">
                               + Ajouter un fichier (PDF, doc...)
                               <input type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleResourceUpload(lesson.id, f); }} />
                             </label>
                             {lesson.lesson_type === 'text' && (
                               <button onClick={() => { setEditingLesson(lesson.id); setEditContent(''); }} className="text-xs text-kleia-burgundy hover:underline">
-                                + Éditer le contenu texte
+                                + Editer le contenu texte
                               </button>
                             )}
                           </div>
 
+                          {/* YouTube URL input */}
+                          {youtubeLessonId === lesson.id && (
+                            <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                              <p className="text-xs text-kleia-gray font-body mb-2">
+                                Collez le lien YouTube de votre video (publique ou non repertoriee)
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=XXXXXXXXXXX" className="flex-1 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy" autoFocus />
+                                <input type="text" value={youtubeTitle} onChange={(e) => setYoutubeTitle(e.target.value)} placeholder="Titre (optionnel)" className="w-40 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy" />
+                              </div>
+                              <div className="flex gap-2 mt-2">
+                                <Button variant="primary" size="sm" onClick={handleAddYoutubeVideo} disabled={!youtubeUrl.trim()}>Ajouter</Button>
+                                <Button variant="ghost" size="sm" onClick={() => setYoutubeLessonId(null)}>Annuler</Button>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Videos list */}
                           {(lessonVideos[lesson.id]?.length || 0) > 0 && (
                             <div className="mt-2 space-y-1">
-                              {lessonVideos[lesson.id]?.map((v) => (
-                                <div key={v.id} className="flex items-center gap-2 text-xs text-kleia-gray">
-                                  <span>🎬 {v.title}</span>
-                                  {v.playback_url && <a href={v.playback_url} target="_blank" className="text-kleia-burgundy hover:underline">Voir</a>}
-                                </div>
-                              ))}
+                              {lessonVideos[lesson.id]?.map((v) => {
+                                const isYt = v.playback_url && v.playback_url.includes('youtube.com/embed/');
+                                return (
+                                  <div key={v.id} className="flex items-center gap-2 text-xs text-kleia-gray">
+                                    <span>{isYt ? '▶️' : '🎬'} {v.title}</span>
+                                    {v.playback_url && <a href={v.playback_url} target="_blank" rel="noopener noreferrer" className="text-kleia-burgundy hover:underline">{isYt ? 'Voir sur YouTube' : 'Voir'}</a>}
+                                  </div>
+                                );
+                              })}
                             </div>
                           )}
 

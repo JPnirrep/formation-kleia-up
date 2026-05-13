@@ -88,7 +88,7 @@ export default function AdminCourses() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate(`/admin/courses/${course.id}`)}
+                  onClick={() => navigate(`/admin/courses/${course.slug}`)}
                   aria-label={`Modifier ${course.title}`}
                 >
                   Modifier

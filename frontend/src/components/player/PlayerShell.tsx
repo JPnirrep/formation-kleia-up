@@ -25,6 +25,7 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
   videoRefState.current = video;
 
   const playbackUrl = video?.playback_url ?? null;
+  const isYoutube = playbackUrl?.includes('youtube.com/embed/') ?? false;
 
   const sendEventRef = useRef((_eventType: string, _position?: number) => {});
   sendEventRef.current = (eventType: string, position?: number) => {
@@ -49,8 +50,9 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
     }).catch(() => {});
   };
 
-  // Handle video element events
+  // Handle video element events (only for non-YouTube)
   useEffect(() => {
+    if (isYoutube) return;
     const el = videoRef.current;
     if (!el || !playbackUrl) return;
 
@@ -118,43 +120,45 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
       if (heartbeatRef.current) clearInterval(heartbeatRef.current);
       sendEventRef.current('ended', el.currentTime);
     };
-  }, [playbackUrl]);
+  }, [playbackUrl, isYoutube]);
 
   if (!playbackUrl) {
     return (
-      <div
-        className={clsx(
-          'relative w-full aspect-video glass-dark flex items-center justify-center overflow-hidden',
-          className
-        )}
-      >
+      <div className={clsx('relative w-full aspect-video glass-dark flex items-center justify-center overflow-hidden', className)}>
         <div className="relative z-10 flex flex-col items-center gap-4 text-center px-6">
-          <svg
-            className="w-16 h-16 text-kleia-burgundy/60"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
+          <svg className="w-16 h-16 text-kleia-burgundy/60" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
-          <h3 className="text-lg font-bold font-heading text-kleia-dark">
-            {video?.title || 'Vidéo'}
-          </h3>
-          <p className="text-sm text-kleia-gray">
-            Aucune vidéo disponible pour cette leçon.
-          </p>
+          <h3 className="text-lg font-bold font-heading text-kleia-dark">{video?.title || 'Vidéo'}</h3>
+          <p className="text-sm text-kleia-gray">Aucune vidéo disponible pour cette leçon.</p>
         </div>
       </div>
     );
   }
 
+  // YouTube embed
+  if (isYoutube) {
+    return (
+      <div className={clsx('relative w-full aspect-video bg-black overflow-hidden rounded-kleia', className)}>
+        <iframe
+          src={playbackUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title={video?.title || 'Lecteur vidéo'}
+        />
+        {video?.title && (
+          <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
+            <h3 className="text-white text-sm font-bold font-heading truncate">{video.title}</h3>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // HTML5 video player
   return (
-    <div
-      className={clsx(
-        'relative w-full aspect-video bg-black overflow-hidden rounded-kleia',
-        className
-      )}
-    >
+    <div className={clsx('relative w-full aspect-video bg-black overflow-hidden rounded-kleia', className)}>
       {status === 'loading' && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/60">
           <div className="flex flex-col items-center gap-3">
@@ -170,41 +174,23 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
         </div>
       )}
 
-      <video
-        ref={videoRef}
-        className="w-full h-full object-contain"
-        controls
-        playsInline
-        preload="metadata"
-        aria-label={video?.title || 'Lecteur vidéo'}
-      >
+      <video ref={videoRef} className="w-full h-full object-contain" controls playsInline preload="metadata" aria-label={video?.title || 'Lecteur vidéo'}>
         {video?.tracks?.map((track) => (
-          <track
-            key={track.id}
-            kind={track.kind as TextTrackKind}
-            src={track.file_url}
-            srcLang={track.language}
-            label={track.label}
-            default={track.is_default}
-          />
+          <track key={track.id} kind={track.kind as TextTrackKind} src={track.file_url} srcLang={track.language} label={track.label} default={track.is_default} />
         ))}
       </video>
 
       {video?.title && (
         <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
-          <h3 className="text-white text-sm font-bold font-heading truncate">
-            {video.title}
-          </h3>
+          <h3 className="text-white text-sm font-bold font-heading truncate">{video.title}</h3>
         </div>
       )}
 
       <div className="absolute bottom-0 left-0 right-0 p-1 bg-black/40 pointer-events-none text-right">
         <span className="text-white/60 text-xs font-body">
-          {Math.floor(currentTime / 60)}:
-          {String(Math.floor(currentTime % 60)).padStart(2, '0')}
+          {Math.floor(currentTime / 60)}:{String(Math.floor(currentTime % 60)).padStart(2, '0')}
           {' / '}
-          {Math.floor(duration / 60)}:
-          {String(Math.floor(duration % 60)).padStart(2, '0')}
+          {Math.floor(duration / 60)}:{String(Math.floor(duration % 60)).padStart(2, '0')}
         </span>
       </div>
     </div>
