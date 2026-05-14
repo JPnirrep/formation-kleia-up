@@ -58,7 +58,15 @@ async function request<T>(
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new ApiError(res.status, body.detail ?? 'Erreur serveur');
+    const error = new ApiError(res.status, body.detail ?? 'Erreur serveur');
+    
+    // Détection spécifique pour la progression linéaire
+    if (res.status === 403 && body.detail?.toLowerCase().includes('terminer la leçon')) {
+      (error as any).isLocked = true;
+      (error as any).requiredLessonTitle = body.required_lesson_title;
+    }
+    
+    throw error;
   }
 
   if (res.status === 204) throw new ApiError(204, 'Aucun contenu');

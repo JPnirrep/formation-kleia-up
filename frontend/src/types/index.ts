@@ -166,6 +166,19 @@ export interface VideoTrackRead {
   created_at: string;
 }
 
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  image_url: string | null;
+  badge_type: string;
+}
+
+export interface ProgressResponse {
+  message: string;
+  new_badges: Badge[];
+}
+
 export interface VideoAssetRead {
   id: string;
   lesson_id: string;

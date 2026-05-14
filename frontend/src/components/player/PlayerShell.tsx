@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { recordVideoEvent, updateVideoProgress } from '@/api';
 import type { VideoAssetRead } from '@/types';
+import YouTubePlayer from './YouTubePlayer';
 
 interface PlayerShellProps {
   video?: VideoAssetRead;
@@ -138,14 +139,22 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
 
   // YouTube embed
   if (isYoutube) {
+    const videoId = playbackUrl.split('/').pop()?.split('?')[0] || '';
+    
     return (
       <div className={clsx('relative w-full aspect-video bg-black overflow-hidden rounded-kleia', className)}>
-        <iframe
-          src={playbackUrl}
+        <YouTubePlayer 
+          videoId={videoId}
           className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          title={video?.title || 'Lecteur vidéo'}
+          onProgress={(percent, currentTime, duration) => {
+            setCurrentTime(currentTime);
+            setDuration(duration);
+            sendProgressRef.current();
+          }}
+          onEnded={() => {
+            sendEventRef.current('ended');
+            sendProgressRef.current(true);
+          }}
         />
         {video?.title && (
           <div className="absolute top-0 left-0 right-0 p-3 bg-gradient-to-b from-black/60 to-transparent pointer-events-none">
