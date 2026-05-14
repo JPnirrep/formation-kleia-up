@@ -67,6 +67,11 @@ class CourseCreate(BaseModel):
     thumbnail_url: str | None = None
     level: str = "débutant"
     category: str | None = None
+    is_premium: bool = False
+    price_ht: float = 0.0
+    tva_rate: float = 20.0
+    stripe_product_id: str | None = None
+    is_linear_progression_enforced: bool = True
 
 
 class CourseUpdate(BaseModel):
@@ -78,6 +83,11 @@ class CourseUpdate(BaseModel):
     level: str | None = None
     status: str | None = None
     category: str | None = None
+    is_premium: bool | None = None
+    price_ht: float | None = None
+    tva_rate: float | None = None
+    stripe_product_id: str | None = None
+    is_linear_progression_enforced: bool | None = None
 
 
 class CourseRead(BaseModel):
@@ -91,6 +101,11 @@ class CourseRead(BaseModel):
     level: str
     status: str
     category: str | None = None
+    is_premium: bool
+    price_ht: float
+    tva_rate: float
+    stripe_product_id: str | None = None
+    is_linear_progression_enforced: bool
     created_by: uuid.UUID
     modules: list[ModuleRead] = []
     created_at: datetime
@@ -109,6 +124,10 @@ class CourseList(BaseModel):
     level: str
     status: str
     category: str | None = None
+    is_premium: bool
+    price_ht: float
+    tva_rate: float
+    is_linear_progression_enforced: bool
     created_at: datetime
 
     model_config = {"from_attributes": True}

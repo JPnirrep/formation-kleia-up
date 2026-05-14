@@ -18,15 +18,25 @@ from app.services.storage import get_playback_url
 router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
+from app.services.progress_service import check_lesson_unlocked
+
 @router.get(
     "/lessons/{lesson_id}/videos",
     response_model=list[VideoAssetRead],
 )
 async def list_lesson_videos(
     lesson_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     """List published videos for a lesson."""
+    # Guard conditionnel
+    lesson_stmt = select(Lesson).options(selectinload(Lesson.module)).where(Lesson.id == lesson_id)
+    lesson = (await db.execute(lesson_stmt)).scalar_one_or_none()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Leçon introuvable.")
+    await check_lesson_unlocked(db, current_user.id, lesson)
+
     stmt = (
         select(VideoAsset)
         .where(
@@ -64,6 +74,33 @@ async def record_video_event(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Vidéo non trouvée.",
         )
+
+    if data.event_type == "heartbeat":
+        from app.models.video import VideoProgress
+        prog_stmt = select(VideoProgress).where(
+            VideoProgress.user_id == current_user.id,
+            VideoProgress.video_asset_id == video_id,
+        )
+        prog_res = await db.execute(prog_stmt)
+        video_progress = prog_res.scalar_one_or_none()
+        
+        if video_progress is None:
+            video_progress = VideoProgress(
+                user_id=current_user.id,
+                video_asset_id=video_id,
+                last_position_seconds=data.position_seconds,
+                max_position_seconds=data.position_seconds,
+                percent_watched=0.0,
+                completed=False,
+            )
+            db.add(video_progress)
+        else:
+            video_progress.last_position_seconds = data.position_seconds
+            if data.position_seconds > (video_progress.max_position_seconds or 0):
+                video_progress.max_position_seconds = data.position_seconds
+                
+        await db.commit()
+        return {"status": "ok", "event_type": data.event_type, "note": "heartbeat saved to progress"}
 
     event = VideoEvent(
         user_id=current_user.id,

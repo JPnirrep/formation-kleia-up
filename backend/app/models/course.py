@@ -31,6 +31,16 @@ class Course(Base, TimestampMixin):
     level: Mapped[str] = mapped_column(String(20), nullable=False, default="débutant")
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="draft")
     category: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    
+    # Nouveaux champs financiers
+    is_premium: Mapped[bool] = mapped_column(default=False)
+    price_ht: Mapped[float] = mapped_column(default=0.0)
+    tva_rate: Mapped[float] = mapped_column(default=20.0)
+    stripe_product_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    
+    # Paramètres pédagogiques
+    is_linear_progression_enforced: Mapped[bool] = mapped_column(default=True)
+    
     created_by: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )

@@ -64,6 +64,10 @@ async def get_course_progress(
     }
 
 
+from sqlalchemy.orm import selectinload
+from app.models.video import VideoAsset
+from app.models.quiz import Quiz, Attempt
+
 @router.post("/lessons/{lesson_id}/complete")
 async def complete_lesson(
     lesson_id: UUID,
@@ -71,8 +75,48 @@ async def complete_lesson(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    Marque une leçon comme terminée pour l'utilisateur connecté.
+    Marque une leçon comme terminée pour l'utilisateur connecté avec validation stricte.
     """
+    # 1. Vérifier l'existence et le type de la leçon
+    lesson_stmt = select(Lesson).options(
+        selectinload(Lesson.module).selectinload(Module.course)
+    ).where(Lesson.id == lesson_id)
+    lesson_result = await db.execute(lesson_stmt)
+    lesson = lesson_result.scalar_one_or_none()
+    
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Leçon introuvable.")
+
+    # 2. Validation stricte selon le type de leçon
+    if lesson.lesson_type == "video":
+        vp_stmt = select(VideoProgress).join(VideoAsset).where(
+            VideoAsset.lesson_id == lesson.id,
+            VideoProgress.user_id == current_user.id
+        )
+        vps = (await db.execute(vp_stmt)).scalars().all()
+        # On tolère 95% pour éviter les bugs de fin de vidéo
+        if not any(vp.percent_watched >= 95 or vp.completed for vp in vps):
+            raise HTTPException(
+                status_code=403, 
+                detail="Vous devez visionner la vidéo jusqu'à la fin pour valider cette étape."
+            )
+            
+    elif lesson.lesson_type == "quiz":
+        quiz_stmt = select(Quiz).where(Quiz.lesson_id == lesson.id)
+        quiz = (await db.execute(quiz_stmt)).scalar_one_or_none()
+        if quiz:
+            attempt_stmt = select(Attempt).where(
+                Attempt.quiz_id == quiz.id,
+                Attempt.user_id == current_user.id
+            ).order_by(Attempt.score.desc())
+            best_attempt = (await db.execute(attempt_stmt)).scalars().first()
+            if not best_attempt or best_attempt.score < quiz.passing_score_percent:
+                raise HTTPException(
+                    status_code=403, 
+                    detail=f"Vous devez obtenir au moins {quiz.passing_score_percent}% au quiz pour valider cette étape."
+                )
+
+    # 3. Enregistrer la complétion
     stmt = select(LessonProgress).where(
         LessonProgress.user_id == current_user.id,
         LessonProgress.lesson_id == lesson_id,
@@ -90,11 +134,19 @@ async def complete_lesson(
     else:
         progress.status = "completed"
 
+    # 4. Évaluer les badges (Gamification)
+    from app.services.gamification_service import evaluate_lesson_completion
+    awarded_badges = await evaluate_lesson_completion(db, current_user.id, lesson)
+
     await db.commit()
     await db.refresh(progress)
     return {
         "lesson_id": lesson_id,
         "status": "completed",
+        "new_badges": [
+            {"id": b.id, "title": b.title, "image_url": b.image_url} 
+            for b in awarded_badges
+        ]
     }
 
 

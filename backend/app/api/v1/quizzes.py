@@ -15,6 +15,8 @@ from app.schemas.quiz import AttemptCreate
 router = APIRouter()
 
 
+from app.services.progress_service import check_lesson_unlocked
+
 @router.get("/{quiz_id}")
 async def get_quiz(
     quiz_id: UUID,
@@ -25,7 +27,10 @@ async def get_quiz(
     Récupère un quiz avec ses questions.
     Les réponses correctes (is_correct) sont masquées pour les apprenants.
     """
-    stmt = select(Quiz).where(Quiz.id == quiz_id).options(selectinload(Quiz.questions))
+    stmt = select(Quiz).where(Quiz.id == quiz_id).options(
+        selectinload(Quiz.questions),
+        selectinload(Quiz.lesson)
+    )
     result = await db.execute(stmt)
     quiz = result.scalar_one_or_none()
     if quiz is None:
@@ -33,6 +38,10 @@ async def get_quiz(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Quiz non trouvé.",
         )
+        
+    # Guard conditionnel
+    if quiz.lesson:
+        await check_lesson_unlocked(db, current_user.id, quiz.lesson)
 
     quiz_data = {
         "id": quiz.id,

@@ -6,6 +6,8 @@ from app.models.quiz import Quiz, Question, Attempt
 from app.models.enrollment import Enrollment
 from app.models.progress import LessonProgress
 from app.models.certificate import Certificate
+from app.models.resource import LessonResource
+from app.models.badge import Badge, UserBadge
 
 __all__ = [
     "TimestampMixin",
@@ -23,4 +25,7 @@ __all__ = [
     "Enrollment",
     "LessonProgress",
     "Certificate",
+    "LessonResource",
+    "Badge",
+    "UserBadge",
 ]

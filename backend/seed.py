@@ -19,7 +19,7 @@ except AttributeError:
 import asyncio
 
 from app.database import async_session, engine, Base
-from app.models import User, Course, Module, Lesson, Quiz, Question, Certificate
+from app.models import User, Course, Module, Lesson, Quiz, Question, Certificate, Badge
 from app.services.auth import get_password_hash
 
 
@@ -56,6 +56,27 @@ async def seed():
         await session.flush()
         print(f"  Created: {clara.display_name} ({clara.email})")
         print(f"  Created: {sandrina.display_name} ({sandrina.email})")
+        
+        print("Creating default badges...")
+        badges = [
+            Badge(
+                title="Premier Pas",
+                description="Félicitations pour avoir terminé votre première leçon !",
+                criteria_type="first_lesson"
+            ),
+            Badge(
+                title="Expert Quiz",
+                description="Vous avez obtenu un score parfait de 100% à un quiz !",
+                criteria_type="perfect_quiz"
+            ),
+            Badge(
+                title="Diplômé d'Agora",
+                description="Vous avez terminé l'intégralité d'un parcours de formation.",
+                criteria_type="course_completion"
+            )
+        ]
+        session.add_all(badges)
+        await session.flush()
 
         courses_data = [
             {

@@ -14,6 +14,8 @@ from app.api.v1 import (
     uploads,
     users,
     videos,
+    resources,
+    badges,
 )
 
 api_v1_router = APIRouter(prefix="/api/v1")
@@ -31,6 +33,12 @@ api_v1_router.include_router(
 )
 api_v1_router.include_router(
     videos.router, prefix="/videos", tags=["Vidéos (apprenant)"]
+)
+api_v1_router.include_router(
+    resources.router, prefix="/resources", tags=["Ressources (apprenant)"]
+)
+api_v1_router.include_router(
+    badges.router, prefix="/badges", tags=["Badges (apprenant)"]
 )
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Administration"])
 api_v1_router.include_router(
