@@ -17,6 +17,7 @@ import AdminCourseDetail from '@/pages/AdminCourseDetail';
 import AdminUsers from '@/pages/AdminUsers';
 import LoginPage from '@/pages/LoginPage';
 import NotFound from '@/pages/NotFound';
+import CoachingHub from '@/pages/CoachingHub';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
               <Route path="/lecon/:lessonId" element={<LessonView />} />
               <Route path="/quiz/:quizId" element={<QuizView />} />
               <Route path="/profil" element={<Profile />} />
+              <Route path="/coaching" element={<CoachingHub />} />
               <Route element={<ProtectedRoute requiredRole="admin" />}>
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/admin/courses" element={<AdminCourses />} />

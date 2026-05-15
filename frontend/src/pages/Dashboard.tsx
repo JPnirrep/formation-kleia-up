@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { BookOpen, CheckCircle2, Clock, Award, PlayCircle, Settings } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import CourseCard from '@/components/course/CourseCard';
@@ -19,11 +20,11 @@ const activityColors: Record<string, string> = {
   quiz: 'bg-blue-500',
 };
 
-const activityIcons: Record<string, string> = {
-  completed: '\u2713',
-  started: '\u25B6',
-  certificate: '\u2605',
-  quiz: '\u2699',
+const activityIcons: Record<string, React.ReactNode> = {
+  completed: <CheckCircle2 className="w-4 h-4" />,
+  started: <PlayCircle className="w-4 h-4" />,
+  certificate: <Award className="w-4 h-4" />,
+  quiz: <Settings className="w-4 h-4" />,
 };
 
 export default function Dashboard() {
@@ -68,10 +69,10 @@ export default function Dashboard() {
     : mockTotalHours;
 
   const stats = [
-    { label: 'Formations en cours', value: inProgress.length.toString(), icon: '\uD83D\uDCDA', color: 'from-kleia-burgundy to-kleia-burgundy' },
-    { label: 'Terminées', value: completedCount.toString(), icon: '\u2714\uFE0F', color: 'from-kleia-success to-kleia-dark' },
-    { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: '\uD83D\uDD52', color: 'from-kleia-gold to-kleia-gold' },
-    { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: '\uD83C\uDFC6', color: 'from-blue-600 to-kleia-burgundy' },
+    { label: 'Formations en cours', value: inProgress.length.toString(), icon: <BookOpen className="w-6 h-6" />, color: 'from-kleia-burgundy to-kleia-burgundy' },
+    { label: 'Terminées', value: completedCount.toString(), icon: <CheckCircle2 className="w-6 h-6" />, color: 'from-kleia-success to-kleia-dark' },
+    { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: <Clock className="w-6 h-6" />, color: 'from-kleia-gold to-kleia-gold' },
+    { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: <Award className="w-6 h-6" />, color: 'from-blue-600 to-kleia-burgundy' },
   ];
 
   const dismissOnboarding = () => {

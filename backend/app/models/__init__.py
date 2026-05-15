@@ -8,6 +8,7 @@ from app.models.progress import LessonProgress
 from app.models.certificate import Certificate
 from app.models.resource import LessonResource
 from app.models.badge import Badge, UserBadge
+from app.models.journal import JournalEntry
 
 __all__ = [
     "TimestampMixin",
@@ -28,4 +29,5 @@ __all__ = [
     "LessonResource",
     "Badge",
     "UserBadge",
+    "JournalEntry",
 ]

@@ -6,6 +6,7 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
 import PlayerShell from '@/components/player/PlayerShell';
+import JournalEditor from '@/components/journal/JournalEditor';
 import { getLessonById, mockCourses } from '@/mock';
 import { getCourse, getCourses } from '@/api/courses';
 import { getLessonVideos } from '@/api/videos';
@@ -206,6 +207,10 @@ export default function LessonView() {
               </div>
             )}
           </Card>
+
+          <div className="mt-6">
+            <JournalEditor lessonId={lesson.id} />
+          </div>
         </div>
 
         <div className="space-y-4">

@@ -146,7 +146,7 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
         <YouTubePlayer 
           videoId={videoId}
           className="w-full h-full"
-          onProgress={(percent, currentTime, duration) => {
+          onProgress={(_percent, currentTime, duration) => {
             setCurrentTime(currentTime);
             setDuration(duration);
             sendProgressRef.current();

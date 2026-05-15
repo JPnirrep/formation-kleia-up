@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import { Clock } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import type { CardCourse } from '@/lib/utils';
@@ -65,10 +66,7 @@ export default function CourseCard({ course, variant = 'default' }: CourseCardPr
           {!isCompact && (
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-kleia-dark/10">
               <div className="flex items-center gap-2 text-xs text-kleia-gray">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-                  <circle cx="12" cy="12" r="10" />
-                </svg>
+                <Clock className="w-4 h-4" />
                 <span>{course.duration}</span>
                 <span className="text-kleia-dark/20">|</span>
                 <span>{course.lessonCount} leçons</span>

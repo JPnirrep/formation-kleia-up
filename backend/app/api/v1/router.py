@@ -16,6 +16,7 @@ from app.api.v1 import (
     videos,
     resources,
     badges,
+    journal,
 )
 
 api_v1_router = APIRouter(prefix="/api/v1")
@@ -39,6 +40,9 @@ api_v1_router.include_router(
 )
 api_v1_router.include_router(
     badges.router, prefix="/badges", tags=["Badges (apprenant)"]
+)
+api_v1_router.include_router(
+    journal.router, prefix="/journal", tags=["Journal (apprenant)"]
 )
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Administration"])
 api_v1_router.include_router(
