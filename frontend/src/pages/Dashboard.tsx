@@ -1,203 +1,78 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, CheckCircle2, Clock, Award, PlayCircle, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import CourseCard from '@/components/course/CourseCard';
-import Loading from '@/components/ui/Loading';
-import { mockUser, mockCourses, mockActivities, getStartedCourses, getCompletedCourses } from '@/mock';
+import { mockUser, mockCourses, getStartedCourses, getCompletedCourses } from '@/mock';
 import { useApi } from '@/hooks/useApi';
 import { getMyEnrollments } from '@/api/enrollments';
 import { getCourses } from '@/api/courses';
 import { isAuthenticated } from '@/api/client';
-import { toCardCourse } from '@/lib/utils';
 import type { Course } from '@/api/courses';
-
-const activityColors: Record<string, string> = {
-  completed: 'bg-kleia-success',
-  started: 'bg-kleia-gold',
-  certificate: 'bg-kleia-burgundy',
-  quiz: 'bg-blue-500',
-};
-
-const activityIcons: Record<string, React.ReactNode> = {
-  completed: <CheckCircle2 className="w-4 h-4" />,
-  started: <PlayCircle className="w-4 h-4" />,
-  certificate: <Award className="w-4 h-4" />,
-  quiz: <Settings className="w-4 h-4" />,
-};
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [showOnboarding, setShowOnboarding] = useState(
-    () => !localStorage.getItem('kleia-onboarding-shown'),
-  );
   const isAuth = isAuthenticated();
   const { data: enrollments } = useApi(() => getMyEnrollments(), [isAuth]);
   const { data: allCourses } = useApi(() => getCourses({ limit: 50 }), []);
   const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
-  const [loadingCourses, setLoadingCourses] = useState(false);
 
   const mockStarted = getStartedCourses().slice(0, 3);
   const mockCompletedCount = getCompletedCourses().length;
-  const mockTotalHours = mockCourses.reduce((acc, c) => {
-    const h = parseInt(c.duration);
-    return acc + (isNaN(h) ? 0 : h);
-  }, 0);
+  const mockTotalHours = mockCourses.reduce((acc, c) => acc + (isNaN(parseInt(c.duration)) ? 0 : parseInt(c.duration)), 0);
 
   useEffect(() => {
-    if (enrollments && enrollments.length > 0 && allCourses) {
-      setLoadingCourses(true);
+    if (enrollments && allCourses) {
       const courseMap = new Map(allCourses.items.map(c => [c.id, c]));
-      const enrolled: Course[] = [];
-      for (const e of enrollments) {
-        const c = courseMap.get(e.course_id);
-        if (c) enrolled.push(c);
-      }
-      setEnrolledCourses(enrolled);
-      setLoadingCourses(false);
+      setEnrolledCourses(enrollments.map(e => courseMap.get(e.course_id)).filter(Boolean) as Course[]);
     }
   }, [enrollments, allCourses]);
 
   const displayCourses = isAuth && enrolledCourses.length > 0 ? enrolledCourses : mockStarted;
   const inProgress = displayCourses.filter(c => (c.progress || 0) > 0 && (c.progress || 0) < 100);
-  const completedCount = isAuth
-    ? displayCourses.filter(c => (c.progress || 0) >= 100).length
-    : mockCompletedCount;
-  const totalHours = isAuth
-    ? Math.round(displayCourses.reduce((acc, c) => acc + ((c as any).duration_seconds || parseInt((c as any).duration) * 3600 || 0), 0) / 3600)
-    : mockTotalHours;
+  const completedCount = isAuth ? displayCourses.filter(c => (c.progress || 0) >= 100).length : mockCompletedCount;
+  const totalHours = isAuth ? Math.round(displayCourses.reduce((acc, c) => acc + ((c as any).duration_seconds || parseInt((c as any).duration) * 3600 || 0), 0) / 3600) : mockTotalHours;
 
   const stats = [
-    { label: 'Formations en cours', value: inProgress.length.toString(), icon: <BookOpen className="w-6 h-6" />, color: 'from-kleia-burgundy to-kleia-burgundy' },
-    { label: 'Terminées', value: completedCount.toString(), icon: <CheckCircle2 className="w-6 h-6" />, color: 'from-kleia-success to-kleia-dark' },
-    { label: 'Heures visionnées', value: totalHours.toString() + 'h', icon: <Clock className="w-6 h-6" />, color: 'from-kleia-gold to-kleia-gold' },
-    { label: 'Certificats', value: mockUser.role === 'admin' ? '—' : '1', icon: <Award className="w-6 h-6" />, color: 'from-blue-600 to-kleia-burgundy' },
+    { label: 'En cours', value: inProgress.length.toString() },
+    { label: 'Terminées', value: completedCount.toString() },
+    { label: 'Heures', value: totalHours.toString() + 'h' },
   ];
 
-  const dismissOnboarding = () => {
-    localStorage.setItem('kleia-onboarding-shown', 'true');
-    setShowOnboarding(false);
-  };
-
   return (
-    <div className="space-y-8">
-      {showOnboarding && (
-        <Card className="relative overflow-hidden border-2 border-transparent bg-gradient-to-br from-kleia-burgundy/5 via-white to-kleia-gold/5 rounded-kleia">
-          <div className="absolute inset-0 rounded-kleia bg-gradient-to-r from-kleia-burgundy to-kleia-gold p-[2px] -m-[2px] [mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [mask-composite:exclude] pointer-events-none" />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h2 className="text-xl font-extrabold font-heading text-kleia-burgundy">
-                Bienvenue sur Kleia-up !
-              </h2>
-              <p className="text-kleia-gray font-body mt-1">
-                Votre plateforme d'apprentissage pour développer votre leadership et votre communication.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 flex-shrink-0">
-              <button
-                onClick={() => navigate('/formations')}
-                className="py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
-              >
-                Découvrir les formations
-              </button>
-              <button
-                onClick={dismissOnboarding}
-                className="py-2 px-4 rounded-lg border border-kleia-dark/20 text-kleia-gray font-medium text-sm font-heading hover:bg-kleia-dark/5 transition-colors"
-              >
-                Fermer
-              </button>
-            </div>
-          </div>
-        </Card>
-      )}
-      <div className="glass p-6 md:p-8 bg-gradient-to-r from-kleia-burgundy/5 via-transparent to-kleia-gold/5 rounded-kleia border border-white/20">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-burgundy">
-              Bonjour, {mockUser.name.split(' ')[0]}
-            </h1>
-            <p className="text-kleia-gray font-body mt-1">
-              Bienvenue sur votre espace d'apprentissage. Continuez à progresser !
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="h-14 w-14 rounded-full gradient-burgundy flex items-center justify-center text-white text-xl font-bold font-heading shadow-md">
-              {mockUser.initials}
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className='max-w-5xl mx-auto space-y-12 py-8 px-4 sm:px-6 lg:px-8'>
+      <section className='text-center space-y-4'>
+        <h1 className='text-4xl md:text-5xl font-extrabold font-heading text-kleia-burgundy'>
+          Ton Incarnation, {mockUser.name.split(' ')[0]}
+        </h1>
+        <p className='text-lg text-kleia-gray font-body max-w-2xl mx-auto italic'>
+          Chaque étape est une pierre posée pour ton leadership organique.
+        </p>
+      </section>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className='flex justify-around items-center border-y border-kleia-dark/10 py-8'>
         {stats.map((stat) => (
-          <Card key={stat.label}>
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-3xl font-bold font-heading text-kleia-dark">{stat.value}</p>
-                <p className="text-sm text-kleia-gray font-body mt-1">{stat.label}</p>
-              </div>
-              <span className="text-2xl" aria-hidden="true">{stat.icon}</span>
-            </div>
-          </Card>
+          <div key={stat.label} className='text-center'>
+            <div className='text-3xl font-bold font-heading text-kleia-dark'>{stat.value}</div>
+            <div className='text-xs uppercase tracking-wider text-kleia-gray mt-1'>{stat.label}</div>
+          </div>
         ))}
       </div>
 
       <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold font-heading text-kleia-dark">
-            Mes formations en cours
-          </h2>
-          <Badge variant="info">{inProgress.length}</Badge>
-        </div>
-        {loadingCourses ? (
-          <Loading className="py-8" size="sm" text="Chargement..." />
-        ) : inProgress.length > 0 ? (
-          <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-thin">
-            {inProgress.map((course) => (
-              <div key={course.slug} className="min-w-[260px] max-w-[280px] flex-shrink-0">
-                <CourseCard course={{ ...toCardCourse(course as any), lessonCount: course.lessons }} variant="compact" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <p className="text-kleia-gray font-body text-center py-4">
-              Aucune formation en cours. <Link to="/formations" className="text-kleia-burgundy font-medium underline underline-offset-2">Explorer les formations</Link>
-            </p>
-          </Card>
-        )}
-      </section>
-
-      <section>
-        <h2 className="text-xl font-bold font-heading text-kleia-dark mb-4">
-          Activité récente
+        <h2 className='text-xl font-bold font-heading text-kleia-dark mb-8 flex items-center gap-2'>
+          <span className='w-2 h-2 rounded-full bg-kleia-burgundy' />
+          Ton Parcours
         </h2>
-        <Card>
-          <div className="space-y-0">
-            {mockActivities.slice(0, 5).map((activity, idx) => (
-              <div key={activity.id} className="flex gap-4">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full ${activityColors[activity.type] || 'bg-kleia-gray'} flex items-center justify-center text-white text-xs font-bold shadow-sm flex-shrink-0`}
-                    aria-label={activity.type}
-                  >
-                    {activityIcons[activity.type] || '•'}
-                  </div>
-                  {idx < Math.min(mockActivities.length, 5) - 1 && (
-                    <div className="w-px flex-1 bg-kleia-dark/10 mt-1" />
-                  )}
-                </div>
-                <div className="pb-6 pt-0.5">
-                  <p className="text-sm font-medium text-kleia-dark font-body">{activity.description}</p>
-                  <p className="text-xs text-kleia-gray font-body mt-0.5">
-                    {new Date(activity.timestamp).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} {activity.courseName ? `— ${activity.courseName}` : ''}
-                  </p>
-                </div>
+        <div className='flex gap-8 overflow-x-auto pb-4'>
+          {displayCourses.map((course, i) => (
+            <div key={course.slug} className='flex-shrink-0 w-64 bg-white border border-kleia-dark/5 p-6 rounded-kleia shadow-sm hover:shadow-md transition-all cursor-pointer' onClick={() => navigate('/formations/' + course.slug)}>
+              <span className='text-sm text-kleia-gray font-body'>Module {i + 1}</span>
+              <h3 className='font-heading font-bold text-lg mt-2 text-kleia-dark'>{course.title}</h3>
+              <div className='mt-4 h-2 w-full bg-kleia-dark/5 rounded-full overflow-hidden'>
+                <div className='h-full bg-kleia-burgundy' style={{ width: (course.progress || 0) + '%' }} />
               </div>
-            ))}
-          </div>
-        </Card>
+            </div>
+          ))}
+        </div>
       </section>
     </div>
   );

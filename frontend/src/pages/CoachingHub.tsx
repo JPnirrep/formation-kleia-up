@@ -1,96 +1,103 @@
-import { MessageCircle, Send, Mail, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { MessageCircle, Send, Mail } from 'lucide-react';
 import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { Switch } from '@/components/ui/Switch';
+import { Label } from '@/components/ui/Label';
 
 export default function CoachingHub() {
+  const [channels, setChannels] = useState({
+    whatsapp: true,
+    telegram: false,
+    email: true,
+  });
+
   const coach = {
-    name: "Sandrina",
-    role: "Master Coach KLEIA",
-    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=600",
-    description: "Je vous accompagne tout au long de votre parcours pour assurer votre progression et l'atteinte de vos objectifs les plus ambitieux.",
-    whatsapp: "https://wa.me/33600000000",
-    telegram: "https://t.me/sandrinakleia",
-    email: "mailto:coach@kleia.com"
+    name: 'Sandrina',
+    whatsapp: 'https://wa.me/33600000000',
+    telegram: 'https://t.me/sandrinakleia',
+    email: 'mailto:coach@kleia.com',
   };
 
+  const handleChannelToggle = (channel: keyof typeof channels) => {
+    setChannels(prev => ({ ...prev, [channel]: !prev[channel] }));
+  };
+
+  const allConnected = Object.values(channels).every(status => status);
+
   return (
-    <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl md:text-5xl font-heading font-bold text-kleia-dark">
-          Conciergerie <span className="text-transparent bg-clip-text gradient-gold">KLEIA</span>
+    <div className='max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700'>
+      <div className='text-center space-y-4'>
+        <h1 className='text-3xl md:text-5xl font-heading font-bold text-kleia-dark'>
+          Lien Direct avec <span className='text-transparent bg-clip-text gradient-gold'>{coach.name}</span>
         </h1>
-        <p className="text-lg text-kleia-gray font-body max-w-2xl mx-auto">
-          Un accompagnement d'élite, sur-mesure et réactif. Connectez-vous directement avec votre coach dédié.
+        <p className='text-lg text-kleia-gray font-body max-w-2xl mx-auto'>
+          Votre espace privilégié pour un accompagnement fluide. Activez vos canaux de communication préférés.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 items-start">
-        {/* Profil du coach */}
-        <Card className="overflow-hidden border-0 shadow-xl bg-white/60 backdrop-blur-md">
-          <div className="aspect-video relative overflow-hidden rounded-t-xl -mx-6 -mt-6 mb-6">
-            <div className="absolute inset-0 bg-gradient-to-t from-kleia-dark/80 to-transparent z-10" />
-            <img 
-              src={coach.avatar} 
-              alt={`Portrait de ${coach.name}`}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-4 left-6 z-20 text-white">
-              <h2 className="text-2xl font-heading font-bold">{coach.name}</h2>
-              <p className="font-body opacity-90">{coach.role}</p>
+      {!allConnected && (
+        <Card className='bg-kleia-cream border-kleia-gold/50'>
+          <div className='flex flex-col md:flex-row items-center gap-6'>
+            <div className='flex-1'>
+              <h2 className='text-xl font-heading font-bold text-kleia-burgundy'>Activez vos Canaux</h2>
+              <p className='text-kleia-gray font-body mt-2'>
+                Pour une expérience optimale, activez les canaux que vous utilisez au quotidien pour échanger avec Sandrina.
+              </p>
             </div>
           </div>
-          <p className="text-kleia-dark/80 font-body leading-relaxed">
-            "{coach.description}"
-          </p>
+        </Card>
+      )}
+      
+      <div className='space-y-4'>
+        <h3 className='text-xl font-heading font-bold text-kleia-dark'>Vos Canaux de Communication</h3>
+        
+        <Card className='p-4 sm:p-6 flex items-center justify-between transition-all'>
+          <a href={coach.whatsapp} target='_blank' rel='noopener noreferrer' className='flex items-center gap-4 group'>
+            <div className='w-12 h-12 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366] group-hover:scale-110 transition-transform'>
+              <MessageCircle className='w-6 h-6' />
+            </div>
+            <div>
+              <h4 className='font-heading font-bold text-kleia-dark'>WhatsApp Privé</h4>
+              <p className='text-sm text-kleia-gray font-body'>Pour les échanges rapides et directs.</p>
+            </div>
+          </a>
+          <div className='flex items-center space-x-2'>
+            <Label htmlFor='whatsapp-toggle' className='text-sm text-kleia-gray'>{channels.whatsapp ? 'Activé' : 'Activer'}</Label>
+            <Switch id='whatsapp-toggle' checked={channels.whatsapp} onChange={() => handleChannelToggle('whatsapp')} />
+          </div>
         </Card>
 
-        {/* Canaux de communication */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-heading font-bold text-kleia-dark mb-4">Connexion Rapide</h3>
-          
-          <a href={coach.whatsapp} target="_blank" rel="noopener noreferrer" className="block">
-            <Card className="hover:shadow-lg transition-shadow border-kleia-dark/5 flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366] group-hover:scale-110 transition-transform">
-                <MessageCircle className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-heading font-bold text-kleia-dark">WhatsApp Privé</h4>
-                <p className="text-sm text-kleia-gray font-body">Réponse garantie en moins de 4h</p>
-              </div>
-            </Card>
+        <Card className='p-4 sm:p-6 flex items-center justify-between transition-all'>
+          <a href={coach.telegram} target='_blank' rel='noopener noreferrer' className='flex items-center gap-4 group'>
+            <div className='w-12 h-12 rounded-full bg-[#0088cc]/10 flex items-center justify-center text-[#0088cc] group-hover:scale-110 transition-transform'>
+              <Send className='w-6 h-6' />
+            </div>
+            <div>
+              <h4 className='font-heading font-bold text-kleia-dark'>Canal Telegram</h4>
+              <p className='text-sm text-kleia-gray font-body'>Idéal pour les messages vocaux et les partages.</p>
+            </div>
           </a>
-
-          <a href={coach.telegram} target="_blank" rel="noopener noreferrer" className="block">
-            <Card className="hover:shadow-lg transition-shadow border-kleia-dark/5 flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-full bg-[#0088cc]/10 flex items-center justify-center text-[#0088cc] group-hover:scale-110 transition-transform">
-                <Send className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-heading font-bold text-kleia-dark">Canal Telegram</h4>
-                <p className="text-sm text-kleia-gray font-body">Échanges vocaux et ressources rapides</p>
-              </div>
-            </Card>
-          </a>
-
-          <a href={coach.email} className="block">
-            <Card className="hover:shadow-lg transition-shadow border-kleia-dark/5 flex items-center gap-4 group">
-              <div className="w-12 h-12 rounded-full bg-kleia-burgundy/10 flex items-center justify-center text-kleia-burgundy group-hover:scale-110 transition-transform">
-                <Mail className="w-6 h-6" />
-              </div>
-              <div>
-                <h4 className="font-heading font-bold text-kleia-dark">Email Premium</h4>
-                <p className="text-sm text-kleia-gray font-body">Pour les revues détaillées</p>
-              </div>
-            </Card>
-          </a>
-
-          <div className="pt-4 border-t border-kleia-dark/10">
-            <Button className="w-full" variant="secondary" size="lg">
-              <Calendar className="w-5 h-5" />
-              Planifier un Audit (H1)
-            </Button>
+          <div className='flex items-center space-x-2'>
+            <Label htmlFor='telegram-toggle' className='text-sm text-kleia-gray'>{channels.telegram ? 'Activé' : 'Activer'}</Label>
+            <Switch id='telegram-toggle' checked={channels.telegram} onChange={() => handleChannelToggle('telegram')} />
           </div>
-        </div>
+        </Card>
+        
+        <Card className='p-4 sm:p-6 flex items-center justify-between transition-all'>
+          <a href={coach.email} className='flex items-center gap-4 group'>
+            <div className='w-12 h-12 rounded-full bg-kleia-burgundy/10 flex items-center justify-center text-kleia-burgundy group-hover:scale-110 transition-transform'>
+              <Mail className='w-6 h-6' />
+            </div>
+            <div>
+              <h4 className='font-heading font-bold text-kleia-dark'>Email Premium</h4>
+              <p className='text-sm text-kleia-gray font-body'>Parfait pour les réflexions et bilans détaillés.</p>
+            </div>
+          </a>
+          <div className='flex items-center space-x-2'>
+            <Label htmlFor='email-toggle' className='text-sm text-kleia-gray'>{channels.email ? 'Activé' : 'Activer'}</Label>
+            <Switch id='email-toggle' checked={channels.email} onChange={() => handleChannelToggle('email')} />
+          </div>
+        </Card>
       </div>
     </div>
   );

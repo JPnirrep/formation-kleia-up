@@ -12,7 +12,7 @@ interface NavLinkItem {
 const navLinks: NavLinkItem[] = [
   { to: '/', label: 'Tableau de bord' },
   { to: '/formations', label: 'Mes formations' },
-  { to: '/coaching', label: 'Conciergerie' },
+  { to: '/coaching', label: 'Lien Direct' },
   { to: '/profil', label: 'Mon profil' },
   { to: '/admin', label: 'Administration', adminOnly: true },
   { to: '/admin/courses', label: 'Gérer les formations', adminOnly: true },

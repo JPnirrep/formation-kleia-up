@@ -1,0 +1,33 @@
+import * as React from 'react';
+import clsx from 'clsx';
+
+interface SwitchProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
+  ({ className, ...props }, ref) => {
+    return (
+      <label className='relative inline-flex items-center cursor-pointer'>
+        <input
+          type='checkbox'
+          ref={ref}
+          className='sr-only peer'
+          {...props}
+        />
+        <div
+          className={clsx(
+            'w-11 h-6 bg-kleia-dark/20 rounded-full',
+            'peer peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-kleia-gold',
+            'peer-checked:after:translate-x-full peer-checked:after:border-white',
+            'after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px]',
+            'after:bg-white after:border-gray-300 after:border after:rounded-full',
+            'after:h-5 after:w-5 after:transition-all',
+            'peer-checked:bg-kleia-burgundy'
+          )}
+        />
+      </label>
+    );
+  }
+);
+Switch.displayName = 'Switch';
+
+export { Switch };
