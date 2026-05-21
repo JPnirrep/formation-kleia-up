@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 import { api } from '@/api';
-import { loginWithEmail, loginWithGoogle as googleLogin, logout as apiLogout, getProfile } from '@/api/auth';
+import { loginWithEmail, loginWithGoogle as googleLogin, register as apiRegister, logout as apiLogout, getProfile } from '@/api/auth';
 import { isAuthenticated, ApiError } from '@/api/client';
 import type { UserProfile } from '@/types';
 
@@ -10,6 +10,7 @@ interface AuthState {
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (idToken: string) => Promise<void>;
+  register: (email: string, password: string, displayName: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -71,9 +72,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   }, []);
 
+  const register = useCallback(async (email: string, password: string, displayName: string) => {
+    setError(null);
+    try {
+      const res = await apiRegister(email, password, displayName);
+      setUser(res.user);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erreur d\'inscription';
+      setError(msg);
+      throw err;
+    }
+  }, []);
+
   return (
     <AuthContext.Provider
-      value={{ user, loading, error, login, loginWithGoogle, logout, isAuthenticated: !!user }}
+      value={{ user, loading, error, login, loginWithGoogle, register, logout, isAuthenticated: !!user }}
     >
       {children}
     </AuthContext.Provider>

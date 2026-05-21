@@ -45,3 +45,11 @@ backend/.venv/
 coverage/
 .coverage
 .pytest_cache/
+
+# Docs & media (fichiers lourds)
+docs/doc formation kleia-up/
+docs/doc formation kleia-up.zip
+*.tar.gz
+*.MOV
+*.mp3
+*.zip

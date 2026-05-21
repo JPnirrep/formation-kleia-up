@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import SkipLink from '@/components/ui/SkipLink';
 import Layout from '@/components/layout/Layout';
 import Dashboard from '@/pages/Dashboard';
+import LandingPage from '@/pages/LandingPage';
 import Courses from '@/pages/Courses';
 import CourseDetail from '@/pages/CourseDetail';
 import LessonView from '@/pages/LessonView';
@@ -16,6 +17,11 @@ import AdminCourseForm from '@/pages/AdminCourseForm';
 import AdminCourseDetail from '@/pages/AdminCourseDetail';
 import AdminUsers from '@/pages/AdminUsers';
 import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
+import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
+import ResetPasswordPage from '@/pages/ResetPasswordPage';
+import AuthCallback from '@/pages/AuthCallback';
+import OnboardingPage from '@/pages/OnboardingPage';
 import NotFound from '@/pages/NotFound';
 import CoachingHub from '@/pages/CoachingHub';
 
@@ -26,9 +32,15 @@ export default function App() {
         <ErrorBoundary>
           <SkipLink />
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
             <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/formations" element={<Courses />} />
               <Route path="/formation/:slug" element={<CourseDetail />} />
               <Route path="/lecon/:lessonId" element={<LessonView />} />

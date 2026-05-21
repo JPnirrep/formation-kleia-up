@@ -4,6 +4,7 @@ export interface UserProfile {
   display_name: string;
   avatar_url?: string;
   role: 'learner' | 'trainer' | 'admin';
+  onboarding_completed?: boolean;
   created_at: string;
 }
 

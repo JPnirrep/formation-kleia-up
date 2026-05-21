@@ -1,35 +1,22 @@
 """Admin routes for lesson resources (PDF, documents, etc.)."""
 
 import uuid
-from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Integer, Text, ForeignKey
 
 from app.api.deps import get_current_admin
-from app.database import Base, get_db
+from app.database import get_db
 from app.models.course import Lesson
-from app.models.user import User
+from app.models.resource import LessonResource
 from app.services.storage import delete_file, store_file
 
 router = APIRouter(dependencies=[Depends(get_current_admin)])
 
 
-class LessonResource(Base):
-    __tablename__ = "lesson_resources"
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
-    lesson_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("lessons.id"), nullable=False, index=True
-    )
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    file_url: Mapped[str] = mapped_column(String(512), nullable=False)
-    file_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    file_size: Mapped[int] = mapped_column(Integer, default=0)
-    storage_key: Mapped[str] = mapped_column(String(512), nullable=True)
-    created_at: Mapped[datetime] = mapped_column(default=datetime.now(timezone.utc))
+
+
 
 
 @router.post(
@@ -56,10 +43,8 @@ async def upload_lesson_resource(
     resource = LessonResource(
         lesson_id=lesson_id,
         title=title or file.filename or "Fichier",
-        file_url=f"/api/v1/uploads/{storage_key}",
-        file_type=ext,
-        file_size=len(content),
-        storage_key=storage_key,
+        url=f"/api/v1/uploads/{storage_key}",
+        resource_type="file",
     )
     db.add(resource)
     await db.commit()
@@ -85,7 +70,8 @@ async def delete_resource(resource_id: uuid.UUID, db: AsyncSession = Depends(get
     resource = result.scalar_one_or_none()
     if not resource:
         raise HTTPException(status_code=404, detail="Ressource non trouvée.")
-    if resource.storage_key:
-        await delete_file(resource.storage_key)
+    if resource.url and resource.url.startswith("/api/v1/uploads/"):
+        storage_key = resource.url.replace("/api/v1/uploads/", "")
+        await delete_file(storage_key)
     await db.delete(resource)
     await db.commit()
