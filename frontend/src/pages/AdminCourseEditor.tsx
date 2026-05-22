@@ -261,7 +261,7 @@ export default function AdminCourseEditor() {
 
       <div className="flex items-center justify-between px-6 py-3 border-b border-kleia-dark/10 bg-white/80">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-burgundy transition-colors">
+          <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-violet transition-colors">
             ← Retour
           </button>
           <h1 className="text-lg font-heading font-bold text-kleia-dark">{courseTitle || 'Nouvelle formation'}</h1>

@@ -39,7 +39,7 @@ export default function CoachingHub() {
         <Card className='bg-kleia-cream border-kleia-gold/50'>
           <div className='flex flex-col md:flex-row items-center gap-6'>
             <div className='flex-1'>
-              <h2 className='text-xl font-heading font-bold text-kleia-burgundy'>Activez vos Canaux</h2>
+              <h2 className='text-xl font-heading font-bold text-kleia-violet'>Activez vos Canaux</h2>
               <p className='text-kleia-gray font-body mt-2'>
                 Pour une expérience optimale, activez les canaux que vous utilisez au quotidien pour échanger avec Sandrina.
               </p>
@@ -85,7 +85,7 @@ export default function CoachingHub() {
         
         <Card className='p-4 sm:p-6 flex items-center justify-between transition-all'>
           <a href={coach.email} className='flex items-center gap-4 group'>
-            <div className='w-12 h-12 rounded-full bg-kleia-burgundy/10 flex items-center justify-center text-kleia-burgundy group-hover:scale-110 transition-transform'>
+            <div className='w-12 h-12 rounded-full bg-kleia-violet/10 flex items-center justify-center text-kleia-violet group-hover:scale-110 transition-transform'>
               <Mail className='w-6 h-6' />
             </div>
             <div>

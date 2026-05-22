@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
     <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
         <div className="w-full max-w-md">
           <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10 text-center space-y-6">
-            <h1 className="text-3xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
+            <h1 className="text-3xl font-extrabold font-heading text-kleia-violet tracking-tight">
               Mot de passe réinitialisé
             </h1>
             <div className="bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm text-green-700">
@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
             </div>
             <button
               onClick={() => navigate('/login', { replace: true })}
-              className="w-full py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+              className="w-full py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
             >
               Se connecter
             </button>
@@ -73,7 +73,7 @@ export default function ResetPasswordPage() {
       <div className="w-full max-w-md">
         <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
+            <h1 className="text-3xl font-extrabold font-heading text-kleia-violet tracking-tight">
               Nouveau mot de passe
             </h1>
             <p className="mt-2 text-sm text-kleia-gray font-body">
@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
                 onChange={(e) => { setNewPassword(e.target.value); setError(null); }}
                 required
                 disabled={!token}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
                 onChange={(e) => { setConfirmPassword(e.target.value); setError(null); }}
                 required
                 disabled={!token}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -129,14 +129,14 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={submitting || !token}
-              className="w-full py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? 'Mise à jour…' : 'Mettre à jour'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <Link to="/login" className="text-sm text-kleia-burgundy font-medium hover:underline">
+            <Link to="/login" className="text-sm text-kleia-violet font-medium hover:underline">
               Retour à la connexion
             </Link>
           </div>

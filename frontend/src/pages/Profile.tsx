@@ -103,7 +103,7 @@ export default function Profile() {
     <div className="space-y-8">
       <Card>
         <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div className="h-20 w-20 rounded-full gradient-burgundy flex items-center justify-center text-white text-2xl font-bold font-heading shadow-lg flex-shrink-0">
+          <div className="h-20 w-20 rounded-full gradient-violet flex items-center justify-center text-white text-2xl font-bold font-heading shadow-lg flex-shrink-0">
             {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
           </div>
           <div className="flex-1 text-center md:text-left">
@@ -176,7 +176,7 @@ export default function Profile() {
               <div
                 className={clsx(
                   'w-12 h-6 rounded-full p-0.5 cursor-pointer transition-colors',
-                  notifications.email ? 'gradient-burgundy' : 'bg-kleia-dark/20',
+                  notifications.email ? 'gradient-violet' : 'bg-kleia-dark/20',
                 )}
                 role="switch"
                 aria-checked={notifications.email}

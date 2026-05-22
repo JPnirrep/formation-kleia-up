@@ -19,8 +19,8 @@ export default function AdminSidebar() {
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-body transition-colors ${
                   isActive
-                    ? 'bg-kleia-burgundy/10 text-kleia-burgundy font-semibold'
-                    : 'text-kleia-dark hover:bg-kleia-dark/5 hover:text-kleia-burgundy'
+                    ? 'bg-kleia-violet/10 text-kleia-violet font-semibold'
+                    : 'text-kleia-dark hover:bg-kleia-dark/5 hover:text-kleia-violet'
                 }`
               }
             >
@@ -33,7 +33,7 @@ export default function AdminSidebar() {
       <div className="mt-6 pt-4 border-t border-kleia-dark/10">
         <NavLink
           to="/formations"
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-body text-kleia-gray hover:text-kleia-burgundy transition-colors"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-body text-kleia-gray hover:text-kleia-violet transition-colors"
         >
           ← Retour au catalogue
         </NavLink>

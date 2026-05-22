@@ -22,7 +22,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 p-8">
-          <h1 className="text-4xl font-heading text-kleia-burgundy">Oups !</h1>
+          <h1 className="text-4xl font-heading text-kleia-violet">Oups !</h1>
           <p className="text-kleia-gray">Une erreur inattendue s'est produite.</p>
           {this.state.error && (
             <pre className="text-sm text-kleia-gray/70 bg-kleia-dark/5 p-4 rounded-kleia max-w-lg overflow-auto">
@@ -31,7 +31,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           )}
           <div className="flex gap-4">
             <button onClick={this.handleReset}
-              className="px-4 py-2 bg-kleia-burgundy text-white rounded-kleia hover:opacity-90">
+              className="px-4 py-2 bg-kleia-violet text-white rounded-kleia hover:opacity-90">
               Réessayer
             </button>
             <Link to="/" className="px-4 py-2 border border-kleia-gold text-kleia-gold rounded-kleia hover:bg-kleia-gold/10">

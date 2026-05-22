@@ -14,7 +14,7 @@ export default function ProtectedRoute({ requiredRole }: Props) {
   if (requiredRole && user?.role !== requiredRole) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-        <h1 className="text-3xl font-heading text-kleia-burgundy">Accès refusé</h1>
+        <h1 className="text-3xl font-heading text-kleia-violet">Accès refusé</h1>
         <p className="text-kleia-gray">Vous n'avez pas les droits nécessaires.</p>
       </div>
     );

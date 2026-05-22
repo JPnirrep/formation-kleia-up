@@ -74,7 +74,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
+            <h1 className="text-3xl font-extrabold font-heading text-kleia-violet tracking-tight">
               Inscription
             </h1>
             <p className="mt-2 text-sm text-kleia-gray font-body">
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                 required
                 aria-invalid={!!validationErrors.email}
                 aria-describedby={validationErrors.email ? 'email-error' : undefined}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="vous@exemple.com"
               />
               {validationErrors.email && (
@@ -117,7 +117,7 @@ export default function RegisterPage() {
                 required
                 aria-invalid={!!validationErrors.displayName}
                 aria-describedby={validationErrors.displayName ? 'name-error' : undefined}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="Sandrina Perrin"
               />
               {validationErrors.displayName && (
@@ -138,7 +138,7 @@ export default function RegisterPage() {
                 required
                 aria-invalid={!!validationErrors.password}
                 aria-describedby={validationErrors.password ? 'password-error' : undefined}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="••••••••"
               />
               {password.length > 0 && (
@@ -170,7 +170,7 @@ export default function RegisterPage() {
                 required
                 aria-invalid={!!validationErrors.confirmPassword}
                 aria-describedby={validationErrors.confirmPassword ? 'confirm-error' : undefined}
-                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                 placeholder="••••••••"
               />
               {validationErrors.confirmPassword && (
@@ -187,7 +187,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isBusy}
-              className="w-full py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isBusy ? 'Création du compte…' : 'Créer mon compte'}
             </button>
@@ -196,12 +196,12 @@ export default function RegisterPage() {
           <div className="mt-6 text-center space-y-2">
             <p className="text-sm text-kleia-gray font-body">
               Déjà un compte ?{' '}
-              <Link to="/login" className="text-kleia-burgundy font-medium hover:underline">
+              <Link to="/login" className="text-kleia-violet font-medium hover:underline">
                 Connectez-vous
               </Link>
             </p>
             <p className="text-sm text-kleia-gray font-body">
-              <Link to="/forgot-password" className="text-kleia-burgundy font-medium hover:underline">
+              <Link to="/forgot-password" className="text-kleia-violet font-medium hover:underline">
                 Mot de passe oublié ?
               </Link>
             </p>

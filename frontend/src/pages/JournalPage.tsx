@@ -85,7 +85,7 @@ export default function JournalPage() {
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-burgundy">
+          <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-violet">
             Second Cerveau
           </h1>
           <p className="text-kleia-gray font-body mt-1">
@@ -105,7 +105,7 @@ export default function JournalPage() {
         <Card className="overflow-hidden">
           <div className="p-4 border-b border-kleia-dark/10 flex items-center justify-between bg-kleia-cream/50">
             <div className="flex items-center gap-2 text-kleia-dark font-heading font-bold">
-              <BookOpen className="w-5 h-5 text-kleia-burgundy" />
+              <BookOpen className="w-5 h-5 text-kleia-violet" />
               {editing ? 'Modifier la note' : 'Nouvelle note'}
             </div>
             <label className="flex items-center gap-2 cursor-pointer" aria-label="Partager avec le coach">
@@ -117,9 +117,9 @@ export default function JournalPage() {
                   checked={isShared}
                   onChange={(e) => setIsShared(e.target.checked)}
                 />
-                <div className="w-9 h-5 bg-kleia-gray/30 rounded-full peer peer-checked:bg-kleia-burgundy after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+                <div className="w-9 h-5 bg-kleia-gray/30 rounded-full peer peer-checked:bg-kleia-violet after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
               </div>
-              <Share2 className={`w-4 h-4 ${isShared ? 'text-kleia-burgundy' : 'text-kleia-gray'}`} />
+              <Share2 className={`w-4 h-4 ${isShared ? 'text-kleia-violet' : 'text-kleia-gray'}`} />
             </label>
           </div>
           <div className="p-4" data-color-mode="light">
@@ -160,7 +160,7 @@ export default function JournalPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-2">
-                    <BookOpen className="w-4 h-4 text-kleia-burgundy" />
+                    <BookOpen className="w-4 h-4 text-kleia-violet" />
                     <span className="text-xs text-kleia-gray font-body">
                       {new Date(entry.created_at).toLocaleDateString('fr-FR', {
                         day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
@@ -172,7 +172,7 @@ export default function JournalPage() {
                       </span>
                     )}
                     {entry.lesson_id && (
-                      <span className="text-xs bg-kleia-burgundy/5 text-kleia-burgundy px-2 py-0.5 rounded-full font-body">
+                      <span className="text-xs bg-kleia-violet/5 text-kleia-violet px-2 py-0.5 rounded-full font-body">
                         Lié à une leçon
                       </span>
                     )}
@@ -184,7 +184,7 @@ export default function JournalPage() {
                 <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => handleEdit(entry)}
-                    className="p-2 rounded-lg hover:bg-kleia-dark/5 text-kleia-gray hover:text-kleia-burgundy transition-colors"
+                    className="p-2 rounded-lg hover:bg-kleia-dark/5 text-kleia-gray hover:text-kleia-violet transition-colors"
                     aria-label="Modifier la note"
                   >
                     <Edit3 className="w-4 h-4" />

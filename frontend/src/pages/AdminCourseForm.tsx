@@ -98,7 +98,7 @@ export default function AdminCourseForm() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-burgundy transition-colors">{'\u2190'} Retour</button>
+        <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-violet transition-colors">{'\u2190'} Retour</button>
         <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{isEditing ? 'Modifier la formation' : 'Créer une formation'}</h1>
       </div>
 
@@ -108,26 +108,26 @@ export default function AdminCourseForm() {
         <Card><div className="space-y-4">
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-kleia-dark font-body mb-1">Titre *</label>
-            <input id="title" type="text" required value={form.title} onChange={(e) => handleChange('title', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body" placeholder="Ex: L'Architecture du Message" />
+            <input id="title" type="text" required value={form.title} onChange={(e) => handleChange('title', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" placeholder="Ex: L'Architecture du Message" />
           </div>
           <div>
             <label htmlFor="short_description" className="block text-sm font-medium text-kleia-dark font-body mb-1">Description courte</label>
-            <input id="short_description" type="text" value={form.short_description} onChange={(e) => handleChange('short_description', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body" placeholder="Brève description" />
+            <input id="short_description" type="text" value={form.short_description} onChange={(e) => handleChange('short_description', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" placeholder="Brève description" />
           </div>
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-kleia-dark font-body mb-1">Description complète</label>
-            <textarea id="description" rows={4} value={form.description} onChange={(e) => handleChange('description', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body resize-y" placeholder="Description détaillée..." />
+            <textarea id="description" rows={4} value={form.description} onChange={(e) => handleChange('description', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body resize-y" placeholder="Description détaillée..." />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="level" className="block text-sm font-medium text-kleia-dark font-body mb-1">Niveau</label>
-              <select id="level" value={form.level} onChange={(e) => handleChange('level', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body bg-white">
+              <select id="level" value={form.level} onChange={(e) => handleChange('level', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body bg-white">
                 {LEVELS.map((l) => <option key={l} value={l}>{l}</option>)}
               </select>
             </div>
             <div>
               <label htmlFor="category" className="block text-sm font-medium text-kleia-dark font-body mb-1">Catégorie</label>
-              <select id="category" value={form.category} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body bg-white">
+              <select id="category" value={form.category} onChange={(e) => handleChange('category', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body bg-white">
                 <option value="">—</option>
                 {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
@@ -136,11 +136,11 @@ export default function AdminCourseForm() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label htmlFor="duration" className="block text-sm font-medium text-kleia-dark font-body mb-1">Durée (secondes)</label>
-              <input id="duration" type="number" min={0} value={form.duration_seconds} onChange={(e) => handleChange('duration_seconds', parseInt(e.target.value) || 0)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body" />
+              <input id="duration" type="number" min={0} value={form.duration_seconds} onChange={(e) => handleChange('duration_seconds', parseInt(e.target.value) || 0)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
             </div>
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-kleia-dark font-body mb-1">Statut</label>
-              <select id="status" value={form.status} onChange={(e) => handleChange('status', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body bg-white">
+              <select id="status" value={form.status} onChange={(e) => handleChange('status', e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body bg-white">
                 <option value="draft">Brouillon</option>
                 <option value="published">Publié</option>
               </select>

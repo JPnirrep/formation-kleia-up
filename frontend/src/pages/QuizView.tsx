@@ -92,7 +92,7 @@ export default function QuizView() {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Quiz introuvable</p>
-        <Link to="/formations" className="text-kleia-burgundy font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
+        <Link to="/formations" className="text-kleia-violet font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
           Retour aux formations
         </Link>
       </Card>
@@ -103,7 +103,7 @@ export default function QuizView() {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Quiz introuvable</p>
-        <Link to="/formations" className="text-kleia-burgundy font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
+        <Link to="/formations" className="text-kleia-violet font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
           Retour aux formations
         </Link>
       </Card>
@@ -213,9 +213,9 @@ export default function QuizView() {
                 else if (isSelected && !isCorrect) optionStyle = 'border-kleia-error bg-kleia-error/5';
                 else optionStyle = 'border-kleia-dark/10 opacity-60';
               } else if (isSelected) {
-                optionStyle = 'border-kleia-burgundy bg-kleia-burgundy/5';
+                optionStyle = 'border-kleia-violet bg-kleia-violet/5';
               } else {
-                optionStyle = 'border-kleia-dark/10 hover:border-kleia-burgundy/50 hover:bg-kleia-burgundy/5';
+                optionStyle = 'border-kleia-dark/10 hover:border-kleia-violet/50 hover:bg-kleia-violet/5';
               }
 
               return (
@@ -232,7 +232,7 @@ export default function QuizView() {
                   <div className="flex items-start gap-3">
                     <span className={clsx(
                       'w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5',
-                      isSelected && !submitted && 'border-kleia-burgundy bg-kleia-burgundy text-white',
+                      isSelected && !submitted && 'border-kleia-violet bg-kleia-violet text-white',
                       showResult && isCorrect && 'border-kleia-success bg-kleia-success text-white',
                       showResult && isSelected && !isCorrect && 'border-kleia-error bg-kleia-error text-white',
                       !isSelected && 'border-kleia-dark/20 text-kleia-gray',

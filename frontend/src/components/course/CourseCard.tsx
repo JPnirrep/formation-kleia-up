@@ -34,7 +34,7 @@ export default function CourseCard({ course, variant = 'default' }: CourseCardPr
           <div className="flex items-center justify-between gap-2 mb-2">
             <h3
               className={clsx(
-                'font-heading font-bold text-kleia-burgundy group-hover:text-kleia-burgundy-light transition-colors',
+                'font-heading font-bold text-kleia-violet group-hover:text-kleia-violet-light transition-colors',
                 isCompact ? 'text-sm' : 'text-lg',
               )}
             >
@@ -53,7 +53,7 @@ export default function CourseCard({ course, variant = 'default' }: CourseCardPr
             <div className="space-y-1 mb-3">
               <div className="w-full h-2 bg-kleia-dark/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full gradient-burgundy rounded-full transition-all duration-500"
+                  className="h-full gradient-violet rounded-full transition-all duration-500"
                   style={{ width: `${course.progress}%` }}
                 />
               </div>
@@ -75,8 +75,8 @@ export default function CourseCard({ course, variant = 'default' }: CourseCardPr
                 className={clsx(
                   'inline-flex items-center justify-center rounded-kleia font-heading font-semibold text-sm transition-all px-3 py-1.5',
                   course.progress > 0
-                    ? 'bg-kleia-cream text-kleia-burgundy border border-kleia-burgundy/20 hover:bg-kleia-burgundy/10'
-                    : 'gradient-burgundy text-white hover:opacity-90',
+                    ? 'bg-kleia-cream text-kleia-violet border border-kleia-violet/20 hover:bg-kleia-violet/10'
+                    : 'gradient-violet text-white hover:opacity-90',
                 )}
               >
                 {course.progress > 0 ? 'Continuer' : 'Commencer'}

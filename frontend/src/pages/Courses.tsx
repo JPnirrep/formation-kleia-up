@@ -46,7 +46,7 @@ export default function Courses() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-burgundy">
+        <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-violet">
           Mes formations
         </h1>
         <p className="text-kleia-gray font-body mt-1">
@@ -62,8 +62,8 @@ export default function Courses() {
             className={clsx(
               'px-4 py-2 rounded-kleia text-sm font-heading font-semibold transition-all',
               activeTab === tab.key
-                ? 'gradient-burgundy text-white shadow-md'
-                : 'bg-white/50 text-kleia-gray hover:text-kleia-burgundy hover:bg-white/80 border border-kleia-dark/10',
+'gradient-violet text-white shadow-md'
+                : 'bg-white/50 text-kleia-gray hover:text-kleia-violet hover:bg-white/80 border border-kleia-dark/10',
             )}
             aria-pressed={activeTab === tab.key}
           >

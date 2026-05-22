@@ -110,7 +110,7 @@ export default function CourseDetail() {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Formation introuvable</p>
-        <Link to="/formations" className="text-kleia-burgundy font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
+        <Link to="/formations" className="text-kleia-violet font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
           Retour aux formations
         </Link>
       </Card>
@@ -165,11 +165,11 @@ export default function CourseDetail() {
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-kleia-dark font-heading">Progression globale</span>
-          <span className="text-sm font-bold font-heading text-kleia-burgundy">{overallProgress}%</span>
+          <span className="text-sm font-bold font-heading text-kleia-violet">{overallProgress}%</span>
         </div>
         <div className="w-full h-3 bg-white/60 rounded-full overflow-hidden shadow-inner">
           <div
-            className="h-full gradient-burgundy rounded-full transition-all duration-700"
+            className="h-full gradient-violet rounded-full transition-all duration-700"
             style={{ width: `${overallProgress}%` }}
           />
         </div>

@@ -128,7 +128,7 @@ export default function QuizEditor({ lessonId, onClose }: QuizEditorProps) {
             value={quizTitle}
             onChange={(e) => setQuizTitle(e.target.value)}
             placeholder="Titre du quiz"
-            className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+            className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
             autoFocus
           />
           <div className="flex items-center gap-2 text-sm font-body">
@@ -181,13 +181,13 @@ export default function QuizEditor({ lessonId, onClose }: QuizEditorProps) {
           ))}
 
           {showAddQ && (
-            <Card className="p-3 border-kleia-burgundy/30">
+            <Card className="p-3 border-kleia-violet/30">
               <textarea
                 value={qText}
                 onChange={(e) => setQText(e.target.value)}
                 placeholder="Texte de la question"
                 rows={2}
-                className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy resize-y"
+                className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet resize-y"
               />
               <div className="flex items-center gap-2 mt-2 text-sm">
                 <select value={qType} onChange={(e) => setQType(e.target.value)} className="px-2 py-1 rounded border border-kleia-dark/20 bg-white text-xs">
@@ -206,7 +206,7 @@ export default function QuizEditor({ lessonId, onClose }: QuizEditorProps) {
                         type="checkbox"
                         checked={opt.is_correct}
                         onChange={() => toggleOptionCorrect(idx)}
-                        className="w-4 h-4 accent-kleia-burgundy"
+                        className="w-4 h-4 accent-kleia-violet"
                       />
                       <span className="text-xs font-bold text-kleia-gray">{opt.label}</span>
                       <input
@@ -214,11 +214,11 @@ export default function QuizEditor({ lessonId, onClose }: QuizEditorProps) {
                         value={opt.text}
                         onChange={(e) => setQOptions(prev => prev.map((o, i) => i === idx ? { ...o, text: e.target.value } : o))}
                         placeholder={`Réponse ${opt.label}`}
-                        className="flex-1 px-2 py-1 rounded border border-kleia-dark/20 text-xs outline-none focus:border-kleia-burgundy"
+                        className="flex-1 px-2 py-1 rounded border border-kleia-dark/20 text-xs outline-none focus:border-kleia-violet"
                       />
                     </div>
                   ))}
-                  <button onClick={addOption} className="text-xs text-kleia-burgundy hover:underline">+ Ajouter une réponse</button>
+                  <button onClick={addOption} className="text-xs text-kleia-violet hover:underline">+ Ajouter une réponse</button>
                 </div>
               )}
               <div className="flex gap-2 mt-2">

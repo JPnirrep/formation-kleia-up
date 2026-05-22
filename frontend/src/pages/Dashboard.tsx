@@ -35,7 +35,7 @@ export default function Dashboard() {
   if (!isAuth) {
     return (
       <div className="max-w-5xl mx-auto text-center py-20 space-y-6">
-        <h1 className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-burgundy">
+        <h1 className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-violet">
           Bienvenue sur Kleia-up
         </h1>
         <p className="text-lg text-kleia-gray font-body max-w-xl mx-auto">
@@ -44,13 +44,13 @@ export default function Dashboard() {
         <div className="flex justify-center gap-4">
           <Link
             to="/login"
-            className="px-6 py-3 rounded-kleia gradient-burgundy text-white font-heading font-semibold text-sm shadow-md hover:opacity-90 transition-opacity"
+            className="px-6 py-3 rounded-kleia gradient-violet text-white font-heading font-semibold text-sm shadow-md hover:opacity-90 transition-opacity"
           >
             Se connecter
           </Link>
           <Link
             to="/register"
-            className="px-6 py-3 rounded-kleia border border-kleia-burgundy/30 text-kleia-burgundy font-heading font-semibold text-sm hover:bg-kleia-burgundy/5 transition-colors"
+            className="px-6 py-3 rounded-kleia border border-kleia-violet/30 text-kleia-violet font-heading font-semibold text-sm hover:bg-kleia-violet/5 transition-colors"
           >
             S'inscrire
           </Link>
@@ -76,7 +76,7 @@ export default function Dashboard() {
   return (
     <div className="max-w-5xl mx-auto space-y-12 py-8 px-4 sm:px-6 lg:px-8">
       <section className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-burgundy">
+        <h1 className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-violet">
           Ton Incarnation, {firstName}
         </h1>
         <p className="text-lg text-kleia-gray font-body max-w-2xl mx-auto italic">
@@ -96,7 +96,7 @@ export default function Dashboard() {
       {displayCourses.length > 0 && (
         <section>
           <h2 className="text-xl font-bold font-heading text-kleia-dark mb-8 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-kleia-burgundy" />
+            <span className="w-2 h-2 rounded-full bg-kleia-violet" />
             Ton Parcours
           </h2>
           <div className="flex gap-8 overflow-x-auto pb-4">
@@ -116,7 +116,7 @@ export default function Dashboard() {
                   <h3 className="font-heading font-bold text-lg mt-2 text-kleia-dark">{course.title}</h3>
                   <div className="mt-4 h-2 w-full bg-kleia-dark/5 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-kleia-burgundy rounded-full transition-all duration-500"
+                      className="h-full bg-kleia-violet rounded-full transition-all duration-500"
                       style={{ width: `${course.progress || 0}%` }}
                     />
                   </div>
@@ -129,7 +129,7 @@ export default function Dashboard() {
 
       <section>
         <h2 className="text-xl font-bold font-heading text-kleia-dark mb-8 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-kleia-burgundy" />
+          <span className="w-2 h-2 rounded-full bg-kleia-violet" />
           Catalogue
         </h2>
         <Courses />

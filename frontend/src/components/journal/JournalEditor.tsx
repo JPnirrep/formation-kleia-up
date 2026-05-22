@@ -84,7 +84,7 @@ export default function JournalEditor({ lessonId }: JournalEditorProps) {
     <div className="bg-white rounded-kleia border border-kleia-dark/10 shadow-sm overflow-hidden flex flex-col h-full">
       <div className="p-4 border-b border-kleia-dark/10 flex items-center justify-between bg-kleia-cream/50">
         <div className="flex items-center gap-2 text-kleia-dark font-heading font-bold">
-          <BookOpen className="w-5 h-5 text-kleia-burgundy" />
+          <BookOpen className="w-5 h-5 text-kleia-violet" />
           Second Cerveau
         </div>
         
@@ -99,9 +99,9 @@ export default function JournalEditor({ lessonId }: JournalEditorProps) {
               checked={isShared}
               onChange={(e) => setIsShared(e.target.checked)}
             />
-            <div className="w-9 h-5 bg-kleia-gray/30 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-kleia-gold rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-kleia-burgundy"></div>
+            <div className="w-9 h-5 bg-kleia-gray/30 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-kleia-gold rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-kleia-violet"></div>
           </div>
-          <Share2 className={`w-4 h-4 transition-colors ${isShared ? 'text-kleia-burgundy' : 'text-kleia-gray'}`} />
+          <Share2 className={`w-4 h-4 transition-colors ${isShared ? 'text-kleia-violet' : 'text-kleia-gray'}`} />
         </label>
       </div>
 

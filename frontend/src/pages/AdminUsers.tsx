@@ -98,7 +98,7 @@ export default function AdminUsers() {
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Nom affiché"
-              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
               autoFocus
             />
             <input
@@ -106,14 +106,14 @@ export default function AdminUsers() {
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
               placeholder="Email"
-              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
             />
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Mot de passe"
-              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+              className="px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
             />
             <div className="flex gap-2">
               <Button variant="primary" size="sm" onClick={handleCreate} disabled={!newEmail.trim() || !newName.trim() || !newPassword.trim()}>
@@ -148,7 +148,7 @@ export default function AdminUsers() {
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      className="px-2 py-1 rounded border border-kleia-dark/20 text-sm font-body bg-white focus:border-kleia-burgundy focus:ring-1 focus:ring-kleia-burgundy/20 outline-none"
+                      className="px-2 py-1 rounded border border-kleia-dark/20 text-sm font-body bg-white focus:border-kleia-violet focus:ring-1 focus:ring-kleia-violet/20 outline-none"
                       aria-label={`Changer le rôle de ${user.display_name}`}
                     >
                       {ROLES.map((r) => (

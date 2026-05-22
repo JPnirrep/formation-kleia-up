@@ -24,7 +24,7 @@ function TimelineChart({ timeline }: { timeline: EventTimelineEntry[] }) {
           title={`${entry.date}: ${entry.plays} lectures`}
         >
           <div
-            className="w-full bg-kleia-burgundy/70 rounded-t"
+            className="w-full bg-kleia-violet/70 rounded-t"
             style={{ height: `${(entry.plays / maxPlays) * 100}%`, minHeight: entry.plays > 0 ? '4px' : '0' }}
           />
           <span className="text-[8px] text-kleia-gray mt-0.5 truncate w-full text-center" aria-hidden="true">
@@ -67,11 +67,11 @@ export default function AdminDashboard() {
 
   const statCards = stats
     ? [
-        { label: 'Apprenants', value: stats.total_users.toString(), color: 'text-kleia-burgundy' },
+        { label: 'Apprenants', value: stats.total_users.toString(), color: 'text-kleia-violet' },
         { label: 'Formations', value: stats.total_courses.toString(), color: 'text-kleia-gold' },
         { label: 'Inscrits actifs', value: stats.active_enrollments.toString(), color: 'text-kleia-success' },
         { label: 'Lectures vidéo', value: stats.total_video_plays.toString(), color: 'text-kleia-dark' },
-        { label: 'Taux complétion', value: `${stats.completion_rate_percent}%`, color: 'text-kleia-burgundy' },
+        { label: 'Taux complétion', value: `${stats.completion_rate_percent}%`, color: 'text-kleia-violet' },
         { label: 'Spectateurs uniques', value: stats.unique_viewers.toString(), color: 'text-kleia-gold' },
       ]
     : [];
@@ -80,7 +80,7 @@ export default function AdminDashboard() {
     <div className="space-y-8" role="region" aria-label="Tableau de bord administration">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-burgundy">
+          <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-violet">
             Administration
           </h1>
           <p className="text-kleia-gray font-body text-sm mt-1">

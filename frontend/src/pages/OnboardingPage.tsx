@@ -16,7 +16,7 @@ export default function OnboardingPage() {
   if (loading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6]">
-        <div className="w-8 h-8 border-2 border-kleia-burgundy border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-kleia-violet border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function OnboardingPage() {
               <div
                 key={s}
                 className={`h-2 w-12 rounded-full transition-colors ${
-                  s <= step ? 'bg-kleia-burgundy' : 'bg-gray-200'
+                  s <= step ? 'bg-kleia-violet' : 'bg-gray-200'
                 }`}
               />
             ))}
@@ -55,7 +55,7 @@ export default function OnboardingPage() {
 
           {step === 1 && (
             <div className="text-center space-y-6">
-              <h1 className="text-3xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
+              <h1 className="text-3xl font-extrabold font-heading text-kleia-violet tracking-tight">
                 Bienvenue, {user.display_name.split(' ')[0]} !
               </h1>
               <p className="text-kleia-gray font-body leading-relaxed">
@@ -64,13 +64,13 @@ export default function OnboardingPage() {
               </p>
               <button
                 onClick={() => setStep(2)}
-                className="w-full py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+                className="w-full py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
               >
                 Commencer
               </button>
               <button
                 onClick={() => handleFinish(true)}
-                className="text-sm text-kleia-gray hover:text-kleia-burgundy underline"
+                className="text-sm text-kleia-gray hover:text-kleia-violet underline"
               >
                 Passer, je verrai plus tard
               </button>
@@ -80,7 +80,7 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <div className="text-center">
-                <h2 className="text-2xl font-bold font-heading text-kleia-burgundy">
+                <h2 className="text-2xl font-bold font-heading text-kleia-violet">
                   Vos informations
                 </h2>
                 <p className="mt-1 text-sm text-kleia-gray font-body">
@@ -111,7 +111,7 @@ export default function OnboardingPage() {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                     placeholder="+33 6 12 34 56 78"
                   />
                 </div>
@@ -125,7 +125,7 @@ export default function OnboardingPage() {
                     type="text"
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                     placeholder="+33 6 12 34 56 78"
                   />
                 </div>
@@ -139,7 +139,7 @@ export default function OnboardingPage() {
                     type="text"
                     value={telegram}
                     onChange={(e) => setTelegram(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-burgundy/30 focus:border-kleia-burgundy text-sm transition-colors"
+                    className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/10 bg-white/50 focus:outline-none focus:ring-2 focus:ring-kleia-violet/30 focus:border-kleia-violet text-sm transition-colors"
                     placeholder="@moncompte"
                   />
                 </div>
@@ -161,7 +161,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={() => setStep(3)}
                   disabled={submitting}
-                  className="flex-[2] py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="flex-[2] py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50"
                 >
                   Continuer
                 </button>
@@ -171,7 +171,7 @@ export default function OnboardingPage() {
 
           {step === 3 && (
             <div className="text-center space-y-6">
-              <h2 className="text-2xl font-bold font-heading text-kleia-burgundy">
+              <h2 className="text-2xl font-bold font-heading text-kleia-violet">
                 Vous êtes prêt !
               </h2>
               <p className="text-kleia-gray font-body leading-relaxed">
@@ -181,7 +181,7 @@ export default function OnboardingPage() {
               <button
                 onClick={() => handleFinish(false)}
                 disabled={submitting}
-                className="w-full py-2.5 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="w-full py-2.5 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity disabled:opacity-50"
               >
                 {submitting ? 'Enregistrement…' : 'Découvrir les formations'}
               </button>

@@ -259,7 +259,7 @@ export default function AdminCourseDetail() {
 
       <div className="flex items-center justify-between">
         <div>
-          <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-burgundy mb-1 block">
+          <button onClick={() => navigate('/admin/courses')} className="text-sm text-kleia-gray hover:text-kleia-violet mb-1 block">
             ← Retour aux formations
           </button>
           <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{course.title}</h1>
@@ -278,7 +278,7 @@ export default function AdminCourseDetail() {
               value={newModTitle}
               onChange={(e) => setNewModTitle(e.target.value)}
               placeholder="Titre du nouveau module"
-              className="flex-1 px-4 py-2 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-body"
+              className="flex-1 px-4 py-2 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body"
               autoFocus
             />
             <Button variant="primary" size="sm" onClick={handleNewModule} disabled={!newModTitle.trim()}>
@@ -319,13 +319,13 @@ export default function AdminCourseDetail() {
                     <button
                       onClick={(e) => { e.stopPropagation(); handleMoveModule(mi, -1); }}
                       disabled={mi === 0}
-                      className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none"
+                      className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none"
                       aria-label="Remonter le module"
                     >▲</button>
                     <button
                       onClick={(e) => { e.stopPropagation(); handleMoveModule(mi, 1); }}
                       disabled={mi >= modules.length - 1}
-                      className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none"
+                      className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none"
                       aria-label="Descendre le module"
                     >▼</button>
                   </div>
@@ -354,7 +354,7 @@ export default function AdminCourseDetail() {
                           value={newLessonTitle}
                           onChange={(e) => setNewLessonTitle(e.target.value)}
                           placeholder="Titre de la leçon"
-                          className="flex-1 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+                          className="flex-1 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
                           autoFocus
                         />
                         <select value={newLessonType} onChange={(e) => setNewLessonType(e.target.value)} className="px-2 py-1.5 rounded border border-kleia-dark/20 text-sm font-body bg-white">
@@ -391,13 +391,13 @@ export default function AdminCourseDetail() {
                           <button
                             onClick={() => handleMoveLesson(mi, li, -1)}
                             disabled={li === 0}
-                            className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none"
+                            className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none"
                             aria-label="Remonter la leçon"
                           >▲</button>
                           <button
                             onClick={() => handleMoveLesson(mi, li, 1)}
                             disabled={li >= lessons.length - 1}
-                            className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none"
+                            className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none"
                             aria-label="Descendre la leçon"
                           >▼</button>
                         </div>
@@ -414,27 +414,27 @@ export default function AdminCourseDetail() {
                           <div className="mt-2 flex flex-wrap items-center gap-2">
                             <button
                               onClick={() => { setYoutubeLessonId(lesson.id); setYoutubeUrl(''); setYoutubeTitle(''); setVideoFileLessonId(null); }}
-                              className="text-xs text-kleia-burgundy cursor-pointer hover:underline"
+                              className="text-xs text-kleia-violet cursor-pointer hover:underline"
                             >
                               + Ajouter une vidéo YouTube
                             </button>
                             <button
                               onClick={() => { setVideoFileLessonId(lesson.id); setYoutubeLessonId(null); }}
-                              className="text-xs text-kleia-burgundy cursor-pointer hover:underline"
+                              className="text-xs text-kleia-violet cursor-pointer hover:underline"
                             >
                               + Uploader une vidéo (fichier)
                             </button>
-                            <label className="text-xs text-kleia-burgundy cursor-pointer hover:underline">
+                            <label className="text-xs text-kleia-violet cursor-pointer hover:underline">
                               + Ajouter un fichier (PDF, doc...)
                               <input type="file" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleResourceUpload(lesson.id, f); }} />
                             </label>
                             {lesson.lesson_type === 'quiz' && (
-                              <button onClick={() => { setQuizLessonId(lesson.id); }} className="text-xs text-kleia-burgundy hover:underline">
+                              <button onClick={() => { setQuizLessonId(lesson.id); }} className="text-xs text-kleia-violet hover:underline">
                                 + Gérer le quiz
                               </button>
                             )}
                             {lesson.lesson_type === 'text' && (
-                              <button onClick={() => { setEditingLesson(lesson.id); setEditContent(''); }} className="text-xs text-kleia-burgundy hover:underline">
+                              <button onClick={() => { setEditingLesson(lesson.id); setEditContent(''); }} className="text-xs text-kleia-violet hover:underline">
                                 + Éditer le contenu texte
                               </button>
                             )}
@@ -447,8 +447,8 @@ export default function AdminCourseDetail() {
                                 Collez le lien YouTube de votre vidéo (publique ou non répertoriée)
                               </p>
                               <div className="flex items-center gap-2">
-                                <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=XXXXXXXXXXX" className="flex-1 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy" autoFocus />
-                                <input type="text" value={youtubeTitle} onChange={(e) => setYoutubeTitle(e.target.value)} placeholder="Titre (optionnel)" className="w-40 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy" />
+                                <input type="text" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/watch?v=XXXXXXXXXXX" className="flex-1 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet" autoFocus />
+                                <input type="text" value={youtubeTitle} onChange={(e) => setYoutubeTitle(e.target.value)} placeholder="Titre (optionnel)" className="w-40 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet" />
                               </div>
                               <div className="flex gap-2 mt-2">
                                 <Button variant="primary" size="sm" onClick={handleAddYoutubeVideo} disabled={!youtubeUrl.trim()}>Ajouter</Button>
@@ -487,7 +487,7 @@ export default function AdminCourseDetail() {
                                 return (
                                   <div key={v.id} className="flex items-center gap-2 text-xs text-kleia-gray group">
                                     <span>{isYt ? '▶️' : '🎬'} {v.title}</span>
-                                    {v.playback_url && <a href={v.playback_url} target="_blank" rel="noopener noreferrer" className="text-kleia-burgundy hover:underline">{isYt ? 'Voir sur YouTube' : 'Voir'}</a>}
+                                    {v.playback_url && <a href={v.playback_url} target="_blank" rel="noopener noreferrer" className="text-kleia-violet hover:underline">{isYt ? 'Voir sur YouTube' : 'Voir'}</a>}
                                     <button
                                       onClick={async () => { await deleteVideo(v.id); load(); }}
                                       className="ml-auto text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -505,7 +505,7 @@ export default function AdminCourseDetail() {
                               {lessonResources[lesson.id]?.map((r) => (
                                 <div key={r.id} className="flex items-center gap-2 text-xs text-kleia-gray">
                                   <span>📎 {r.title}</span>
-                                  <a href={r.file_url} target="_blank" className="text-kleia-burgundy hover:underline">Télécharger</a>
+                                  <a href={r.file_url} target="_blank" className="text-kleia-violet hover:underline">Télécharger</a>
                                 </div>
                               ))}
                             </div>
@@ -518,7 +518,7 @@ export default function AdminCourseDetail() {
                                 value={editContent}
                                 onChange={(e) => setEditContent(e.target.value)}
                                 rows={6}
-                                className="w-full px-3 py-2 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy resize-y"
+                                className="w-full px-3 py-2 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet resize-y"
                                 placeholder="Contenu markdown / texte..."
                               />
                               <div className="flex gap-2 mt-2">

@@ -43,7 +43,7 @@ export default function VideoUploader({ lessonId, onUploaded, onCancel }: VideoU
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Titre de la vidéo (optionnel)"
-              className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-burgundy"
+              className="w-full px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet"
             />
             <input
               type="file"
@@ -68,7 +68,7 @@ export default function VideoUploader({ lessonId, onUploaded, onCancel }: VideoU
         <div className="space-y-2">
           <div className="w-full bg-kleia-dark/10 rounded-full h-3 overflow-hidden">
             <div
-              className="bg-kleia-burgundy h-full rounded-full transition-all duration-300"
+              className="bg-kleia-violet h-full rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>

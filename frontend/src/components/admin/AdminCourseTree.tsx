@@ -47,13 +47,13 @@ export default function AdminCourseTree({
           type="text"
           value={course.title}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="w-full px-3 py-2 rounded-lg border border-kleia-dark/20 focus:border-kleia-burgundy focus:ring-2 focus:ring-kleia-burgundy/20 outline-none font-heading font-bold text-sm"
+          className="w-full px-3 py-2 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-heading font-bold text-sm"
           placeholder="Titre de la formation"
           aria-label="Titre de la formation"
         />
         <button
           onClick={onAddModule}
-          className="w-full py-2 text-sm font-heading font-semibold text-kleia-burgundy border border-dashed border-kleia-burgundy/30 rounded-lg hover:bg-kleia-burgundy/5 transition-colors"
+          className="w-full py-2 text-sm font-heading font-semibold text-kleia-violet border border-dashed border-kleia-violet/30 rounded-lg hover:bg-kleia-violet/5 transition-colors"
         >
           + Ajouter un module
         </button>
@@ -77,8 +77,8 @@ export default function AdminCourseTree({
                   aria-expanded={isExpanded}
                 >
                   <div className="flex flex-col mr-1">
-                    <button onClick={(e) => { e.stopPropagation(); onMoveModule(mi, -1); }} disabled={mi === 0} className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none" aria-label="Remonter">▲</button>
-                    <button onClick={(e) => { e.stopPropagation(); onMoveModule(mi, 1); }} disabled={mi >= course.modules.length - 1} className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none" aria-label="Descendre">▼</button>
+                    <button onClick={(e) => { e.stopPropagation(); onMoveModule(mi, -1); }} disabled={mi === 0} className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none" aria-label="Remonter">▲</button>
+                    <button onClick={(e) => { e.stopPropagation(); onMoveModule(mi, 1); }} disabled={mi >= course.modules.length - 1} className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none" aria-label="Descendre">▼</button>
                   </div>
                   <span className="text-xs text-kleia-gray">{isExpanded ? '▼' : '▶'}</span>
                   <span className="text-sm font-heading font-bold text-kleia-dark truncate flex-1">{mod.title}</span>
@@ -95,15 +95,15 @@ export default function AdminCourseTree({
                         <div
                           key={lesson.id}
                           className={`flex items-center gap-1 px-2 py-1.5 rounded cursor-pointer text-sm group ${
-                            isSelected ? 'bg-kleia-burgundy/10 text-kleia-burgundy font-medium' : 'hover:bg-kleia-dark/5 text-kleia-dark'
+                            isSelected ? 'bg-kleia-violet/10 text-kleia-violet font-medium' : 'hover:bg-kleia-dark/5 text-kleia-dark'
                           }`}
                           onClick={() => onSelectLesson(lesson.id)}
                           role="treeitem"
                           aria-selected={isSelected}
                         >
                           <div className="flex flex-col mr-1">
-                            <button onClick={(e) => { e.stopPropagation(); onMoveLesson(mi, li, -1); }} disabled={li === 0} className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none" aria-label="Remonter">▲</button>
-                            <button onClick={(e) => { e.stopPropagation(); onMoveLesson(mi, li, 1); }} disabled={li >= lessons.length - 1} className="text-xs text-kleia-gray hover:text-kleia-burgundy disabled:opacity-20 leading-none" aria-label="Descendre">▼</button>
+                            <button onClick={(e) => { e.stopPropagation(); onMoveLesson(mi, li, -1); }} disabled={li === 0} className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none" aria-label="Remonter">▲</button>
+                            <button onClick={(e) => { e.stopPropagation(); onMoveLesson(mi, li, 1); }} disabled={li >= lessons.length - 1} className="text-xs text-kleia-gray hover:text-kleia-violet disabled:opacity-20 leading-none" aria-label="Descendre">▼</button>
                           </div>
                           <span className="text-xs w-4 text-center">{icon}</span>
                           <span className="flex-1 truncate font-body">{lesson.title}</span>
@@ -114,7 +114,7 @@ export default function AdminCourseTree({
                     })}
                     <button
                       onClick={(e) => { e.stopPropagation(); onAddLesson(mod.id); }}
-                      className="w-full mt-1 py-1 text-xs text-kleia-burgundy border border-dashed border-kleia-burgundy/20 rounded hover:bg-kleia-burgundy/5 transition-colors"
+                      className="w-full mt-1 py-1 text-xs text-kleia-violet border border-dashed border-kleia-violet/20 rounded hover:bg-kleia-violet/5 transition-colors"
                     >
                       + Leçon
                     </button>

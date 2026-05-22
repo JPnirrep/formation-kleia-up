@@ -127,7 +127,7 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
     return (
       <div className={clsx('relative w-full aspect-video glass-dark flex items-center justify-center overflow-hidden', className)}>
         <div className="relative z-10 flex flex-col items-center gap-4 text-center px-6">
-          <svg className="w-16 h-16 text-kleia-burgundy/60" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <svg className="w-16 h-16 text-kleia-violet/60" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M8 5v14l11-7z" />
           </svg>
           <h3 className="text-lg font-bold font-heading text-kleia-dark">{video?.title || 'Vidéo'}</h3>
@@ -171,7 +171,7 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
       {status === 'loading' && (
         <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/60">
           <div className="flex flex-col items-center gap-3">
-            <div className="w-10 h-10 border-4 border-kleia-burgundy border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-kleia-violet border-t-transparent rounded-full animate-spin" />
             <p className="text-white text-sm font-body">Chargement...</p>
           </div>
         </div>

@@ -95,7 +95,7 @@ export default function LessonView() {
     return (
       <Card className="text-center py-12">
         <p className="text-kleia-gray font-body text-lg">Leçon introuvable</p>
-        <Link to="/formations" className="text-kleia-burgundy font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
+        <Link to="/formations" className="text-kleia-violet font-heading font-semibold underline underline-offset-2 mt-2 inline-block">
           Retour aux formations
         </Link>
       </Card>
@@ -124,7 +124,7 @@ export default function LessonView() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="text-sm text-kleia-gray hover:text-kleia-burgundy font-body transition-colors inline-flex items-center gap-1"
+          className="text-sm text-kleia-gray hover:text-kleia-violet font-body transition-colors inline-flex items-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -220,7 +220,7 @@ export default function LessonView() {
               {prevLesson && (
                 <Link
                   to={`/lecon/${prevLesson.id}`}
-                  className="block p-3 rounded-lg bg-kleia-dark/5 hover:bg-kleia-burgundy/10 transition-colors"
+                  className="block p-3 rounded-lg bg-kleia-dark/5 hover:bg-kleia-violet/10 transition-colors"
                 >
                   <span className="text-xs text-kleia-gray font-body">Leçon précédente</span>
                   <p className="text-sm font-medium text-kleia-dark font-body truncate">{prevLesson.title}</p>
