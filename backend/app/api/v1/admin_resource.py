@@ -10,17 +10,15 @@ from app.api.deps import get_current_admin
 from app.database import get_db
 from app.models.course import Lesson
 from app.models.resource import LessonResource
+from app.schemas.resource import LessonResourceRead
 from app.services.storage import delete_file, store_file
 
 router = APIRouter(dependencies=[Depends(get_current_admin)])
 
 
-
-
-
-
 @router.post(
     "/lessons/{lesson_id}/resources",
+    response_model=LessonResourceRead,
     status_code=status.HTTP_201_CREATED,
 )
 async def upload_lesson_resource(
@@ -52,7 +50,7 @@ async def upload_lesson_resource(
     return resource
 
 
-@router.get("/lessons/{lesson_id}/resources")
+@router.get("/lessons/{lesson_id}/resources", response_model=list[LessonResourceRead])
 async def list_resources(lesson_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
     stmt = (
         select(LessonResource)

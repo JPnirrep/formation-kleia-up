@@ -95,6 +95,13 @@ export default function CourseDetail() {
   const [expandedModule, setExpandedModule] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // Tous les hooks appelés avant les early returns (règle React des hooks)
+  const modules = course?.modules || [];
+  const allLessons = useMemo(() =>
+    modules.flatMap(m => m.lessons || []),
+    [modules]
+  );
+
   if (loading) {
     return <Loading className="py-20" text="Chargement de la formation..." />;
   }
@@ -110,7 +117,6 @@ export default function CourseDetail() {
     );
   }
 
-  const modules = course.modules || [];
   const totalLessons = modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0);
   const totalDurationSeconds = modules.reduce((acc, m) =>
     acc + (m.lessons || []).reduce((s, l) => s + l.duration_seconds, 0), 0);
@@ -121,10 +127,6 @@ export default function CourseDetail() {
 
   const courseLessonsProgress = (course as { progress?: { lessons_progress?: { lesson_id: string; status: 'not_started' | 'in_progress' | 'completed' | 'locked' }[] } }).progress?.lessons_progress;
 
-  const allLessons = useMemo(() =>
-    modules.flatMap(m => m.lessons || []),
-    [modules]
-  );
   const firstUncompleted = allLessons.find(l => {
     const status = deriveStatus(l.id, courseLessonsProgress);
     return status === 'not_started' || status === 'in_progress';

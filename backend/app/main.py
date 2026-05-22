@@ -18,6 +18,9 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
+        # Redirect /docs → /api/docs (Swagger UI) — FastAPI réserve /docs donc on le fait ici
+        if request.url.path == "/docs":
+            return RedirectResponse(url="/api/docs", status_code=301)
         if request.method == "OPTIONS":
             response = Response(status_code=200)
         else:
@@ -60,9 +63,15 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
-    # Les decorateurs FastAPI enregistrent ces fonctions aupres du routeur,
-    # donc Pyright ne les voit pas comme "accedees" — on ignore ce faux positif.
+    @app.get("/api/health")
+    async def health_check() -> dict[str, str]:  # pyright: ignore[reportUnusedFunction]
+        return {
+            "status": "ok",
+            "version": settings.VERSION,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
 
+    # Exception handlers
     @app.exception_handler(401)
     async def unauthorized_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
         return JSONResponse(
@@ -99,14 +108,6 @@ def create_app() -> FastAPI:
             status_code=500,
             content={"detail": "Erreur interne du serveur."},
         )
-
-    @app.get("/api/health")
-    async def health_check() -> dict[str, str]:  # pyright: ignore[reportUnusedFunction]
-        return {
-            "status": "ok",
-            "version": settings.VERSION,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
 
     # Import et enregistrement des routers
     from app.api.v1.router import api_v1_router

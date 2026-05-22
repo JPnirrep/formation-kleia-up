@@ -76,6 +76,78 @@ async def upload_video(
     return result
 
 
+@router.post(
+    "/lessons/{lesson_id}/videos/link",
+    response_model=VideoAssetRead,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_video_link(
+    lesson_id: uuid.UUID,
+    data: VideoAssetCreate,
+    current_user: User = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a video asset from an external URL (YouTube, Vimeo, etc.). No file upload."""
+    stmt = select(Lesson).where(Lesson.id == lesson_id)
+    result = await db.execute(stmt)
+    lesson = result.scalar_one_or_none()
+    if lesson is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Leçon non trouvée.",
+        )
+
+    asset = VideoAsset(
+        lesson_id=lesson_id,
+        title=data.title,
+        description=data.description,
+        order=data.order,
+        status=data.status,
+        language=data.language,
+        visibility=data.visibility,
+        playback_manifest_url=data.playback_url,
+        duration_seconds=0,
+        created_by=current_user.id,
+    )
+    db.add(asset)
+    await db.commit()
+    await db.refresh(asset)
+
+    r = VideoAssetRead.model_validate(asset)
+    r.playback_url = asset.playback_manifest_url
+    return r
+
+
+@router.get("/lessons/{lesson_id}/videos", response_model=list[VideoAssetRead])
+async def list_lesson_videos(
+    lesson_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """List all video assets for a lesson."""
+    stmt = select(Lesson).where(Lesson.id == lesson_id)
+    result = await db.execute(stmt)
+    lesson = result.scalar_one_or_none()
+    if lesson is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Leçon non trouvée.",
+        )
+    stmt = (
+        select(VideoAsset)
+        .where(VideoAsset.lesson_id == lesson_id)
+        .options(selectinload(VideoAsset.tracks))
+        .order_by(VideoAsset.order)
+    )
+    result = await db.execute(stmt)
+    assets = result.scalars().all()
+    data = []
+    for asset in assets:
+        d = VideoAssetRead.model_validate(asset)
+        d.playback_url = get_playback_url(asset.source_storage_key)
+        data.append(d)
+    return data
+
+
 @router.get("/videos/{video_id}", response_model=VideoAssetRead)
 async def get_video(
     video_id: uuid.UUID,

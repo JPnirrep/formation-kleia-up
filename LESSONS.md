@@ -140,3 +140,51 @@ Frontend envoyait `selected_option_ids: string[]` mais le backend lisait `select
 11. **`uuid.UUID` dans tous les schémas** → validation cohérente
 12. **Pagination uniforme** → `PaginatedResponse` sur toutes les listes
 13. **Boutons fonctionnels ou retirés** → pas de `onClick` vide
+
+---
+
+## 🔴 Pattern 15 : Boutons ✕ sans aria-label (WCAG 2.4.4)
+
+**Exemple :** Boutons de fermeture/suppression avec seul caractère `✕` — les lecteurs d'écran annoncent juste "bouton".
+
+**Règle :** Tout bouton icon-only DOIT avoir `aria-label`. Ex : `aria-label="Supprimer la leçon"`.
+
+**Détection :** Rechercher `<button` sans contenu texte ET sans `aria-label`.
+
+---
+
+## 🟠 Pattern 16 : `<div onClick>` sans support clavier (WCAG 2.1.1)
+
+**Exemple :** Dashboard avait `<div onClick={navigate}>` sans `role="button"`, `tabIndex`, `onKeyDown`. Inutilisable au clavier.
+
+**Règle :** Tout élément cliquable custom DOIT avoir `role="button"`, `tabIndex={0}`, et handler `onKeyDown` pour Enter/Space. Ou mieux : utiliser un vrai `<button>`.
+
+---
+
+## 🟠 Pattern 17 : SkipLink cassé sur pages publiques (WCAG 2.4.1)
+
+**Exemple :** `SkipLink` pointe vers `#main-content` mais les pages Landing/Login/Register utilisent `<div>`, pas `<main id="main-content">`.
+
+**Règle :** Toute page Doit avoir `<main id="main-content">` pour que `SkipLink` fonctionne partout.
+
+---
+
+## 🟡 Pattern 18 : Inputs sans label (WCAG 3.3.2)
+
+**Exemple :** Formulaires admin avec placeholder comme seul label. Les placeholders ne sont pas des labels valides.
+
+**Règle :** Chaque input doit avoir un `<label htmlFor="...">` ou un `aria-label`. Placeholder = supplément, pas substitut.
+
+---
+
+## 🟡 Pattern 19 : `<h1> → <h3>` sans `<h2>` (WCAG 1.3.1)
+
+**Exemple :** AdminCourseDetail sautait de `<h1>` directement à `<h3>` pour les titres de modules.
+
+**Règle :** La hiérarchie de titres doit être séquentielle. Pas de saut de niveau.
+
+---
+
+## 🔵 Pattern 20 : `outline-none` sans `focus:ring` (WCAG 2.4.7)
+
+**Règle :** Si `outline-none` est utilisé, toujours fournir `focus:ring-2` ou `focus:border-*` visible.

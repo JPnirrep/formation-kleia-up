@@ -8,14 +8,14 @@ export function formatDuration(seconds: number): string {
 
 export function getCourseGradient(level: string): string {
   const gradients: Record<string, string> = {
-    'débutant': 'from-kleia-burgundy/20 via-kleia-burgundy/10 to-kleia-cream',
-    'Débutant': 'from-kleia-burgundy/20 via-kleia-burgundy/10 to-kleia-cream',
-    'intermédiaire': 'from-kleia-gold/20 via-kleia-gold/10 to-kleia-cream',
-    'Intermédiaire': 'from-kleia-gold/20 via-kleia-gold/10 to-kleia-cream',
-    'avancé': 'from-kleia-dark/20 via-kleia-dark/10 to-kleia-cream',
-    'Avancé': 'from-kleia-dark/20 via-kleia-dark/10 to-kleia-cream',
+    'débutant': 'from-[#7C3AED] to-[#A78BFA]',
+    'Débutant': 'from-[#7C3AED] to-[#A78BFA]',
+    'intermédiaire': 'from-[#EC4899] to-[#F472B6]',
+    'Intermédiaire': 'from-[#EC4899] to-[#F472B6]',
+    'avancé': 'from-[#F59E0B] to-[#FBBF24]',
+    'Avancé': 'from-[#F59E0B] to-[#FBBF24]',
   };
-  return gradients[level] || 'from-kleia-cream to-kleia-cream';
+  return gradients[level] || 'from-[#10B981] to-[#34D399]';
 }
 
 export interface CardCourse {

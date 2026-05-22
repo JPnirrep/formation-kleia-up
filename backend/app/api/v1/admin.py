@@ -25,6 +25,7 @@ from app.schemas.course import (
 )
 from app.schemas.enrollment import EnrollmentRead
 from app.schemas.quiz import QuizCreate, QuizRead
+from app.schemas.user import UserCreate, UserRead, UserUpdate
 from app.services.course_service import (
     create_course,
     create_lesson,
@@ -258,3 +259,140 @@ async def admin_list_enrollments(
         page_size=page_size,
         total_pages=total_pages,
     )
+
+
+@router.get("/users", response_model=PaginatedResponse)
+async def admin_list_users(
+    page: int = 1,
+    page_size: int = 20,
+    role: str | None = None,
+    search: str | None = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """Liste tous les utilisateurs (admin, avec filtres optionnels)."""
+    conditions = [User.is_active == True]
+    if role:
+        conditions.append(User.role == role)
+    if search:
+        conditions.append(
+            (User.first_name.ilike(f"%{search}%"))
+            | (User.last_name.ilike(f"%{search}%"))
+            | (User.email.ilike(f"%{search}%"))
+        )
+
+    count_stmt = select(func.count()).select_from(User).where(*conditions)
+    count_result = await db.execute(count_stmt)
+    total = count_result.scalar() or 0
+
+    stmt = (
+        select(User)
+        .where(*conditions)
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+        .order_by(User.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    users = result.scalars().all()
+
+    total_pages = math.ceil(total / page_size) if page_size else 0
+    return PaginatedResponse(
+        items=[UserRead.model_validate(u) for u in users],
+        total=total,
+        page=page,
+        page_size=page_size,
+        total_pages=total_pages,
+    )
+
+
+@router.delete("/enrollments/{enrollment_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def admin_delete_enrollment(
+    enrollment_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Révoque une inscription (admin)."""
+    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+    result = await db.execute(stmt)
+    enrollment = result.scalar_one_or_none()
+    if enrollment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inscription non trouvée.",
+        )
+    await db.delete(enrollment)
+    await db.commit()
+
+
+@router.patch("/enrollments/{enrollment_id}", response_model=EnrollmentRead)
+async def admin_update_enrollment_status(
+    enrollment_id: UUID,
+    status_field: str = "active",
+    db: AsyncSession = Depends(get_db),
+):
+    """Modifie le statut d'une inscription (admin)."""
+    if status_field not in ("active", "completed", "cancelled"):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Statut invalide. Valeurs : active, completed, cancelled.",
+        )
+    stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
+    result = await db.execute(stmt)
+    enrollment = result.scalar_one_or_none()
+    if enrollment is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Inscription non trouvée.",
+        )
+    enrollment.status = status_field
+    await db.commit()
+    await db.refresh(enrollment)
+    return EnrollmentRead.model_validate(enrollment)
+
+
+@router.post("/users", response_model=UserRead, status_code=status.HTTP_201_CREATED)
+async def admin_create_user(
+    data: UserCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Crée un utilisateur (admin)."""
+    from app.services.auth import get_password_hash
+
+    existing = await db.execute(select(User).where(User.email == data.email))
+    if existing.scalar_one_or_none():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Un utilisateur avec cet email existe déjà.",
+        )
+    user = User(
+        email=data.email,
+        display_name=data.display_name,
+        password_hash=get_password_hash(data.password),
+        auth_provider="email",
+        role="learner",
+        is_active=True,
+    )
+    db.add(user)
+    await db.commit()
+    await db.refresh(user)
+    return UserRead.model_validate(user)
+
+
+@router.patch("/users/{user_id}", response_model=UserRead)
+async def admin_update_user(
+    user_id: UUID,
+    data: UserUpdate,
+    db: AsyncSession = Depends(get_db),
+):
+    """Modifie un utilisateur (admin)."""
+    stmt = select(User).where(User.id == user_id)
+    result = await db.execute(stmt)
+    user = result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Utilisateur non trouvé.",
+        )
+    for key, value in data.model_dump(exclude_unset=True).items():
+        setattr(user, key, value)
+    await db.commit()
+    await db.refresh(user)
+    return UserRead.model_validate(user)

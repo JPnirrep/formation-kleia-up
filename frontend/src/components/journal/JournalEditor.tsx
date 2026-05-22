@@ -28,10 +28,10 @@ export default function JournalEditor({ lessonId }: JournalEditorProps) {
       try {
         setLoading(true);
         const res = await getJournalEntries({ lesson_id: lessonId, limit: 1 });
-        if (active && res.items.length > 0) {
-          setEntry(res.items[0]);
-          setContent(res.items[0].content);
-          setIsShared(res.items[0].is_shared);
+        if (active && res.length > 0) {
+          setEntry(res[0]);
+          setContent(res[0].content);
+          setIsShared(res[0].is_shared);
         }
       } catch (err) {
         console.error("Erreur lors du chargement des notes du journal:", err);

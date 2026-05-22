@@ -11,6 +11,8 @@ class VideoAssetCreate(BaseModel):
     order: int = 0
     language: str = "fr"
     visibility: str = "draft"
+    playback_url: str | None = None  # URL externe (YouTube/Vimeo) à la place du fichier
+    status: str = "published"
     completion_threshold_percent: int = 85
 
 
@@ -96,7 +98,7 @@ class VideoProgressRead(BaseModel):
 
 
 class VideoEventCreate(BaseModel):
-    video_asset_id: uuid.UUID
+    video_asset_id: uuid.UUID | None = None  # optionnel : ignoré si l'ID vient du path
     session_id: str
     event_type: str
     position_seconds: float

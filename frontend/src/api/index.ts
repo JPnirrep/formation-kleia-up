@@ -7,3 +7,4 @@ export * from './quizzes';
 export * from './admin';
 export * from './certificates';
 export * from './videos';
+export * from './resources';

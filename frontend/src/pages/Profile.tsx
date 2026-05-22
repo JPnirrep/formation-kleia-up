@@ -183,6 +183,7 @@ export default function Profile() {
                 aria-label="Notifications par email"
                 tabIndex={0}
                 onClick={() => setNotifications(prev => ({ ...prev, email: !prev.email }))}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setNotifications(prev => ({ ...prev, email: !prev.email })); } }}
               >
                 <div
                   className={clsx(

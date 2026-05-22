@@ -69,7 +69,7 @@ async function request<T>(
     throw error;
   }
 
-  if (res.status === 204) throw new ApiError(204, 'Aucun contenu');
+  if (res.status === 204) return undefined as unknown as T;
   return res.json();
 }
 

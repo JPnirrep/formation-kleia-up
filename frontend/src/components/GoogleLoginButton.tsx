@@ -124,7 +124,7 @@ export default function GoogleLoginButton() {
   }
 
   return (
-    <div onClick={handleCustomClick} className="cursor-pointer">
+    <div onClick={handleCustomClick} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCustomClick(); } }} role="button" tabIndex={0} className="cursor-pointer" aria-label="Se connecter avec Google">
       {/* Google's rendered button */}
       <div ref={buttonRef} className="flex justify-center" />
     </div>

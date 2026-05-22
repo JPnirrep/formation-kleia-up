@@ -39,6 +39,7 @@ export default function BadgeNotification({ badge, onClose }: BadgeNotificationP
         <button 
           onClick={onClose}
           className="ml-2 p-1 hover:bg-kleia-dark/5 rounded-full transition-colors"
+          aria-label="Fermer la notification"
         >
           <svg className="w-5 h-5 text-kleia-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

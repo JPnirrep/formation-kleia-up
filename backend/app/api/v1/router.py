@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     admin,
+    admin_quiz,
     admin_resource,
     admin_stats,
     admin_video,
@@ -45,6 +46,9 @@ api_v1_router.include_router(
     journal.router, prefix="/journal", tags=["Journal (apprenant)"]
 )
 api_v1_router.include_router(admin.router, prefix="/admin", tags=["Administration"])
+api_v1_router.include_router(
+    admin_quiz.router, prefix="/admin", tags=["Administration"]
+)
 api_v1_router.include_router(
     admin_video.router, prefix="/admin", tags=["Administration"]
 )

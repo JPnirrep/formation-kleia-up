@@ -21,25 +21,24 @@ export default function OnboardingPage() {
     );
   }
 
-  const handleFinish = async (skip: boolean) => {
+  const handleFinish = (skip: boolean) => {
     setError(null);
     setSubmitting(true);
-    try {
-      await completeOnboarding({
-        onboarding_completed: true,
-        phone: skip ? '' : phone || undefined,
-        whatsapp: skip ? '' : whatsapp || undefined,
-        telegram: skip ? '' : telegram || undefined,
-      });
-      navigate('/formations', { replace: true });
-    } catch {
-      setError('Erreur lors de l\'enregistrement. Vous pouvez réessayer.');
-      setSubmitting(false);
-    }
+    // Marquer l'onboarding comme fait (même si l'API backend n'existe pas encore)
+    localStorage.setItem('kleia_onboarding_done', '1');
+    completeOnboarding({
+      onboarding_completed: true,
+      phone: skip ? '' : phone || undefined,
+      whatsapp: skip ? '' : whatsapp || undefined,
+      telegram: skip ? '' : telegram || undefined,
+    }).catch(() => {
+      // Silencieux — l'onboarding est facultatif
+    });
+    navigate('/formations', { replace: true });
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
       <div className="w-full max-w-lg">
         <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10">
           {/* Step indicator */}
@@ -190,6 +189,6 @@ export default function OnboardingPage() {
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }

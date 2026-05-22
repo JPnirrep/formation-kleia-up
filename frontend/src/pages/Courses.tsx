@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import clsx from 'clsx';
+import EmptyState from '@/components/ui/EmptyState';
 import Card from '@/components/ui/Card';
 import CourseCard from '@/components/course/CourseCard';
 import Loading from '@/components/ui/Loading';
@@ -78,18 +79,11 @@ export default function Courses() {
           ))}
         </div>
       ) : (
-        <Card className="text-center py-12">
-          <div className="text-4xl mb-3" aria-hidden="true">📭</div>
-          <p className="text-kleia-gray font-body text-lg">Aucune formation trouvée</p>
-          {activeTab !== 'all' && (
-            <button
-              onClick={() => setActiveTab('all')}
-              className="mt-2 text-kleia-burgundy font-heading font-semibold text-sm underline underline-offset-2 hover:text-kleia-burgundy-light"
-            >
-              Voir toutes les formations
-            </button>
-          )}
-        </Card>
+        <EmptyState
+          title="Aucune formation trouvée"
+          description={activeTab !== 'all' ? 'Essayez de changer de filtre.' : 'Revenez bientôt, de nouvelles formations arrivent.'}
+          icon="search"
+        />
       )}
     </div>
   );

@@ -74,6 +74,8 @@ export default function Header() {
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-3 cursor-pointer"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="true"
                 >
                   <div className="h-9 w-9 rounded-full gradient-burgundy flex items-center justify-center text-white text-sm font-bold font-heading">
                     {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}

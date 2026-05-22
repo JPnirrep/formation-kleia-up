@@ -30,7 +30,7 @@ export default function AuthCallback() {
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
+      <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
         <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10 max-w-md text-center">
           <h1 className="text-2xl font-bold text-kleia-burgundy mb-4">Erreur de connexion</h1>
           <p className="text-kleia-gray mb-6">{errorMsg}</p>
@@ -41,7 +41,7 @@ export default function AuthCallback() {
             Retour à la connexion
           </button>
         </div>
-      </div>
+      </main>
     );
   }
 

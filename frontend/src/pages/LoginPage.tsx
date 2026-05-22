@@ -79,7 +79,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-        navigate(user.onboarding_completed ? '/dashboard' : '/onboarding', { replace: true });
+        const onboardingDone = user.onboarding_completed || localStorage.getItem('kleia_onboarding_done');
+        navigate(onboardingDone ? '/dashboard' : '/onboarding', { replace: true });
     }
   }, [user, navigate]);
 
@@ -92,7 +93,7 @@ export default function LoginPage() {
   const isBusy = submitting || loading;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
       <div className="w-full max-w-md">
         <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10">
 
@@ -144,6 +145,6 @@ export default function LoginPage() {
 
         </div>
       </div>
-    </div>
+    </main>
   );
 }

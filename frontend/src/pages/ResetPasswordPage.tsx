@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
+    <main id="main-content" className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6] px-4">
         <div className="w-full max-w-md">
           <div className="bg-white/70 backdrop-blur-[16px] border border-white/20 shadow-glass rounded-2xl p-8 sm:p-10 text-center space-y-6">
             <h1 className="text-3xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
@@ -64,7 +64,7 @@ export default function ResetPasswordPage() {
             </button>
           </div>
         </div>
-      </div>
+      </main>
     );
   }
 
