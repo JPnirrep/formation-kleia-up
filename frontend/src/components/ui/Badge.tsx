@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 
-type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info';
+type BadgeVariant = 'default' | 'success' | 'warning' | 'danger' | 'info' | 'violet';
 
 interface BadgeProps {
   variant?: BadgeVariant;
@@ -15,6 +15,7 @@ const variantStyles: Record<BadgeVariant, string> = {
   warning: 'text-kleia-gold bg-kleia-gold/10',
   danger: 'bg-kleia-error/15 text-kleia-error',
   info: 'bg-kleia-burgundy/15 text-kleia-burgundy',
+  violet: 'bg-kleia-violet/15 text-kleia-violet',
 };
 
 export default function Badge({ variant = 'default', className, children }: BadgeProps) {

@@ -28,7 +28,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             'w-full px-4 py-2.5 rounded-kleia border bg-white text-kleia-dark placeholder:text-kleia-gray/60 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-0',
             error
               ? 'border-kleia-error focus:ring-kleia-error'
-              : 'border-kleia-dark/20 focus:ring-kleia-burgundy',
+              : 'border-kleia-dark/20 focus:ring-kleia-violet',
             className,
           )}
           aria-invalid={!!error}

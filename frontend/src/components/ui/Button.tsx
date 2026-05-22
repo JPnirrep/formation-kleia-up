@@ -1,7 +1,7 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 import clsx from 'clsx';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
+type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'premium' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -13,13 +13,15 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'gradient-burgundy text-white hover:brightness-110 shadow-md',
+    'gradient-violet text-white hover:brightness-110 shadow-md',
   secondary:
     'gradient-gold text-kleia-dark hover:brightness-110 shadow-md',
+  premium:
+    'gradient-gold text-kleia-dark hover:brightness-110 shadow-gold',
   outline:
-    'border-2 border-kleia-burgundy text-kleia-burgundy hover:bg-kleia-burgundy hover:text-white transition-colors',
+    'border-2 border-kleia-violet text-kleia-violet hover:bg-kleia-violet hover:text-white transition-colors',
   ghost:
-    'text-kleia-burgundy hover:bg-kleia-burgundy/10 transition-colors',
+    'text-kleia-violet hover:bg-kleia-violet/10 transition-colors',
   danger:
     'bg-kleia-error text-white hover:brightness-110 shadow-md',
 };
@@ -47,7 +49,7 @@ export default function Button({
       aria-disabled={isDisabled}
       aria-busy={loading}
       className={clsx(
-        'inline-flex items-center justify-center gap-2 font-heading font-semibold rounded-kleia transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-kleia-gold focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center gap-2 font-heading font-semibold rounded-kleia transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-kleia-violet focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
         variantStyles[variant],
         sizeStyles[size],
         className,

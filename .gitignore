@@ -52,4 +52,4 @@ docs/doc formation kleia-up.zip
 *.tar.gz
 *.MOV
 *.mp3
-*.zip
+*.zip*.sqlite3

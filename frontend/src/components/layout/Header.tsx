@@ -43,7 +43,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-extrabold font-heading text-kleia-burgundy tracking-tight">
+            <span className="text-2xl font-extrabold font-heading text-kleia-violet tracking-tight">
               Kleia-up
             </span>
           </Link>
@@ -58,8 +58,8 @@ export default function Header() {
                   clsx(
                     'text-sm font-medium font-heading transition-colors',
                     isActive
-                      ? 'text-kleia-burgundy'
-                      : 'text-kleia-gray hover:text-kleia-burgundy',
+                      ? 'text-kleia-violet'
+                      : 'text-kleia-gray hover:text-kleia-violet',
                   )
                 }
               >
@@ -77,7 +77,7 @@ export default function Header() {
                   aria-expanded={userMenuOpen}
                   aria-haspopup="true"
                 >
-                  <div className="h-9 w-9 rounded-full gradient-burgundy flex items-center justify-center text-white text-sm font-bold font-heading">
+                  <div className="h-9 w-9 rounded-full gradient-violet flex items-center justify-center text-white text-sm font-bold font-heading">
                     {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
@@ -87,13 +87,13 @@ export default function Header() {
                     <NavLink
                       to="/profil"
                       onClick={() => setUserMenuOpen(false)}
-                      className="block px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-burgundy/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-violet/5 transition-colors"
                     >
                       Mon profil
                     </NavLink>
                     <button
                       onClick={() => { logout(); setUserMenuOpen(false); }}
-                      className="w-full text-left px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-burgundy/5 transition-colors"
+                      className="w-full text-left px-4 py-2 text-sm text-kleia-dark hover:bg-kleia-violet/5 transition-colors"
                     >
                       Déconnexion
                     </button>
@@ -103,7 +103,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/login"
-                className="py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+                className="py-2 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
               >
                 Connexion
               </Link>
@@ -138,8 +138,8 @@ export default function Header() {
                   clsx(
                     'block px-3 py-2 rounded-lg text-sm font-medium font-heading transition-colors',
                     isActive
-                      ? 'text-kleia-burgundy bg-kleia-burgundy/5'
-                      : 'text-kleia-gray hover:text-kleia-burgundy hover:bg-kleia-burgundy/5',
+                      ? 'text-kleia-violet bg-kleia-violet/5'
+                      : 'text-kleia-gray hover:text-kleia-violet hover:bg-kleia-violet/5',
                   )
                 }
               >
@@ -148,7 +148,7 @@ export default function Header() {
             ))}
             {loading ? null : user ? (
               <div className="flex items-center gap-3 px-3 py-2 mt-2 border-t border-kleia-dark/10 pt-3">
-                <div className="h-8 w-8 rounded-full gradient-burgundy flex items-center justify-center text-white text-xs font-bold font-heading">
+                <div className="h-8 w-8 rounded-full gradient-violet flex items-center justify-center text-white text-xs font-bold font-heading">
                   {user.display_name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || '?'}
                 </div>
                 <span className="text-sm font-medium text-kleia-dark">{user.display_name}</span>
@@ -158,7 +158,7 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-2 px-4 rounded-lg gradient-burgundy text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
+                  className="block w-full text-center py-2 px-4 rounded-lg gradient-violet text-white font-semibold text-sm font-heading hover:opacity-90 transition-opacity"
                 >
                   Connexion
                 </Link>
