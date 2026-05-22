@@ -9,6 +9,12 @@ import { getCourses } from '@/api/courses';
 import { deleteCourse } from '@/api/admin';
 import type { Course } from '@/api/courses';
 
+const LEVEL_COLORS: Record<string, string> = {
+  débutant: 'bg-kleia-violet/10 text-kleia-violet',
+  intermédiaire: 'bg-kleia-gold/10 text-kleia-gold',
+  avancé: 'bg-kleia-burgundy/10 text-kleia-burgundy',
+};
+
 export default function AdminCourses() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,10 +48,11 @@ export default function AdminCourses() {
 
   return (
     <div className="space-y-6" role="region" aria-label="Gestion des formations">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">
-            Gestion des formations
+          <h1 className="text-2xl md:text-3xl font-extrabold font-heading text-kleia-violet tracking-tight">
+            Formations
           </h1>
           <p className="text-sm text-kleia-gray font-body mt-1">
             {courses.length} formation{courses.length > 1 ? 's' : ''}
@@ -64,44 +71,66 @@ export default function AdminCourses() {
           onAction={() => navigate('/admin/courses/new')}
         />
       ) : (
-        <div className="space-y-3">
+        /* ── Catalogue visuel en grille ── */
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {courses.map((course) => (
-            <Card key={course.id} className="flex items-center justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-heading font-bold text-kleia-dark truncate">
-                    {course.title}
-                  </h3>
-                  <Badge variant={course.status === 'published' ? 'success' : 'warning'}>
-                    {course.status === 'published' ? 'Publié' : 'Brouillon'}
-                  </Badge>
+            <Card key={course.id} variant="surface" className="!p-0 overflow-hidden group">
+              {/* Color stripe */}
+              <div className={`h-2 ${course.status === 'published' ? 'bg-kleia-violet' : 'bg-kleia-alt'}`} />
+
+              <div className="p-5 space-y-4">
+                {/* Title + Status */}
+                <div className="space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <h3 className="font-heading font-bold text-base text-kleia-dark leading-snug group-hover:text-kleia-violet transition-colors line-clamp-2">
+                      {course.title}
+                    </h3>
+                    <Badge variant={course.status === 'published' ? 'success' : 'warning'} className="shrink-0">
+                      {course.status === 'published' ? 'Publié' : 'Brouillon'}
+                    </Badge>
+                  </div>
+                  {course.short_description && (
+                    <p className="text-xs text-kleia-gray font-body line-clamp-2 leading-relaxed">
+                      {course.short_description}
+                    </p>
+                  )}
                 </div>
-                <p className="text-sm text-kleia-gray font-body truncate mt-0.5">
-                  {course.short_description || course.description?.slice(0, 100) || '—'}
-                </p>
-                <div className="flex items-center gap-3 mt-1 text-xs text-kleia-gray/60 font-body">
-                  <span>Niveau : {course.level}</span>
-                  <span>Durée : {Math.round(course.duration_seconds / 60)} min</span>
+
+                {/* Meta */}
+                <div className="flex flex-wrap items-center gap-2 text-xs text-kleia-gray font-body">
+                  <span className={LEVEL_COLORS[course.level] || 'bg-kleia-dark/10 text-kleia-dark px-2 py-0.5 rounded-full font-medium'}>
+                    {course.level}
+                  </span>
+                  <span>•</span>
+                  <span>{Math.round(course.duration_seconds / 60)} min</span>
+                  {course.category && (
+                    <>
+                      <span>•</span>
+                      <span>{course.category}</span>
+                    </>
+                  )}
                 </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(`/admin/courses/${course.slug}`)}
-                  aria-label={`Modifier ${course.title}`}
-                >
-                  Modifier
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="!text-red-500"
-                  onClick={() => handleDelete(course.id, course.title)}
-                  aria-label={`Supprimer ${course.title}`}
-                >
-                  Supprimer
-                </Button>
+
+                {/* Actions */}
+                <div className="flex items-center gap-2 pt-2 border-t border-kleia-border">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => navigate(`/admin/courses/${course.slug}`)}
+                  >
+                    Éditer
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="!text-red-500"
+                    onClick={() => handleDelete(course.id, course.title)}
+                    aria-label={`Supprimer ${course.title}`}
+                  >
+                    Supprimer
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}
