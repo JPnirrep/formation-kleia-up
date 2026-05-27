@@ -7,13 +7,14 @@ import YouTubePlayer from './YouTubePlayer';
 interface PlayerShellProps {
   video?: VideoAssetRead;
   className?: string;
+  onTimeUpdate?: (currentTime: number) => void;
 }
 
 function generateSessionId(): string {
   return `session_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
 }
 
-export default function PlayerShell({ video, className }: PlayerShellProps) {
+export default function PlayerShell({ video, className, onTimeUpdate }: PlayerShellProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const sessionRef = useRef(generateSessionId());
   const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -95,6 +96,7 @@ export default function PlayerShell({ video, className }: PlayerShellProps) {
 
     const onTimeUpdate = () => {
       setCurrentTime(el.currentTime);
+      onTimeUpdate?.(el.currentTime);
     };
 
     el.addEventListener('loadedmetadata', onLoaded);

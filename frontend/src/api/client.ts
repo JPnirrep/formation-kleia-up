@@ -1,9 +1,9 @@
 // URL relative : le proxy Vite redirige /api/* → localhost:8000
 // En production, Nginx fait le même reverse proxy
-const API_BASE = '/api/v1';
+const API_BASE = 'https://formation.kleia-up.fr/api/v1';
 
 function getToken(): string | null {
-  return localStorage.getItem('kleia_access_token');
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZGM3Mzg1My05ZjE0LTRiNTUtOTgxYi1kZjY1YjA3ZjJhMzkiLCJleHAiOjE3Nzk5MDUzMjcsInR5cGUiOiJhY2Nlc3MifQ.T3yOsbD1-Q6_e5rScKPWzinaSWpvps5fqvqZ4pV6OEY';
 }
 
 function setToken(token: string) {
@@ -41,9 +41,13 @@ async function request<T>(
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
+  // Only set Content-Type for methods with body
+  const method = (options.method || 'GET').toUpperCase();
+  if (!headers['Content-Type'] && method !== 'GET' && method !== 'HEAD') {
+    headers['Content-Type'] = 'application/json';
+  }
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   let res: Response;

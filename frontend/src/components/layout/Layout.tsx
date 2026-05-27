@@ -49,7 +49,7 @@ export default function Layout() {
         <div className="flex items-center justify-between h-16 px-5 border-b border-white/5">
           {!collapsed && (
             <Link to="/" className="text-xl font-extrabold font-heading text-[#FFFDF9] tracking-tighter uppercase">
-              Kleia<span className="text-[#D4A97A]">up</span>
+              Kleia<span className="text-[#D4AF37]">up</span>
             </Link>
           )}
           <button

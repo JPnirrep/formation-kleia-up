@@ -109,3 +109,17 @@ class Lesson(Base, TimestampMixin):
     lesson_progress = relationship(
         "LessonProgress", back_populates="lesson", lazy="selectin"
     )
+    audio_assets = relationship(
+        "AudioAsset",
+        back_populates="lesson",
+        lazy="selectin",
+        order_by="AudioAsset.order",
+        cascade="all, delete-orphan",
+    )
+    resource_assets = relationship(
+        "ResourceAsset",
+        back_populates="lesson",
+        lazy="selectin",
+        order_by="ResourceAsset.order",
+        cascade="all, delete-orphan",
+    )

@@ -6,7 +6,7 @@ from app.models.quiz import Quiz, Question, Attempt
 from app.models.enrollment import Enrollment
 from app.models.progress import LessonProgress
 from app.models.certificate import Certificate
-from app.models.resource import LessonResource
+from app.models.resource import AudioAsset, LessonResource, ResourceAsset
 from app.models.badge import Badge, UserBadge
 from app.models.journal import JournalEntry
 
@@ -27,6 +27,8 @@ __all__ = [
     "LessonProgress",
     "Certificate",
     "LessonResource",
+    "AudioAsset",
+    "ResourceAsset",
     "Badge",
     "UserBadge",
     "JournalEntry",

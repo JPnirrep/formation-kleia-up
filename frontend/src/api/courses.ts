@@ -59,7 +59,7 @@ export async function getCourses(params?: {
   if (params?.level) searchParams.set('level', params.level);
   if (params?.category) searchParams.set('category', params.category);
   const qs = searchParams.toString();
-  return api.request<PaginatedResponse<Course>>(`/courses${qs ? `?${qs}` : ''}`);
+  return api.request<PaginatedResponse<Course>>(`/courses/${qs ? `?${qs}` : ''}`);
 }
 
 export async function getCourse(slug: string): Promise<CourseDetail> {

@@ -20,11 +20,17 @@ from app.api.v1 import (
     journal,
 )
 
+# lessons_router is defined in resources.py alongside the resources router
+from app.api.v1.resources import lessons_router
+
 api_v1_router = APIRouter(prefix="/api/v1")
 
 api_v1_router.include_router(auth.router, prefix="/auth", tags=["Authentification"])
 api_v1_router.include_router(users.router, prefix="/users", tags=["Utilisateurs"])
 api_v1_router.include_router(courses.router, prefix="/courses", tags=["Formations"])
+api_v1_router.include_router(
+    lessons_router, prefix="/lessons", tags=["Leçons"]
+)
 api_v1_router.include_router(
     enrollments.router, prefix="/enrollments", tags=["Inscriptions"]
 )
