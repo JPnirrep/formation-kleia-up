@@ -62,7 +62,7 @@ export default function Courses() {
             className={clsx(
               'px-4 py-2 rounded-kleia text-sm font-heading font-semibold transition-all',
               activeTab === tab.key
-'gradient-violet text-white shadow-md'
+                ? 'gradient-violet text-white shadow-md'
                 : 'bg-white/50 text-kleia-gray hover:text-kleia-violet hover:bg-white/80 border border-kleia-dark/10',
             )}
             aria-pressed={activeTab === tab.key}

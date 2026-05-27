@@ -1,86 +1,171 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@300;400;500;600;700;800&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500;700&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=ranade@300,400,500,600,700,800,900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 @theme {
-  /* ——— Base & Text ——— */
-  --color-kleia-cream: #FAF9F6;
-  --color-kleia-dark: #1A1A2E;
-  --color-kleia-gray: #6B7280;
-  --color-kleia-surface: #FFFFFF;
-  --color-kleia-alt: #F5F3F0;
-  --color-kleia-border: rgba(0, 0, 0, 0.06);
+  /* ─── DESIGN SYSTEM: STRIPE × KLEIA DARK ─── */
+  
+  /* Defaults (Dark Mode) */
+  --color-kleia-bg: #1A1418;
+  --color-kleia-surface: #251C22;
+  --color-kleia-alt: #2D242A;
+  --color-kleia-border: rgba(255, 253, 249, 0.08);
+  
+  --color-kleia-heading: #FFFDF9;
+  --color-kleia-body: #A89A90;
+  
+  /* Accents */
+  --color-kleia-accent: #D4A97A;
+  --color-kleia-accent-hover: #C49868;
+  --color-kleia-accent-light: rgba(212, 169, 122, 0.1);
+  
+  /* Green for "Clair" (Hybrid) selector */
+  --color-kleia-success: #10B981;
+  --color-kleia-success-bg: rgba(16, 185, 129, 0.1);
+  
+  /* Typo - Using Ranade for Titles as requested (same as kleia-up.fr) */
+  --font-heading: 'Ranade', sans-serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --font-mono: 'Source Code Pro', monospace;
 
-  /* ——— Accent doux (violet) ——— */
-  --color-kleia-violet: #6C5CE7;
-  --color-kleia-violet-light: #8B7CF7;
-  --color-kleia-violet-dark: #4A3DB5;
+  /* Shadows Stripe-style */
+  --shadow-stripe: rgba(0, 0, 0, 0.3) 0px 15px 35px, rgba(0, 0, 0, 0.15) 0px 3px 8px;
+  --shadow-stripe-lg: rgba(0, 0, 0, 0.4) 0px 30px 45px -30px, rgba(0, 0, 0, 0.15) 0px 18px 36px -18px;
+  --shadow-glow: 0 0 40px rgba(212, 169, 122, 0.15);
 
-  /* ——— Accent chaud (gold, dosé — CTA uniquement) ——— */
-  --color-kleia-gold: #D4AF37;
-  --color-kleia-gold-light: #E0C45A;
-
-  /* ——— Burgundy (RÉSERVÉ — 1x par page max) ——— */
-  --color-kleia-burgundy: #8B1D3D;
-  --color-kleia-burgundy-light: #A8234D;
-
-  /* ——— Sémantique ——— */
-  --color-kleia-success: #059669;
-  --color-kleia-error: #DC2626;
-  --color-kleia-locked: #4A5568;
-
-  /* ——— Badges gamification ——— */
-  --color-badge-bronze: #CD7F32;
-  --color-badge-silver: #C0C0C0;
-  --color-badge-gold: #FFD700;
-
-  /* ——— Typographie ——— */
-  --font-heading: 'Syne', sans-serif;
-  --font-body: 'Ranade', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-
-  /* ——— Radius ——— */
-  --radius-kleia: 12px;
-  --radius-kleia-sm: 8px;
-  --radius-kleia-lg: 16px;
-
-  /* ——— Ombres ——— */
-  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-locked: inset 0 0 15px rgba(0, 0, 0, 0.2);
-  --shadow-violet: 0 0 20px rgba(108, 92, 231, 0.25);
+  --radius-kleia: 6px;
+  --radius-kleia-sm: 4px;
+  --radius-kleia-lg: 10px;
 }
 
 @layer base {
-  body {
-    @apply font-body text-kleia-dark bg-kleia-cream antialiased;
+  html, body {
+    @apply antialiased;
+    background: var(--color-kleia-bg);
+    color: var(--color-kleia-body);
+    font-family: var(--font-body);
+    margin: 0;
+    transition: background 0.3s ease, color 0.3s ease;
   }
+
+  /* Mode Hybrid (Clair) */
+  html.theme-light {
+    --color-kleia-bg: #FFFDF9;
+    --color-kleia-surface: #FFFFFF;
+    --color-kleia-alt: #F8F3EC;
+    --color-kleia-border: rgba(44, 30, 36, 0.08);
+    --color-kleia-heading: #2C1E24;
+    --color-kleia-body: #7A6E66;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+    color: var(--color-kleia-heading);
   }
-  code, pre, .mono {
-    @apply font-mono;
+
+  /* Titles matching kleia-up.fr : Ranade, weight 800, tight but readable */
+  h1 { 
+    font-size: 3.5rem; 
+    line-height: 1.05; 
+    font-weight: 800;
+    letter-spacing: -0.02em; 
   }
+  h2 { 
+    font-size: 2.2rem; 
+    line-height: 1.1; 
+    font-weight: 800;
+    letter-spacing: -0.015em;
+  }
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  
+  code { font-family: var(--font-mono); }
 }
 
 @layer components {
-  /* ——— Glassmorphism ——— */
-  .glass {
-    @apply bg-white/10 backdrop-blur-[12px] border border-white/20 rounded-kleia shadow-glass;
-  }
-  .glass-dark {
-    @apply bg-kleia-dark/5 backdrop-blur-[12px] border border-kleia-dark/10 rounded-kleia shadow-glass;
+  /* Sidebar is ALWAYS Dark per user request */
+  .sidebar {
+    background: #1A1418;
+    border-right: 1px solid rgba(255, 253, 249, 0.08);
+    @apply flex flex-col h-full transition-all duration-300;
   }
 
-  /* ——— Dégradés ——— */
-  .gradient-violet {
-    @apply bg-gradient-to-r from-kleia-violet to-kleia-violet-light;
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all;
+    font-family: 'Syne', sans-serif;
+    color: #A89A90;
   }
-  .gradient-gold {
-    @apply bg-gradient-to-r from-kleia-gold to-kleia-gold-light;
+  .sidebar-link:hover {
+    color: #FFFDF9;
+    background: rgba(255, 255, 255, 0.05);
   }
-  .gradient-burgundy {
-    @apply bg-gradient-to-r from-kleia-burgundy to-kleia-burgundy-light;
+  .sidebar-link.active {
+    color: #D4A97A;
+    background: rgba(212, 169, 122, 0.12);
+  }
+
+  .glass {
+    @apply backdrop-blur-[20px] border rounded-kleia;
+    background: color-mix(in srgb, var(--color-kleia-surface) 80%, transparent);
+    border-color: var(--color-kleia-border);
+    box-shadow: var(--shadow-stripe);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-kleia font-heading font-semibold text-sm transition-all;
+    background: linear-gradient(135deg, var(--color-kleia-accent), #E0B988);
+    color: #FFFDF9;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-primary:hover {
+    @apply -translate-y-px;
+    box-shadow: var(--shadow-glow);
+    opacity: 0.9;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-5 py-2.5 rounded-kleia font-heading font-semibold text-sm transition-all;
+    background: transparent;
+    color: var(--color-kleia-heading);
+    border: 1px solid var(--color-kleia-border);
+    cursor: pointer;
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-kleia-accent);
+    color: var(--color-kleia-accent);
+  }
+
+  .card {
+    background: var(--color-kleia-surface);
+    border: 1px solid var(--color-kleia-border);
+    border-radius: var(--radius-kleia-lg);
+    @apply p-7 transition-all duration-300;
+    box-shadow: var(--shadow-stripe);
+  }
+  .card:hover {
+    @apply -translate-y-0.5;
+    box-shadow: var(--shadow-stripe-lg);
+  }
+
+  .badge {
+    @apply inline-flex px-2 py-0.5 rounded text-[11px] font-normal;
+  }
+  .badge-success {
+    background: var(--color-kleia-success-bg);
+    color: var(--color-kleia-success);
+    border: 1px solid color-mix(in srgb, var(--color-kleia-success) 30%, transparent);
   }
 }
+
+/* Mapping legacy classes to design system */
+.text-kleia-violet { color: var(--color-kleia-accent); }
+.bg-kleia-violet { background: var(--color-kleia-accent); }
+.gradient-violet { background: linear-gradient(135deg, var(--color-kleia-accent), #E0B988); }
+.shadow-glass { box-shadow: var(--shadow-stripe); }
+.rounded-kleia { border-radius: var(--radius-kleia); }
+.font-heading { font-family: var(--font-heading); }
+.font-body { font-family: var(--font-body); }

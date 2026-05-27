@@ -32,34 +32,6 @@ export default function Dashboard() {
     }
   }, [enrollments, allCourses]);
 
-  if (!isAuth) {
-    return (
-      <div className="max-w-5xl mx-auto text-center py-20 space-y-6">
-        <h1 className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-violet">
-          Bienvenue sur Kleia-up
-        </h1>
-        <p className="text-lg text-kleia-gray font-body max-w-xl mx-auto">
-          Connectez-vous pour accéder à votre tableau de bord et suivre votre parcours de formation.
-        </p>
-        <div className="flex justify-center gap-4">
-          <Link
-            to="/login"
-            className="px-6 py-3 rounded-kleia gradient-violet text-white font-heading font-semibold text-sm shadow-md hover:opacity-90 transition-opacity"
-          >
-            Se connecter
-          </Link>
-          <Link
-            to="/register"
-            className="px-6 py-3 rounded-kleia border border-kleia-violet/30 text-kleia-violet font-heading font-semibold text-sm hover:bg-kleia-violet/5 transition-colors"
-          >
-            S'inscrire
-          </Link>
-        </div>
-        <Courses />
-      </div>
-    );
-  }
-
   const displayCourses = enrolledCourses;
   const inProgress = displayCourses.filter(c => (c.progress || 0) > 0 && (c.progress || 0) < 100);
   const completedCount = displayCourses.filter(c => (c.progress || 0) >= 100).length;
