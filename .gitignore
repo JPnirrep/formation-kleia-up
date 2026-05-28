@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Docker
+*.log
+
+# Python venv + DB
+.venv/
+backend/.venv/
+*.db
+*.db-journal
+
+# Testing
+coverage/
+.coverage
+.pytest_cache/
+
+# Docs & media (fichiers lourds)
+docs/doc formation kleia-up/
+docs/doc formation kleia-up.zip
+*.tar.gz
+*.MOV
+*.mp3
+*.zip*.sqlite3
+deploy/.env
