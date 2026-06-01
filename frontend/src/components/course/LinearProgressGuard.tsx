@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface LinearProgressGuardProps {
   isLocked: boolean;
@@ -8,6 +7,8 @@ interface LinearProgressGuardProps {
 }
 
 export default function LinearProgressGuard({ isLocked, requiredLessonTitle, children }: LinearProgressGuardProps) {
+  const fadeInStyle = { animation: 'fadeIn 0.3s ease' } as React.CSSProperties;
+
   if (!isLocked) return <>{children}</>;
 
   return (
@@ -16,10 +17,7 @@ export default function LinearProgressGuard({ isLocked, requiredLessonTitle, chi
         {children}
       </div>
       
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="absolute inset-0 z-20 flex items-center justify-center bg-kleia-dark/40 backdrop-blur-[2px] rounded-kleia"
+      <div style={fadeInStyle} className="absolute inset-0 z-20 flex items-center justify-center bg-kleia-dark/40 backdrop-blur-[2px] rounded-kleia"
       >
         <div className="glass-dark p-8 max-w-md text-center border-white/10 shadow-2xl">
           <div className="w-16 h-16 mx-auto mb-4 bg-kleia-dark/50 rounded-full flex items-center justify-center">
@@ -44,7 +42,7 @@ export default function LinearProgressGuard({ isLocked, requiredLessonTitle, chi
             Retourner à la leçon précédente
           </button>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
