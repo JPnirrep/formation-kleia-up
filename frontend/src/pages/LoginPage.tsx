@@ -80,7 +80,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (user) {
-        const onboardingDone = user.onboarding_completed || localStorage.getItem('kleia_onboarding_done');
+        const isAdmin = user.role === 'admin';
+        const onboardingDone = isAdmin || user.onboarding_completed || localStorage.getItem('kleia_onboarding_done');
         navigate(onboardingDone ? '/dashboard' : '/onboarding', { replace: true });
     }
   }, [user, navigate]);
