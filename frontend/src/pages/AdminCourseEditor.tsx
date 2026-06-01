@@ -237,6 +237,27 @@ export default function AdminCourseEditor() {
     catch { showError('Erreur sauvegarde contenu'); }
   };
 
+  const handleSaveLesson = async () => {
+    if (!selectedLesson) return;
+    try {
+      await updateLesson(selectedLesson.id, {
+        title: editTitle, description: editDesc,
+        lesson_type: editType, duration_seconds: editDur, order: editOrder,
+      });
+    } catch { showError('Erreur sauvegarde leçon'); }
+  };
+
+  const handleSaveCourse = async () => {
+    if (!course) return;
+    try {
+      await updateCourse(course.id, {
+        title: courseTitle, short_description: courseShortDesc,
+        description: courseDesc, level: courseLevel,
+        category: courseCat, duration_seconds: courseDur, status: courseStatus,
+      });
+    } catch { showError('Erreur sauvegarde formation'); }
+  };
+
   if (loading) return <Loading className="py-20" text="Chargement..." />;
   if (!course && courseId !== 'new') {
     return (
