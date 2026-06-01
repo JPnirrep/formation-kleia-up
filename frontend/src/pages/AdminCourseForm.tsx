@@ -32,7 +32,7 @@ const LEVELS = ['débutant', 'intermédiaire', 'avancé'];
 const CATEGORIES = ['communication', 'prise de parole', 'développement personnel', 'leadership'];
 
 function makeSlug(title: string): string {
-  return title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
+  return title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').slice(0, 80);
 }
 
 export default function AdminCourseForm() {
