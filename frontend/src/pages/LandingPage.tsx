@@ -120,6 +120,7 @@ function IconStar({ className }: { className?: string }) {
 
 function NavHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     function onScroll() {
@@ -129,39 +130,104 @@ function NavHeader() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
+  const closeMenu = () => setMenuOpen(false);
+
   return (
-    <header
-      className={clsx(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
-        scrolled
-          ? 'bg-white/80 backdrop-blur-[16px] border-b border-kleia-burgundy/10 shadow-sm'
-          : 'bg-transparent',
-      )}
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-extrabold text-kleia-burgundy tracking-tight">
-              Kleia-up
-            </span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="py-2 px-4 text-sm font-semibold text-kleia-burgundy hover:text-kleia-burgundy-light transition-colors"
-            >
-              Se connecter
+    <>
+      <header
+        className={clsx(
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
+          scrolled || menuOpen
+            ? 'bg-white/95 backdrop-blur-[16px] border-b border-kleia-violet/10 shadow-sm'
+            : 'bg-transparent',
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            <Link to="/" className="flex items-center gap-2 z-50" onClick={closeMenu}>
+              <span className="text-2xl font-extrabold text-kleia-violet tracking-tight">
+                Kleia-up
+              </span>
             </Link>
-            <Link
-              to="/register"
-              className="py-2.5 px-5 rounded-xl gradient-burgundy text-white font-semibold text-sm hover:brightness-110 transition-all shadow-md"
+
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-3">
+              <Link
+                to="/login"
+                className="py-2 px-4 text-sm font-semibold text-kleia-violet hover:text-kleia-violet-light transition-colors"
+              >
+                Se connecter
+              </Link>
+              <Link
+                to="/register"
+                className="py-2.5 px-5 rounded-xl gradient-violet text-white font-semibold text-sm hover:brightness-110 transition-all shadow-md"
+              >
+                Commencer
+              </Link>
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden z-50 p-2 -mr-2 rounded-lg text-kleia-violet hover:bg-kleia-violet/5 transition-colors focus-visible:ring-2 focus-visible:ring-kleia-gold focus-visible:outline-none"
+              aria-label={menuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              aria-expanded={menuOpen}
             >
-              Commencer
-            </Link>
+              <div className="w-6 h-5 flex flex-col justify-between">
+                {menuOpen ? (
+                  <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <>
+                    <span className="w-full h-0.5 bg-kleia-violet rounded transition-transform duration-200" />
+                    <span className="w-full h-0.5 bg-kleia-violet rounded" />
+                    <span className="w-3/4 h-0.5 bg-kleia-violet rounded transition-all duration-200" />
+                  </>
+                )}
+              </div>
+            </button>
           </div>
         </div>
+      </header>
+
+      {/* Mobile fullscreen overlay */}
+      <div
+        className={clsx(
+          'fixed inset-0 z-40 bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center transition-all duration-300 md:hidden',
+          menuOpen ? 'opacity-100 visible' : 'opacity-0 invisible',
+        )}
+      >
+        <nav className="flex flex-col items-center gap-6">
+          <Link
+            to="/login"
+            onClick={closeMenu}
+            className="text-xl font-semibold text-kleia-violet hover:text-kleia-violet-light transition-colors py-2 px-8"
+          >
+            Se connecter
+          </Link>
+          <Link
+            to="/register"
+            onClick={closeMenu}
+            className="text-xl font-semibold py-3 px-10 rounded-xl gradient-violet text-white hover:brightness-110 transition-all shadow-lg"
+          >
+            Commencer
+          </Link>
+        </nav>
+        <p className="absolute bottom-8 text-sm text-kleia-gray font-body">
+          Leadership organique
+        </p>
       </div>
-    </header>
+    </>
   );
 }
 
@@ -172,19 +238,19 @@ function NavHeader() {
 function HeroSection() {
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden bg-gradient-to-br from-[#fdfbf7] via-white to-[#fdf4e6]">
-      <div className="absolute top-20 -right-32 w-[600px] h-[600px] rounded-full bg-kleia-burgundy/3 blur-3xl pointer-events-none" />
+      <div className="absolute top-20 -right-32 w-[600px] h-[600px] rounded-full bg-kleia-violet/3 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-32 -left-32 w-[500px] h-[500px] rounded-full bg-kleia-gold/6 blur-3xl pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 w-full">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div>
-            <span className="inline-block text-sm font-semibold text-kleia-burgundy uppercase tracking-widest mb-4">
+            <span className="inline-block text-sm font-semibold text-kleia-violet uppercase tracking-widest mb-4">
               Leadership organique
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-kleia-dark tracking-tight leading-tight mb-6">
               Ta place est
               <br />
-              <span className="italic font-normal text-kleia-burgundy">unique</span>. Prends-la.
+              <span className="italic font-normal text-kleia-violet">unique</span>. Prends-la.
             </h1>
             <p className="text-lg text-kleia-gray max-w-xl mb-10 leading-relaxed">
               Tant que tu doutes, le bruit des autres occupe l'espace. Kleia-up t'aide à passer du trac à l'impact —
@@ -193,14 +259,14 @@ function HeroSection() {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/register"
-                className="py-3.5 px-8 rounded-xl gradient-burgundy text-white font-semibold text-base hover:brightness-110 transition-all shadow-lg inline-flex items-center gap-2"
+                className="py-3.5 px-8 rounded-xl gradient-violet text-white font-semibold text-base hover:brightness-110 transition-all shadow-lg inline-flex items-center gap-2"
               >
                 Je commence gratuitement
                 <IconArrow className="w-5 h-5" />
               </Link>
               <a
                 href="#miroir"
-                className="py-3.5 px-8 rounded-xl border-2 border-kleia-burgundy/15 text-kleia-burgundy font-semibold text-base hover:bg-kleia-burgundy/5 transition-colors"
+                className="py-3.5 px-8 rounded-xl border-2 border-kleia-violet/15 text-kleia-violet font-semibold text-base hover:bg-kleia-violet/5 transition-colors"
               >
                 Découvrir
               </a>
@@ -208,10 +274,40 @@ function HeroSection() {
           </div>
           <div className="relative hidden lg:block">
             <div className="relative">
-              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-kleia-burgundy/5 to-kleia-gold/10 border border-kleia-burgundy/10 flex items-center justify-center">
-                <IconRocket className="w-24 h-24 text-kleia-burgundy/15" />
+              {/* Main illustration: abstract geometric "leadership" composition */}
+              <div className="w-full aspect-[4/3] rounded-2xl bg-gradient-to-br from-kleia-violet/5 via-white/90 to-kleia-gold/5 border border-kleia-violet/10 overflow-hidden relative">
+                {/* Top gradient blob */}
+                <div className="absolute -top-10 -right-10 w-64 h-64 rounded-full bg-gradient-to-br from-kleia-violet/15 to-transparent blur-2xl" />
+                {/* Bottom gradient blob */}
+                <div className="absolute -bottom-10 -left-10 w-56 h-56 rounded-full bg-gradient-to-tr from-kleia-gold/10 to-transparent blur-2xl" />
+                
+                {/* Center: layered geometric shapes */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-48 h-48">
+                    {/* Outer circle */}
+                    <div className="absolute inset-0 rounded-full border-2 border-kleia-violet/10" />
+                    {/* Middle circle */}
+                    <div className="absolute inset-4 rounded-full border-2 border-kleia-violet/20 bg-kleia-violet/5" />
+                    {/* Inner circle */}
+                    <div className="absolute inset-10 rounded-full bg-gradient-to-br from-kleia-violet to-kleia-violet-light flex items-center justify-center shadow-lg">
+                      <IconRocket className="w-16 h-16 text-white" />
+                    </div>
+                    
+                    {/* Orbiting dots */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-kleia-gold" />
+                    <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-kleia-gold/60" />
+                    <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-kleia-violet/40" />
+                    <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-kleia-violet/30" />
+                  </div>
+                </div>
+                
+                {/* Decorative lines */}
+                <div className="absolute top-8 left-8 w-12 h-[2px] bg-kleia-gold/40 rounded-full" />
+                <div className="absolute top-12 left-8 w-8 h-[2px] bg-kleia-gold/30 rounded-full" />
+                <div className="absolute bottom-8 right-8 w-16 h-[2px] bg-kleia-violet/30 rounded-full" />
+                <div className="absolute bottom-12 right-8 w-10 h-[2px] bg-kleia-violet/20 rounded-full" />
               </div>
-              <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-kleia-burgundy/5">
+              <div className="absolute -bottom-5 -left-5 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-kleia-violet/5">
                 <div className="w-10 h-10 rounded-xl gradient-gold flex items-center justify-center">
                   <IconStar className="w-5 h-5 text-kleia-dark" />
                 </div>
@@ -220,8 +316,8 @@ function HeroSection() {
                   <div className="text-lg font-bold text-kleia-dark">4.9/5</div>
                 </div>
               </div>
-              <div className="absolute -top-5 -right-5 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-kleia-burgundy/5">
-                <div className="w-10 h-10 rounded-xl gradient-burgundy flex items-center justify-center">
+              <div className="absolute -top-5 -right-5 bg-white rounded-2xl shadow-xl p-4 flex items-center gap-3 border border-kleia-violet/5">
+                <div className="w-10 h-10 rounded-xl gradient-violet flex items-center justify-center">
                   <IconPeople className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -261,11 +357,11 @@ function PainMirrorSection() {
   ];
 
   return (
-    <section id="miroir" className="py-24 bg-[#FFF8F2]">
+    <section id="miroir" className="py-24 bg-kleia-cream">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-extrabold text-kleia-dark mb-4">
-            La place que tu ne prends pas est <span className="text-kleia-burgundy">occupée par d'autres.</span>
+            La place que tu ne prends pas est <span className="text-kleia-violet">occupée par d'autres.</span>
           </h2>
           <p className="text-kleia-gray max-w-xl mx-auto text-lg">
             Tu n'es pas cassé·e. Tu es juste passé·e à côté de ta propre puissance.
@@ -276,9 +372,9 @@ function PainMirrorSection() {
           {pains.map((pain) => (
             <div
               key={pain.title}
-              className="group p-8 bg-white rounded-2xl border-l-[3px] border-kleia-burgundy hover:shadow-lg transition-all duration-300"
+              className="group p-8 bg-white rounded-2xl border-l-[3px] border-kleia-violet hover:shadow-lg transition-all duration-300"
             >
-              <pain.icon className="w-10 h-10 text-kleia-burgundy mb-4" />
+              <pain.icon className="w-10 h-10 text-kleia-violet mb-4" />
               <h3 className="text-lg font-bold text-kleia-dark mb-2">{pain.title}</h3>
               <p className="text-kleia-gray text-sm leading-relaxed">{pain.desc}</p>
             </div>
@@ -306,7 +402,7 @@ function ManifestSection() {
         </p>
         <Link
           to="/register"
-          className="inline-flex items-center gap-2 py-3.5 px-10 rounded-xl gradient-burgundy text-white font-bold text-base hover:brightness-110 transition-all shadow-lg"
+          className="inline-flex items-center gap-2 py-3.5 px-10 rounded-xl gradient-violet text-white font-bold text-base hover:brightness-110 transition-all shadow-lg"
         >
           Je découvre le manifeste
           <IconArrow className="w-5 h-5" />
@@ -360,7 +456,7 @@ function TransformationSection() {
               key={s.step}
               className="relative group p-8 rounded-2xl hover:bg-kleia-cream/50 transition-colors duration-300"
             >
-              <span className="text-5xl font-extrabold text-kleia-burgundy/10 group-hover:text-kleia-burgundy/20 transition-colors">
+              <span className="text-5xl font-extrabold text-kleia-violet/10 group-hover:text-kleia-violet/20 transition-colors">
                 {s.step}
               </span>
               <h3 className="text-xl font-bold text-kleia-dark mt-4 mb-3">{s.title}</h3>
@@ -427,10 +523,10 @@ function FeaturesSection() {
           {features.map((f) => (
             <div
               key={f.title}
-              className="group p-6 bg-white rounded-2xl border border-kleia-burgundy/5 hover:shadow-lg hover:border-kleia-gold/30 transition-all duration-300"
+              className="group p-6 bg-white rounded-2xl border border-kleia-violet/5 hover:shadow-lg hover:border-kleia-gold/30 transition-all duration-300"
             >
-              <div className="w-12 h-12 rounded-xl bg-kleia-burgundy/5 flex items-center justify-center mb-4 group-hover:bg-kleia-burgundy/10 transition-colors">
-                <f.icon className="w-6 h-6 text-kleia-burgundy" />
+              <div className="w-12 h-12 rounded-xl bg-kleia-violet/5 flex items-center justify-center mb-4 group-hover:bg-kleia-violet/10 transition-colors">
+                <f.icon className="w-6 h-6 text-kleia-violet" />
               </div>
               <h3 className="text-lg font-bold text-kleia-dark mb-2">{f.title}</h3>
               <p className="text-kleia-gray text-sm leading-relaxed">{f.desc}</p>
@@ -489,7 +585,7 @@ function UseCasesSection() {
                 className={clsx(
                   'px-6 py-2.5 rounded-xl font-semibold text-sm transition-all',
                   active === i
-                    ? 'bg-white text-kleia-burgundy shadow-md'
+                    ? 'bg-white text-kleia-violet shadow-md'
                     : 'text-kleia-gray hover:text-kleia-dark',
                 )}
               >
@@ -500,15 +596,25 @@ function UseCasesSection() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center max-w-4xl mx-auto">
-          <div className="aspect-[4/3] rounded-2xl bg-kleia-cream border border-kleia-burgundy/5 flex items-center justify-center">
-            <current.icon className="w-20 h-20 text-kleia-burgundy/15" />
+          <div className="aspect-[4/3] rounded-2xl bg-gradient-to-br from-kleia-cream via-white to-kleia-violet/5 border border-kleia-violet/10 overflow-hidden relative">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative">
+                {/* Decorative ring */}
+                <div className="absolute -inset-8 rounded-full border border-kleia-violet/10" />
+                <div className="absolute -inset-16 rounded-full border border-kleia-violet/5" />
+                <current.icon className="w-20 h-20 text-kleia-violet/20" />
+              </div>
+            </div>
+            {/* Corner accents */}
+            <div className="absolute top-4 right-4 w-3 h-3 rounded-full bg-kleia-gold/30" />
+            <div className="absolute bottom-4 left-4 w-2 h-2 rounded-full bg-kleia-violet/30" />
           </div>
           <div>
             <h3 className="text-2xl font-extrabold text-kleia-dark mb-4">{current.title}</h3>
             <p className="text-kleia-gray text-lg leading-relaxed mb-6">{current.desc}</p>
             <Link
               to="/register"
-              className="inline-flex items-center gap-2 text-kleia-burgundy font-semibold hover:underline"
+              className="inline-flex items-center gap-2 text-kleia-violet font-semibold hover:underline"
             >
               En savoir plus <IconArrow className="w-4 h-4" />
             </Link>
@@ -556,7 +662,7 @@ function SocialProofSection() {
           ].map((t) => (
             <div
               key={t.name}
-              className="bg-white rounded-2xl p-8 border border-kleia-burgundy/5"
+              className="bg-white rounded-2xl p-8 border border-kleia-violet/5"
             >
               <div className="flex gap-1 mb-4">
                 {[1, 2, 3, 4, 5].map((s) => (
@@ -582,7 +688,7 @@ function SocialProofSection() {
 
 function FinalCTASection() {
   return (
-    <section className="py-24 bg-gradient-to-br from-kleia-burgundy to-kleia-burgundy-light text-white overflow-hidden relative">
+    <section className="py-24 bg-gradient-to-br from-kleia-violet to-kleia-violet-light text-white overflow-hidden relative">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-white/5 blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-kleia-gold/10 blur-3xl pointer-events-none" />
 
@@ -595,7 +701,7 @@ function FinalCTASection() {
         </p>
         <Link
           to="/register"
-          className="inline-flex items-center gap-2 py-4 px-10 rounded-xl bg-white text-kleia-burgundy font-bold text-base hover:brightness-95 transition-all shadow-xl"
+          className="inline-flex items-center gap-2 py-4 px-10 rounded-xl bg-white text-kleia-violet font-bold text-base hover:brightness-95 transition-all shadow-xl"
         >
           Je commence maintenant
           <IconArrow className="w-5 h-5" />
