@@ -10,7 +10,7 @@ test.describe('Parcours critique — Apprenant', () => {
     await page.click('text=Se connecter');
     await expect(page).toHaveURL(/\/login/);
 
-    await page.fill('input[type="email"]', 'clara.fontaine@kleia-up.fr');
+    await page.fill('input[type="email"]', 'clara.f@example.com');
     await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
     await expect(page).toHaveURL(/\/dashboard/);
@@ -23,7 +23,7 @@ test.describe('Parcours critique — Apprenant', () => {
 
   test('Dashboard → Formation → Leçon', async ({ page }) => {
     await page.goto(`${APP_URL}/login`);
-    await page.fill('input[type="email"]', 'clara.fontaine@kleia-up.fr');
+    await page.fill('input[type="email"]', 'clara.f@example.com');
     await page.fill('input[type="password"]', 'password123');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard/);
@@ -42,8 +42,8 @@ test.describe('Parcours critique — Apprenant', () => {
 test.describe('Parcours Admin', () => {
   test('Login admin → Dashboard admin → Utilisateurs', async ({ page }) => {
     await page.goto(`${APP_URL}/login`);
-    await page.fill('input[type="email"]', 'sandrina.perrin@kleia-up.fr');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input[type="email"]', 'sandrina@kleia-up.com');
+    await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard/);
 
@@ -56,8 +56,8 @@ test.describe('Parcours Admin', () => {
 
   test('Admin → Formations → Créer', async ({ page }) => {
     await page.goto(`${APP_URL}/login`);
-    await page.fill('input[type="email"]', 'sandrina.perrin@kleia-up.fr');
-    await page.fill('input[type="password"]', 'password123');
+    await page.fill('input[type="email"]', 'sandrina@kleia-up.com');
+    await page.fill('input[type="password"]', 'admin123');
     await page.click('button[type="submit"]');
     await page.waitForURL(/\/dashboard/);
 
