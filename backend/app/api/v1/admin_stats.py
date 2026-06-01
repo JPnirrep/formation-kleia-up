@@ -17,7 +17,7 @@ from app.models.video import VideoEvent, VideoProgress
 router = APIRouter(dependencies=[Depends(get_current_admin)])
 
 
-@router.get("/stats")
+@router.get("/stats", response_model=dict)
 async def get_admin_stats(
     db: AsyncSession = Depends(get_db),
 ):
@@ -83,7 +83,7 @@ async def get_admin_stats(
     }
 
 
-@router.get("/stats/events")
+@router.get("/stats/events", response_model=dict)
 async def get_event_stats(
     days: int = 14,
     db: AsyncSession = Depends(get_db),

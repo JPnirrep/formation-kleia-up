@@ -7,13 +7,13 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
+    JSON,
     String,
     Text,
     UniqueConstraint,
+    Uuid,
     func,
 )
-from sqlalchemy import JSON
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -24,7 +24,7 @@ class VideoAsset(Base, TimestampMixin):
     __tablename__ = "video_assets"
 
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("lessons.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("lessons.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -42,7 +42,7 @@ class VideoAsset(Base, TimestampMixin):
         Integer, nullable=False, default=85
     )
     created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
 
     lesson = relationship("Lesson", back_populates="video_assets", lazy="selectin")
@@ -62,7 +62,7 @@ class VideoTrack(Base, TimestampMixin):
     __tablename__ = "video_tracks"
 
     video_asset_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("video_assets.id"),
         nullable=False,
         index=True,
@@ -86,10 +86,10 @@ class VideoProgress(Base, TimestampMixin):
     )
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     video_asset_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("video_assets.id"),
         nullable=False,
         index=True,
@@ -117,10 +117,10 @@ class VideoEvent(Base, TimestampMixin):
     __tablename__ = "video_events"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     video_asset_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("video_assets.id"),
         nullable=False,
         index=True,
