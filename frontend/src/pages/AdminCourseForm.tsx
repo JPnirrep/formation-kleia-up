@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
-import { createCourse, updateCourse, getAdminCourses } from '@/api/admin';
+import { createCourse, updateCourse, getAdminCourse } from '@/api/admin';
 import type { Course } from '@/api/courses';
 
 interface FormData {
@@ -49,8 +49,7 @@ export default function AdminCourseForm() {
     if (!isEditing) return;
     (async () => {
       try {
-        const data = await getAdminCourses({ limit: 100 });
-        const course = data.items.find((c: Course) => c.id === courseId);
+        const course = await getAdminCourse(courseId);
         if (course) {
           setForm({
             title: course.title, slug: course.slug,

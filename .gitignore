@@ -46,6 +46,18 @@ coverage/
 .coverage
 .pytest_cache/
 
+# Playwright
+test-results/
+playwright-report/
+
+# Vite
+.vite/
+
+# Temp files
+temp_combined.md
+SCRIPT_REF.docx
+nul
+
 # Docs & media (fichiers lourds)
 docs/doc formation kleia-up/
 docs/doc formation kleia-up.zip

@@ -34,6 +34,16 @@ export async function getProfile(): Promise<UserProfile> {
   return api.request<UserProfile>(`${AUTH_BASE}/auth/me`);
 }
 
+export async function updateProfile(data: {
+  display_name?: string;
+  avatar_url?: string;
+}): Promise<UserProfile> {
+  return api.request<UserProfile>(`${AUTH_BASE}/auth/me`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function logout() {
   try {
     await api.request(`${AUTH_BASE}/auth/logout`, { method: 'POST' });

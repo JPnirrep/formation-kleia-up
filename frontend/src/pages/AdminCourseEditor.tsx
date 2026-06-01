@@ -7,16 +7,15 @@ import Badge from '@/components/ui/Badge';
 import AdminCourseTree from '@/components/admin/AdminCourseTree';
 import AdminLessonPanel from '@/components/admin/AdminLessonPanel';
 import {
-  getCourse, getCourseModules,
-} from '@/api/courses';
-import {
   createModule, deleteModule,
   createLesson, updateLesson, deleteLesson,
   addYoutubeVideo, listLessonVideos, deleteVideo,
   updateModule, reorderLesson,
-  updateCourse,
+  updateCourse, getAdminCourse,
+  createResource, getResources, deleteResource,
+  type ResourceAsset,
 } from '@/api/admin';
-import type { CourseDetail, Module } from '@/api/courses';
+import type { Module } from '@/api/courses';
 
 /* ── Auto-save hook with debounce ── */
 function useAutoSave(saveFn: () => Promise<void>, deps: any[], ms = 1500) {
@@ -65,7 +64,9 @@ export default function AdminCourseEditor() {
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [youtubeTitle, setYoutubeTitle] = useState('');
 
-  // Drive links
+  // Drive links — now persisted via ResourceAsset API
+  const [resources, setResources] = useState<ResourceAsset[]>([]);
+  const [driveTitle, setDriveTitle] = useState('');
   const [driveAudio, setDriveAudio] = useState('');
   const [drivePdf, setDrivePdf] = useState('');
 
@@ -99,7 +100,7 @@ export default function AdminCourseEditor() {
     if (!courseId || courseId === 'new') { setLoading(false); return; }
     setLoading(true);
     try {
-      const c = await getCourse(courseId);
+      const c = await getAdminCourse(courseId);
       setCourse(c);
       setCourseTitle(c.title);
       setCourseShortDesc(c.short_description || '');
@@ -108,8 +109,7 @@ export default function AdminCourseEditor() {
       setCourseCat(c.category || '');
       setCourseDur(c.duration_seconds);
       setCourseStatus(c.status);
-      const mods = await getCourseModules(c.slug);
-      setModules(mods || []);
+      setModules(c.modules || []);
     } catch { setCourse(null); }
     setLoading(false);
   }, [courseId]);
@@ -122,6 +122,12 @@ export default function AdminCourseEditor() {
     listLessonVideos(selectedLessonId).then(vids => {
       setLessonVideos(prev => ({ ...prev, [selectedLessonId]: vids || [] }));
     }).catch(() => {});
+  }, [selectedLessonId]);
+
+  // Load Drive resources when selecting a lesson
+  useEffect(() => {
+    if (!selectedLessonId) return;
+    getResources(selectedLessonId).then(res => setResources(res || [])).catch(() => setResources([]));
   }, [selectedLessonId]);
 
   const selectedLesson = (() => {
@@ -231,9 +237,23 @@ export default function AdminCourseEditor() {
     catch { showError('Erreur suppression vidéo'); }
   };
 
+  const handleAddResource = async (title: string, url: string, type: string) => {
+    if (!selectedLessonId || !url.trim()) return;
+    try {
+      await createResource(selectedLessonId, { title, file_url: url, resource_type: type });
+      const res = await getResources(selectedLessonId);
+      setResources(res || []);
+    } catch { showError('Erreur ajout ressource'); }
+  };
+
+  const handleDeleteResource = async (resourceId: string) => {
+    try { await deleteResource(resourceId); setResources(prev => prev.filter(r => r.id !== resourceId)); }
+    catch { showError('Erreur suppression ressource'); }
+  };
+
   const handleSaveContent = async () => {
     if (!selectedLesson) return;
-    try { await updateLesson(selectedLesson.id, { content: { markdown: editContent } }); showError('Contenu sauvegardé'); }
+    try { await updateLesson(selectedLesson.id, { content: editContent }); showError('Contenu sauvegardé'); }
     catch { showError('Erreur sauvegarde contenu'); }
   };
 
@@ -354,6 +374,8 @@ export default function AdminCourseEditor() {
               youtubeTitle={youtubeTitle}
               driveAudioUrl={driveAudio}
               drivePdfUrl={drivePdf}
+              driveTitle={driveTitle}
+              resources={resources}
               editContent={editContent}
               lessonVideos={selectedLessonId ? (lessonVideos[selectedLessonId] || []) : []}
               onLessonFieldChange={(f, v) => {
@@ -376,6 +398,9 @@ export default function AdminCourseEditor() {
               onAddYoutube={handleAddYoutube}
               onDriveAudioChange={setDriveAudio}
               onDrivePdfChange={setDrivePdf}
+              onDriveTitleChange={setDriveTitle}
+              onAddResource={handleAddResource}
+              onDeleteResource={handleDeleteResource}
               onSaveLesson={handleSaveLesson}
               onSaveCourse={handleSaveCourse}
               onDeleteVideo={handleDeleteVideo}

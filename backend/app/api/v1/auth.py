@@ -1,6 +1,7 @@
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -168,6 +169,28 @@ async def get_profile(
     current_user: User = Depends(get_current_user),
 ):
     """Récupère le profil de l'utilisateur connecté."""
+    return UserProfile.model_validate(current_user)
+
+
+class MeUpdate(BaseModel):
+    display_name: str | None = None
+    avatar_url: str | None = None
+
+
+@router.patch("/me", response_model=UserProfile)
+async def update_profile(
+    data: MeUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Met à jour le profil de l'utilisateur connecté."""
+    if data.display_name is not None:
+        current_user.display_name = data.display_name
+    if data.avatar_url is not None:
+        current_user.avatar_url = data.avatar_url
+    db.add(current_user)
+    await db.commit()
+    await db.refresh(current_user)
     return UserProfile.model_validate(current_user)
 
 

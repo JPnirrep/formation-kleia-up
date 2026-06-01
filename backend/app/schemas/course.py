@@ -24,6 +24,7 @@ class LessonRead(BaseModel):
     order: int
     lesson_type: str
     duration_seconds: int
+    content: str | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -58,6 +59,7 @@ class LessonUpdate(BaseModel):
     order: int | None = None
     lesson_type: str | None = None
     duration_seconds: int | None = None
+    content: str | None = None
 
 
 class CourseCreate(BaseModel):

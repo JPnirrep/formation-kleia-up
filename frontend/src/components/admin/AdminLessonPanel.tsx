@@ -32,6 +32,8 @@ interface Props {
   youtubeTitle: string;
   driveAudioUrl: string;
   drivePdfUrl: string;
+  driveTitle: string;
+  resources: { id: string; title: string; file_url: string; resource_type: string }[];
   editContent: string;
   lessonVideos: { id: string; title: string; playback_url: string | null }[];
   onLessonFieldChange: (field: string, value: string | number) => void;
@@ -41,6 +43,9 @@ interface Props {
   onAddYoutube: () => void;
   onDriveAudioChange: (url: string) => void;
   onDrivePdfChange: (url: string) => void;
+  onDriveTitleChange: (title: string) => void;
+  onAddResource: (title: string, url: string, type: string) => void;
+  onDeleteResource: (resourceId: string) => void;
   onSaveLesson: () => void;
   onSaveCourse: () => void;
   onDeleteVideo: (videoId: string) => void;
@@ -251,18 +256,44 @@ export default function AdminLessonPanel({
           {/* ── External Media Section (Drive links) ── */}
           <Card>
             <h3 className="font-heading font-bold text-kleia-dark mb-3">📎 Ressources externes (Drive)</h3>
-            <p className="text-xs text-kleia-gray font-body mb-3">
-              Liens Google Drive pour les fichiers audio et PDF (pas de stockage sur le VPS).
-            </p>
-            <div className="space-y-3">
+
+            {/* Existing resources */}
+            {resources.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {resources.map((r) => (
+                  <div key={r.id} className="flex items-center justify-between bg-kleia-cream/50 rounded-lg px-3 py-2 group">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-sm">{r.resource_type === 'audio' ? '🔊' : '📄'}</span>
+                      <span className="text-sm font-body text-kleia-dark truncate">{r.title}</span>
+                    </div>
+                    <button onClick={() => onDeleteResource(r.id)} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity text-xs ml-2 shrink-0" aria-label={`Supprimer ${r.title}`}>✕</button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Add new resource form */}
+            <div className="space-y-2">
               <label className="block">
-                <span className="text-sm font-medium text-kleia-dark">🔊 Lien audio (Google Drive)</span>
-                <input type="url" value={driveAudioUrl} onChange={(e) => onDriveAudioChange(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full mt-1 px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-gold focus:ring-offset-1" />
+                <span className="text-xs font-medium text-kleia-dark">Titre</span>
+                <input type="text" value={driveTitle} onChange={(e) => onDriveTitleChange(e.target.value)} placeholder="Ex: Support de cours PDF" className="w-full mt-0.5 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-gold/20" />
               </label>
               <label className="block">
-                <span className="text-sm font-medium text-kleia-dark">📄 Lien PDF (Google Drive)</span>
-                <input type="url" value={drivePdfUrl} onChange={(e) => onDrivePdfChange(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full mt-1 px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-gold focus:ring-offset-1" />
+                <span className="text-xs font-medium text-kleia-dark">🔊 Lien audio (Drive)</span>
+                <input type="url" value={driveAudioUrl} onChange={(e) => onDriveAudioChange(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full mt-0.5 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-gold/20" />
               </label>
+              <label className="block">
+                <span className="text-xs font-medium text-kleia-dark">📄 Lien PDF (Drive)</span>
+                <input type="url" value={drivePdfUrl} onChange={(e) => onDrivePdfChange(e.target.value)} placeholder="https://drive.google.com/file/d/..." className="w-full mt-0.5 px-3 py-1.5 rounded border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-gold/20" />
+              </label>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => { if (driveAudioUrl.trim()) { onAddResource(driveTitle || 'Audio', driveAudioUrl, 'audio'); onDriveAudioChange(''); onDriveTitleChange(''); } }}>
+                  + Audio
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => { if (drivePdfUrl.trim()) { onAddResource(driveTitle || 'PDF', drivePdfUrl, 'pdf'); onDrivePdfChange(''); onDriveTitleChange(''); } }}>
+                  + PDF
+                </Button>
+              </div>
             </div>
           </Card>
 

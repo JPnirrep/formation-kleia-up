@@ -31,6 +31,10 @@ export async function getAdminCourses(params?: { limit?: number; status?: string
   return api.request<PaginatedResponse<Course>>(`/admin/courses${qs ? '?' + qs : ''}`);
 }
 
+export async function getAdminCourse(courseId: string): Promise<Course> {
+  return api.request<Course>(`/admin/courses/${courseId}`);
+}
+
 export async function createModule(courseId: string, data: ModuleCreate): Promise<Module> {
   return api.request<Module>(`/admin/courses/${courseId}/modules`, {
     method: 'POST',
@@ -330,4 +334,42 @@ export async function updateQuestion(questionId: string, data: {
 
 export async function deleteQuestion(questionId: string): Promise<void> {
   return api.request(`/admin/questions/${questionId}`, { method: 'DELETE' });
+}
+
+// --- Resource Asset management (Drive links) ---
+
+export interface ResourceAssetCreate {
+  title: string;
+  description?: string;
+  file_url: string;
+  resource_type: string;  // "pdf", "audio", "drive_link"
+  order?: number;
+}
+
+export interface ResourceAsset {
+  id: string;
+  lesson_id: string;
+  title: string;
+  description: string | null;
+  order: number;
+  file_url: string;
+  resource_type: string;
+  file_size_bytes: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function createResource(lessonId: string, data: ResourceAssetCreate): Promise<ResourceAsset> {
+  return api.request<ResourceAsset>(`/admin/lessons/${lessonId}/resources`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getResources(lessonId: string): Promise<ResourceAsset[]> {
+  return api.request<ResourceAsset[]>(`/admin/lessons/${lessonId}/resources`);
+}
+
+export async function deleteResource(resourceId: string): Promise<void> {
+  return api.request(`/admin/resources/${resourceId}`, { method: 'DELETE' });
 }

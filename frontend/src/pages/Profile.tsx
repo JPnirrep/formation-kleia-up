@@ -8,12 +8,24 @@ import Loading from '@/components/ui/Loading';
 import EmptyState from '@/components/ui/EmptyState';
 import { getMyCertificates, downloadCertificate } from '@/api/certificates';
 import { getMyEnrollments } from '@/api/enrollments';
+import { updateProfile } from '@/api/auth';
 import type { CertificateWithDetails } from '@/api/certificates';
 
 export default function Profile() {
   const { user, loading: authLoading } = useAuth();
   useEffect(() => { document.title = 'Mon profil — Kleia-up'; }, []);
   const [notifications, setNotifications] = useState({ email: true, progress: true });
+  const [editName, setEditName] = useState(user?.display_name || '');
+  const [profileSaving, setProfileSaving] = useState(false);
+
+  const handleSaveProfile = async () => {
+    if (!editName.trim()) return;
+    setProfileSaving(true);
+    try { await updateProfile({ display_name: editName.trim() }); }
+    catch { /* silent */ }
+    finally { setProfileSaving(false); }
+  };
+  useEffect(() => { if (user?.display_name) setEditName(user.display_name); }, [user]);
   const [certs, setCerts] = useState<CertificateWithDetails[]>([]);
   const [certsLoading, setCertsLoading] = useState(true);
   const [certsError, setCertsError] = useState<string | null>(null);
@@ -156,7 +168,23 @@ export default function Profile() {
         <h2 className="text-xl font-bold font-heading text-kleia-dark mb-4">Paramètres du compte</h2>
         <Card>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div>
+              <p className="font-medium text-kleia-dark font-body mb-1">Nom affiché</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="flex-1 px-3 py-2 rounded-lg border border-kleia-dark/20 text-sm font-body outline-none focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20"
+                  placeholder={user?.display_name || ''}
+                  aria-label="Nom affiché"
+                />
+                <Button variant="primary" size="sm" onClick={handleSaveProfile} disabled={profileSaving || !editName.trim()}>
+                  {profileSaving ? '...' : 'Enregistrer'}
+                </Button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between pt-3 border-t border-kleia-dark/10">
               <div>
                 <p className="font-medium text-kleia-dark font-body">Notifications par email</p>
                 <p className="text-sm text-kleia-gray font-body">Recevoir des mises à jour sur mes formations</p>

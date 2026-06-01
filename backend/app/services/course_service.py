@@ -34,17 +34,25 @@ async def get_course_by_slug(db: AsyncSession, slug: str) -> Course | None:
     return result.scalar_one_or_none()
 
 
-async def get_course_by_id(db: AsyncSession, course_id: UUID) -> Course | None:
+async def get_course_by_id(
+    db: AsyncSession, course_id: UUID, eager: bool = False
+) -> Course | None:
     stmt = select(Course).where(Course.id == course_id)
+    if eager:
+        stmt = stmt.options(
+            selectinload(Course.modules).selectinload(Module.lessons),
+        )
     result = await db.execute(stmt)
-    return result.scalar_one_or_none()
+    return result.unique().scalar_one_or_none()
 
 
 async def create_course(db: AsyncSession, data: CourseCreate, user_id: UUID) -> Course:
     # Vérifier si le slug existe déjà
     existing = await db.execute(select(Course).where(Course.slug == data.slug))
     if existing.scalar_one_or_none():
-        raise HTTPException(status_code=409, detail="Ce slug est déjà utilisé par une autre formation.")
+        raise HTTPException(
+            status_code=409, detail="Ce slug est déjà utilisé par une autre formation."
+        )
     course = Course(**data.model_dump(), created_by=user_id)
     db.add(course)
     await db.commit()

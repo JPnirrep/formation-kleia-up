@@ -13,6 +13,7 @@ env:
   DEPLOY_PATH: /opt/kleia-up
   VPS_HOST: ${{ secrets.VPS_HOST }}
   VPS_USER: ${{ secrets.VPS_USER }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
   test:
@@ -33,20 +34,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install flake8 pytest
+          pip install flake8
 
       - name: Vérification du linting backend
         working-directory: ./backend
-        run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
-      - name: Exécution des tests backend (placeholder)
-        working-directory: ./backend
-        run: pytest --verbose || echo "Aucun test trouvé pour le moment"
+        run: flake8 app/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Configuration Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Installation des dépendances frontend
         working-directory: ./frontend

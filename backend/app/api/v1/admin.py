@@ -9,7 +9,7 @@ from app.api.deps import get_current_admin
 from app.database import get_db
 from app.models.course import Course, Lesson, Module
 from app.models.enrollment import Enrollment
-from app.models.quiz import Quiz
+from app.models.resource import ResourceAsset
 from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.course import (
@@ -25,6 +25,7 @@ from app.schemas.course import (
 )
 from app.schemas.enrollment import EnrollmentRead
 from app.schemas.quiz import QuizCreate, QuizRead
+from app.schemas.resource import ResourceAssetCreate, ResourceAssetRead
 from app.schemas.user import UserCreate, UserRead, UserUpdate
 from app.services.course_service import (
     create_course,
@@ -73,6 +74,21 @@ async def admin_list_courses(
         page_size=limit,
         total_pages=total_pages,
     )
+
+
+@router.get("/courses/{course_id}", response_model=CourseRead)
+async def admin_get_course(
+    course_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Récupère une formation par UUID (éditeur admin)."""
+    course = await get_course_by_id(db, course_id, eager=True)
+    if course is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Formation introuvable.",
+        )
+    return CourseRead.model_validate(course)
 
 
 @router.post("/courses", response_model=CourseRead, status_code=status.HTTP_201_CREATED)
@@ -240,30 +256,66 @@ async def admin_delete_lesson(
     await db.commit()
 
 
+# ── Resource Assets (Drive links: PDF, audio) ──
+
+
 @router.post(
-    "/lessons/{lesson_id}/quiz",
-    response_model=QuizRead,
+    "/lessons/{lesson_id}/resources",
+    response_model=ResourceAssetRead,
     status_code=status.HTTP_201_CREATED,
 )
-async def admin_create_quiz(
+async def admin_create_resource(
     lesson_id: UUID,
-    data: QuizCreate,
+    data: ResourceAssetCreate,
     db: AsyncSession = Depends(get_db),
 ):
-    """Ajoute un quiz à une leçon."""
+    """Attache une ressource Drive (PDF, audio) à une leçon."""
     stmt = select(Lesson).where(Lesson.id == lesson_id)
     result = await db.execute(stmt)
-    lesson = result.scalar_one_or_none()
-    if lesson is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Leçon non trouvée.",
-        )
-    quiz = Quiz(**data.model_dump(exclude={"lesson_id"}), lesson_id=lesson_id)
-    db.add(quiz)
+    if result.scalar_one_or_none() is None:
+        raise HTTPException(status_code=404, detail="Leçon introuvable.")
+    resource = ResourceAsset(
+        lesson_id=lesson_id,
+        title=data.title,
+        description=data.description,
+        file_url=data.file_url,
+        resource_type=data.resource_type,
+        order=data.order,
+    )
+    db.add(resource)
     await db.commit()
-    await db.refresh(quiz)
-    return QuizRead.model_validate(quiz)
+    await db.refresh(resource)
+    return resource
+
+
+@router.get("/lessons/{lesson_id}/resources", response_model=list[ResourceAssetRead])
+async def admin_list_resources(
+    lesson_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Liste les ressources attachées à une leçon."""
+    stmt = (
+        select(ResourceAsset)
+        .where(ResourceAsset.lesson_id == lesson_id)
+        .order_by(ResourceAsset.order)
+    )
+    result = await db.execute(stmt)
+    return result.scalars().all()
+
+
+@router.delete("/resources/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def admin_delete_resource(
+    resource_id: UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """Supprime une ressource."""
+    stmt = select(ResourceAsset).where(ResourceAsset.id == resource_id)
+    result = await db.execute(stmt)
+    resource = result.scalar_one_or_none()
+    if resource is None:
+        raise HTTPException(status_code=404, detail="Ressource introuvable.")
+    await db.delete(resource)
+    await db.commit()
 
 
 @router.get("/enrollments", response_model=PaginatedResponse)
