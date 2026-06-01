@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -81,9 +81,12 @@ export default function AdminCourseDetail() {
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
 
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const showError = (msg: string) => {
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     setError(msg);
-    setTimeout(() => setError(null), 4000);
+    errorTimerRef.current = setTimeout(() => setError(null), 8000);
   };
 
   const load = useCallback(async () => {
@@ -110,7 +113,7 @@ export default function AdminCourseDetail() {
     setExpandedModule(modId);
     const mod = modules.find(m => m.id === modId);
     if (!mod) return;
-    for (const lesson of (mod as any).lessons || []) {
+    for (const lesson of mod.lessons || []) {
       if (!lessonVideos[lesson.id]) {
         try {
           const vids = await listLessonVideos(lesson.id);
@@ -141,7 +144,8 @@ export default function AdminCourseDetail() {
 
   const handleNewLesson = async (modId: string) => {
     if (!newLessonTitle.trim()) return;
-    const lessonCount = ((modules.find(m => m.id === modId) as any)?.lessons?.length || 0);
+    const mod2 = modules.find(m => m.id === modId);
+    const lessonCount = mod2?.lessons?.length || 0;
     try {
       await createLesson(modId, {
         title: newLessonTitle.trim(),
@@ -176,15 +180,14 @@ export default function AdminCourseDetail() {
   const handleMoveModule = async (modIdx: number, direction: 1 | -1) => {
     const target = modIdx + direction;
     if (target < 0 || target >= modules.length) return;
-    const a = modules[modIdx] as any;
-    const b = modules[target] as any;
+    const a = modules[modIdx]; const b = modules[target];
     await updateModule(a.id, { order: b.order || target + 1 });
     await updateModule(b.id, { order: a.order || modIdx + 1 });
     load();
   };
 
   const handleMoveLesson = async (modIdx: number, lessonIdx: number, direction: 1 | -1) => {
-    const mod = modules[modIdx] as any;
+    const mod = modules[modIdx];
     const lessons: Lesson[] = mod.lessons || [];
     const target = lessonIdx + direction;
     if (target < 0 || target >= lessons.length) return;
@@ -252,7 +255,7 @@ export default function AdminCourseDetail() {
   return (
     <div className="space-y-6" role="region" aria-label="Gestion du contenu de la formation">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body">
+        <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body">
           {error}
         </div>
       )}
@@ -302,7 +305,7 @@ export default function AdminCourseDetail() {
       )}
 
       <div className="space-y-4">
-        {modules.map((mod: any, mi: number) => {
+        {modules.map((mod, mi) => {
           const lessons: Lesson[] = mod.lessons || [];
           const isExpanded = expandedModule === mod.id;
           return (
@@ -489,11 +492,15 @@ export default function AdminCourseDetail() {
                                 const isYt = v.playback_url && v.playback_url.includes('youtube.com/embed/');
                                 return (
                                   <div key={v.id} className="flex items-center gap-2 text-xs text-kleia-gray group">
-                                    <span>{isYt ? '▶️' : '🎬'} {v.title}</span>
+                                    <span>
+                                        <span aria-hidden="true">{isYt ? '▶️' : '🎬'}</span>
+                                        <span className="sr-only">{isYt ? 'YouTube : ' : 'Fichier vidéo : '}</span>
+                                        {v.title}
+                                    </span>
                                     {v.playback_url && <a href={v.playback_url} target="_blank" rel="noopener noreferrer" className="text-kleia-violet hover:underline">{isYt ? 'Voir sur YouTube' : 'Voir'}</a>}
                                     <button
                                       onClick={async () => { await deleteVideo(v.id); load(); }}
-                                      className="ml-auto text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="ml-auto text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded transition-colors"
                                       aria-label={`Supprimer la vidéo ${v.title}`}
                                     >✕</button>
                                   </div>

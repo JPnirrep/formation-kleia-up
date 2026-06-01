@@ -30,7 +30,9 @@ function useAutoSave(saveFn: () => Promise<void>, deps: any[], ms = 1500) {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(async () => {
       setSaving(true);
-      try { await saveFnRef.current(); setLastSaved(new Date()); } catch {}
+      try { await saveFnRef.current(); setLastSaved(new Date()); } catch (e) {
+        console.error('[useAutoSave] save failed:', e);
+      }
       setSaving(false);
     }, ms);
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
@@ -85,7 +87,13 @@ export default function AdminCourseEditor() {
   // Preview mode
   const [preview, setPreview] = useState(false);
 
-  const showError = (msg: string) => { setError(msg); setTimeout(() => setError(null), 4000); };
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showError = (msg: string) => {
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    setError(msg);
+    errorTimerRef.current = setTimeout(() => setError(null), 8000);
+  };
 
   const load = useCallback(async () => {
     if (!courseId || courseId === 'new') { setLoading(false); return; }
@@ -118,7 +126,7 @@ export default function AdminCourseEditor() {
 
   const selectedLesson = (() => {
     if (!selectedLessonId) return null;
-    for (const mod of modules as any[]) {
+    for (const mod of modules) {
       for (const les of (mod.lessons || [])) {
         if (les.id === selectedLessonId) return les;
       }
@@ -170,7 +178,7 @@ export default function AdminCourseEditor() {
   const handleAddLesson = async (modId: string) => {
     const title = prompt('Titre de la leçon :');
     if (!title?.trim()) return;
-    const mod = (modules as any[]).find(m => m.id === modId);
+    const mod = modules.find(m => m.id === modId);
     const order = (mod?.lessons?.length || 0) + 1;
     try { await createLesson(modId, { title: title.trim(), order, lesson_type: 'video', duration_seconds: 600 }); load(); }
     catch { showError('Erreur création leçon'); }
@@ -189,14 +197,14 @@ export default function AdminCourseEditor() {
   const handleMoveModule = async (mi: number, dir: 1 | -1) => {
     const target = mi + dir;
     if (target < 0 || target >= modules.length) return;
-    const a = modules[mi] as any; const b = modules[target] as any;
+    const a = modules[mi]; const b = modules[target];
     await updateModule(a.id, { order: b.order || target + 1 });
     await updateModule(b.id, { order: a.order || mi + 1 });
     load();
   };
 
   const handleMoveLesson = async (mi: number, li: number, dir: 1 | -1) => {
-    const mod = modules[mi] as any;
+    const mod = modules[mi];
     const lessons = mod.lessons || [];
     const target = li + dir;
     if (target < 0 || target >= lessons.length) return;
@@ -265,7 +273,7 @@ export default function AdminCourseEditor() {
     <div className="flex flex-col -m-6 lg:-m-8 h-[calc(100vh-4rem)]">
       {/* Toast notifications */}
       {error && (
-        <div className="bg-red-50 border-b border-red-200 text-red-700 px-4 py-2 text-sm font-body text-center">{error}</div>
+        <div role="alert" aria-live="polite" className="bg-red-50 border-b border-red-200 text-red-700 px-4 py-2 text-sm font-body text-center">{error}</div>
       )}
 
       {/* Header bar */}
