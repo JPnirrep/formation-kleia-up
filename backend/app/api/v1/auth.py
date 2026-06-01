@@ -197,14 +197,14 @@ async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
     try:
         from uuid import UUID as _UUID
 
-        _UUID(user_id)
+        user_uuid = _UUID(user_id)
     except (ValueError, AttributeError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token invalide.",
         )
 
-    stmt = select(User).where(User.id == user_id)
+    stmt = select(User).where(User.id == user_uuid)
     result = await db.execute(stmt)
     user = result.scalar_one_or_none()
     if user is None:

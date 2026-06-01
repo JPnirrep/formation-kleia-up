@@ -4,7 +4,7 @@ from typing import override
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, RedirectResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
@@ -26,10 +26,10 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self, request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
-        if request.url.path == "/docs":
-            return RedirectResponse(url="/api/docs", status_code=301)
         if request.method == "OPTIONS":
             response = Response(status_code=200)
+        elif request.url.path == "/docs":
+            return RedirectResponse(url="/api/docs", status_code=301)
         else:
             response = await call_next(request)
 
@@ -43,9 +43,7 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
         response.headers["Access-Control-Allow-Methods"] = (
             "GET, POST, PUT, PATCH, DELETE, OPTIONS"
         )
-        response.headers["Access-Control-Allow-Headers"] = (
-            "Content-Type, Authorization"
-        )
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Vary"] = "Origin"
         return response
@@ -81,24 +79,40 @@ def create_app() -> FastAPI:
 
     # Exception handlers
     @app.exception_handler(401)
-    async def unauthorized_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+    @app.exception_handler(401)
+    async def unauthorized_handler(_request: Request, exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+        detail = (
+            getattr(exc, "detail", "Non authentifié. Veuillez vous connecter.")
+            if hasattr(exc, "detail")
+            else "Non authentifié. Veuillez vous connecter."
+        )
         return JSONResponse(
             status_code=401,
-            content={"detail": "Non authentifié. Veuillez vous connecter."},
+            content={"detail": detail},
         )
 
     @app.exception_handler(403)
-    async def forbidden_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+    async def forbidden_handler(_request: Request, exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+        detail = (
+            getattr(exc, "detail", "Accès refusé.")
+            if hasattr(exc, "detail")
+            else "Accès refusé."
+        )
         return JSONResponse(
             status_code=403,
-            content={"detail": "Accès refusé. Vous n'avez pas les droits nécessaires."},
+            content={"detail": detail},
         )
 
     @app.exception_handler(404)
-    async def not_found_handler(_request: Request, _exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+    async def not_found_handler(_request: Request, exc: Exception) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+        detail = (
+            getattr(exc, "detail", "Ressource non trouvée.")
+            if hasattr(exc, "detail")
+            else "Ressource non trouvée."
+        )
         return JSONResponse(
             status_code=404,
-            content={"detail": "Ressource non trouvée."},
+            content={"detail": detail},
         )
 
     @app.exception_handler(422)
