@@ -111,7 +111,7 @@ export default function AdminCourseTree({
                           </div>
                           <span className="text-xs w-4 text-center">{icon}</span>
                           <span className="flex-1 truncate font-body">{lesson.title}</span>
-                          <span className="text-xs text-kleia-gray/60">{Math.round(lesson.duration_seconds / 60)}m</span>
+                          <span className="text-xs text-kleia-gray/60">{Math.round(lesson.duration_seconds / 60)} min</span>
                           <button onClick={(e) => { e.stopPropagation(); if (confirm('Supprimer cette leçon ?')) onDeleteLesson(lesson.id); }} className="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity ml-1 text-xs" aria-label={`Supprimer ${lesson.title}`}>✕</button>
                         </div>
                       );

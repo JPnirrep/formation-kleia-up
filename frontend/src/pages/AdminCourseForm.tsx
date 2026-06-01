@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Loading from '@/components/ui/Loading';
-import { getCourses } from '@/api/courses';
-import { createCourse, updateCourse } from '@/api/admin';
+import { createCourse, updateCourse, getAdminCourses } from '@/api/admin';
 import type { Course } from '@/api/courses';
 
 interface FormData {
@@ -44,13 +43,13 @@ export default function AdminCourseForm() {
   const [form, setForm] = useState<FormData>(INITIAL_FORM);
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isEditing) return;
     (async () => {
       try {
-        const data = await getCourses({ limit: 100 });
+        const data = await getAdminCourses({ limit: 100 });
         const course = data.items.find((c: Course) => c.id === courseId);
         if (course) {
           setForm({
@@ -76,21 +75,24 @@ export default function AdminCourseForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSaving(true); setError('');
+    setSaving(true); setError(null);
     try {
-      if (isEditing) {
+      if (isEditing && courseId) {
         await updateCourse(courseId, {
           title: form.title, short_description: form.short_description,
           description: form.description, level: form.level,
           duration_seconds: form.duration_seconds, status: form.status, category: form.category,
         });
-        navigate('/admin/courses');
       } else {
-        const created = await createCourse({ ...form, slug: form.slug || makeSlug(form.title) });
-        navigate(`/admin/courses/${created.slug}`);
+        const newCourse = await createCourse({ ...form, slug: form.slug || makeSlug(form.title) });
+        navigate(`/admin/courses/${newCourse.id}`, { replace: true });
+        return;
       }
+      navigate('/admin/courses');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erreur lors de la sauvegarde.');
+      const message = err instanceof Error ? err.message : 'Erreur inconnue';
+      setError(message);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } finally { setSaving(false); }
   };
 
@@ -103,7 +105,7 @@ export default function AdminCourseForm() {
         <h1 className="text-2xl font-extrabold font-heading text-kleia-dark">{isEditing ? 'Modifier la formation' : 'Créer une formation'}</h1>
       </div>
 
-      {error && <div className="p-4 bg-red-50 border border-red-200 rounded-kleia text-red-700 text-sm" role="alert">{error}</div>}
+      {error && <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body mb-6">{error}</div>}
 
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         <Card><div className="space-y-4">
@@ -136,8 +138,8 @@ export default function AdminCourseForm() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="duration" className="block text-sm font-medium text-kleia-dark font-body mb-1">Durée (secondes)</label>
-              <input id="duration" type="number" min={0} value={form.duration_seconds} onChange={(e) => handleChange('duration_seconds', parseInt(e.target.value) || 0)} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
+              <label htmlFor="duration" className="block text-sm font-medium text-kleia-dark font-body mb-1">Durée (minutes)</label>
+              <input id="duration" type="number" min={0} value={Math.round(form.duration_seconds / 60)} onChange={(e) => setForm({ ...form, duration_seconds: (parseInt(e.target.value) || 0) * 60 })} className="w-full px-4 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
             </div>
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-kleia-dark font-body mb-1">Statut</label>

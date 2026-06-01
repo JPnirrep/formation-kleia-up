@@ -161,8 +161,8 @@ export default function AdminLessonPanel({
 
               <div className="grid grid-cols-2 gap-4">
                 <label className="block">
-                  <span className="text-sm font-medium text-kleia-dark">Durée (secondes)</span>
-                  <input type="number" min={0} value={courseInfo.duration_seconds} onChange={(e) => onCourseFieldChange('duration_seconds', parseInt(e.target.value) || 0)} className="w-full mt-1 px-3 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
+                  <span className="text-sm font-medium text-kleia-dark">Durée (minutes)</span>
+                  <input type="number" min={0} value={Math.round(courseInfo.duration_seconds / 60)} onChange={(e) => onCourseFieldChange('duration_seconds', (parseInt(e.target.value) || 0) * 60)} className="w-full mt-1 px-3 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
                 </label>
                 <label className="block">
                   <span className="text-sm font-medium text-kleia-dark">Statut</span>
@@ -204,8 +204,8 @@ export default function AdminLessonPanel({
                   </select>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-medium text-kleia-dark">Durée (secondes)</span>
-                  <input type="number" min={0} value={selectedLesson.duration_seconds} onChange={(e) => onLessonFieldChange('duration_seconds', parseInt(e.target.value) || 0)} className="w-full mt-1 px-3 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
+                  <span className="text-sm font-medium text-kleia-dark">Durée (minutes)</span>
+                  <input type="number" min={0} value={Math.round(selectedLesson.duration_seconds / 60)} onChange={(e) => onLessonFieldChange('duration_seconds', (parseInt(e.target.value) || 0) * 60)} className="w-full mt-1 px-3 py-2.5 rounded-lg border border-kleia-dark/20 focus:border-kleia-violet focus:ring-2 focus:ring-kleia-violet/20 outline-none font-body" />
                 </label>
               </div>
 

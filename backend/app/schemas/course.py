@@ -16,7 +16,6 @@ class ModuleUpdate(BaseModel):
     order: int | None = None
 
 
-
 class LessonRead(BaseModel):
     id: uuid.UUID
     module_id: uuid.UUID
@@ -29,6 +28,7 @@ class LessonRead(BaseModel):
     updated_at: datetime
 
     model_config = {"from_attributes": True}
+
 
 class ModuleRead(BaseModel):
     id: uuid.UUID
@@ -60,20 +60,6 @@ class LessonUpdate(BaseModel):
     duration_seconds: int | None = None
 
 
-class LessonRead(BaseModel):
-    id: uuid.UUID
-    module_id: uuid.UUID
-    title: str
-    description: str | None = None
-    order: int
-    lesson_type: str
-    duration_seconds: int
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
 class CourseCreate(BaseModel):
     title: str
     slug: str
@@ -82,6 +68,8 @@ class CourseCreate(BaseModel):
     thumbnail_url: str | None = None
     level: str = "débutant"
     category: str | None = None
+    duration_seconds: int = 0
+    status: str = "draft"
     is_premium: bool = False
     price_ht: float = 0.0
     tva_rate: float = 20.0
@@ -98,6 +86,7 @@ class CourseUpdate(BaseModel):
     level: str | None = None
     status: str | None = None
     category: str | None = None
+    duration_seconds: int | None = None
     is_premium: bool | None = None
     price_ht: float | None = None
     tva_rate: float | None = None

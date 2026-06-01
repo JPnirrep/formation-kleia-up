@@ -40,6 +40,41 @@ from app.services.course_service import (
 router = APIRouter(dependencies=[Depends(get_current_admin)])
 
 
+@router.get("/courses", response_model=PaginatedResponse)
+async def admin_list_courses(
+    skip: int = 0,
+    limit: int = 50,
+    status_filter: str | None = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """Liste toutes les formations (admin) — y compris brouillons."""
+    base_query = select(Course)
+    count_query = select(func.count(Course.id))
+
+    if status_filter:
+        base_query = base_query.where(Course.status == status_filter)
+        count_query = count_query.where(Course.status == status_filter)
+
+    count_result = await db.execute(count_query)
+    total = count_result.scalar_one()
+
+    result = await db.execute(
+        base_query.offset(skip).limit(limit).order_by(Course.created_at.desc())
+    )
+    courses = result.scalars().all()
+
+    page = (skip // limit) + 1 if limit > 0 else 1
+    total_pages = math.ceil(total / limit) if limit > 0 else 1
+
+    return PaginatedResponse(
+        items=[CourseRead.model_validate(c) for c in courses],
+        total=total,
+        page=page,
+        page_size=limit,
+        total_pages=total_pages,
+    )
+
+
 @router.post("/courses", response_model=CourseRead, status_code=status.HTTP_201_CREATED)
 async def admin_create_course(
     data: CourseCreate,

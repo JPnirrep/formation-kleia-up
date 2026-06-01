@@ -2,7 +2,7 @@ import api from './client';
 import type {
   CourseCreate, CourseUpdate, ModuleCreate, LessonCreate, EnrollmentGrant,
 } from '../types';
-import type { Course, Module, Lesson } from './courses';
+import type { Course, Module, Lesson, PaginatedResponse } from './courses';
 import type { Enrollment } from './enrollments';
 
 export async function createCourse(data: CourseCreate): Promise<Course> {
@@ -21,6 +21,14 @@ export async function updateCourse(courseId: string, data: CourseUpdate): Promis
 
 export async function deleteCourse(courseId: string): Promise<void> {
   return api.request(`/admin/courses/${courseId}`, { method: 'DELETE' });
+}
+
+export async function getAdminCourses(params?: { limit?: number; status?: string }): Promise<PaginatedResponse<Course>> {
+  const query = new URLSearchParams();
+  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.status) query.set('status_filter', params.status);
+  const qs = query.toString();
+  return api.request<PaginatedResponse<Course>>(`/admin/courses${qs ? '?' + qs : ''}`);
 }
 
 export async function createModule(courseId: string, data: ModuleCreate): Promise<Module> {
