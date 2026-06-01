@@ -113,7 +113,7 @@ export default function AdminCourseDetail() {
     setExpandedModule(modId);
     const mod = modules.find(m => m.id === modId);
     if (!mod) return;
-    for (const lesson of (mod as any).lessons || []) {
+    for (const lesson of mod.lessons || []) {
       if (!lessonVideos[lesson.id]) {
         try {
           const vids = await listLessonVideos(lesson.id);
@@ -144,7 +144,8 @@ export default function AdminCourseDetail() {
 
   const handleNewLesson = async (modId: string) => {
     if (!newLessonTitle.trim()) return;
-    const lessonCount = ((modules.find(m => m.id === modId) as any)?.lessons?.length || 0);
+    const mod2 = modules.find(m => m.id === modId);
+    const lessonCount = mod2?.lessons?.length || 0;
     try {
       await createLesson(modId, {
         title: newLessonTitle.trim(),
@@ -179,15 +180,14 @@ export default function AdminCourseDetail() {
   const handleMoveModule = async (modIdx: number, direction: 1 | -1) => {
     const target = modIdx + direction;
     if (target < 0 || target >= modules.length) return;
-    const a = modules[modIdx] as any;
-    const b = modules[target] as any;
+    const a = modules[modIdx]; const b = modules[target];
     await updateModule(a.id, { order: b.order || target + 1 });
     await updateModule(b.id, { order: a.order || modIdx + 1 });
     load();
   };
 
   const handleMoveLesson = async (modIdx: number, lessonIdx: number, direction: 1 | -1) => {
-    const mod = modules[modIdx] as any;
+    const mod = modules[modIdx];
     const lessons: Lesson[] = mod.lessons || [];
     const target = lessonIdx + direction;
     if (target < 0 || target >= lessons.length) return;
@@ -305,7 +305,7 @@ export default function AdminCourseDetail() {
       )}
 
       <div className="space-y-4">
-        {modules.map((mod: any, mi: number) => {
+        {modules.map((mod, mi) => {
           const lessons: Lesson[] = mod.lessons || [];
           const isExpanded = expandedModule === mod.id;
           return (
