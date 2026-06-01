@@ -94,6 +94,9 @@ jobs:
             echo "→ Exécution des migrations de base de données..."
             docker compose -f deploy/docker-compose.yml run --rm backend alembic upgrade head
 
+            echo "→ Mise à jour de l'index CodeGraph..."
+            codegraph sync || echo "⚠ CodeGraph non installé — exécute 'curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh' sur le VPS"
+
             echo "✅ Déploiement terminé avec succès"
           DEPLOY_EOF
 

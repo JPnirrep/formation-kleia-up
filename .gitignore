@@ -58,6 +58,10 @@ temp_combined.md
 SCRIPT_REF.docx
 nul
 
+# CodeGraph index (local to each machine/VPS)
+.codegraph/
+opencode.jsonc
+
 # Docs & media (fichiers lourds)
 docs/doc formation kleia-up/
 docs/doc formation kleia-up.zip
