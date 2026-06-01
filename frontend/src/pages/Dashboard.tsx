@@ -65,11 +65,11 @@ export default function Dashboard() {
   const firstName = user?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'apprenant';
 
   if (isLoading) {
-    return <Loading className="py-20" text="Chargement du tableau de bord..." />;
+    return <Loading testId="dashboard-loading" className="py-20" text="Chargement du tableau de bord..." />;
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-12 py-8 px-4 sm:px-6 lg:px-8">
+    <div data-testid="dashboard-content" className="max-w-5xl mx-auto space-y-12 py-8 px-4 sm:px-6 lg:px-8">
       <section className="text-center space-y-4">
         <h1 data-testid="dashboard-title" className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-violet">
           Ton Incarnation, {firstName}

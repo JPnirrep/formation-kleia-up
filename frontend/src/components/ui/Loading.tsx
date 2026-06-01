@@ -6,6 +6,7 @@ interface LoadingProps {
   size?: LoadingSize;
   className?: string;
   text?: string;
+  testId?: string;
 }
 
 const sizeStyles: Record<LoadingSize, string> = {
@@ -14,9 +15,9 @@ const sizeStyles: Record<LoadingSize, string> = {
   lg: 'h-12 w-12',
 };
 
-export default function Loading({ size = 'md', className, text }: LoadingProps) {
+export default function Loading({ size = 'md', className, text, testId = 'loading' }: LoadingProps) {
   return (
-    <div className={clsx('flex flex-col items-center justify-center gap-3', className)} role="status" aria-label="Chargement">
+    <div className={clsx('flex flex-col items-center justify-center gap-3', className)} role="status" aria-label="Chargement" data-testid={testId}>
       <svg
         className={clsx('animate-spin', sizeStyles[size])}
         viewBox="0 0 24 24"
