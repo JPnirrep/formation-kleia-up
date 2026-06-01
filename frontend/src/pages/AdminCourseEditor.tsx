@@ -85,7 +85,13 @@ export default function AdminCourseEditor() {
   // Preview mode
   const [preview, setPreview] = useState(false);
 
-  const showError = (msg: string) => { setError(msg); setTimeout(() => setError(null), 4000); };
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showError = (msg: string) => {
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+    setError(msg);
+    errorTimerRef.current = setTimeout(() => setError(null), 8000);
+  };
 
   const load = useCallback(async () => {
     if (!courseId || courseId === 'new') { setLoading(false); return; }
@@ -265,7 +271,7 @@ export default function AdminCourseEditor() {
     <div className="flex flex-col -m-6 lg:-m-8 h-[calc(100vh-4rem)]">
       {/* Toast notifications */}
       {error && (
-        <div className="bg-red-50 border-b border-red-200 text-red-700 px-4 py-2 text-sm font-body text-center">{error}</div>
+        <div role="alert" aria-live="polite" className="bg-red-50 border-b border-red-200 text-red-700 px-4 py-2 text-sm font-body text-center">{error}</div>
       )}
 
       {/* Header bar */}

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -81,9 +81,12 @@ export default function AdminCourseDetail() {
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
 
+  const errorTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const showError = (msg: string) => {
+    if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
     setError(msg);
-    setTimeout(() => setError(null), 4000);
+    errorTimerRef.current = setTimeout(() => setError(null), 8000);
   };
 
   const load = useCallback(async () => {
@@ -252,7 +255,7 @@ export default function AdminCourseDetail() {
   return (
     <div className="space-y-6" role="region" aria-label="Gestion du contenu de la formation">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body">
+        <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body">
           {error}
         </div>
       )}
@@ -489,11 +492,15 @@ export default function AdminCourseDetail() {
                                 const isYt = v.playback_url && v.playback_url.includes('youtube.com/embed/');
                                 return (
                                   <div key={v.id} className="flex items-center gap-2 text-xs text-kleia-gray group">
-                                    <span>{isYt ? '▶️' : '🎬'} {v.title}</span>
+                                    <span>
+                                        <span aria-hidden="true">{isYt ? '▶️' : '🎬'}</span>
+                                        <span className="sr-only">{isYt ? 'YouTube : ' : 'Fichier vidéo : '}</span>
+                                        {v.title}
+                                    </span>
                                     {v.playback_url && <a href={v.playback_url} target="_blank" rel="noopener noreferrer" className="text-kleia-violet hover:underline">{isYt ? 'Voir sur YouTube' : 'Voir'}</a>}
                                     <button
                                       onClick={async () => { await deleteVideo(v.id); load(); }}
-                                      className="ml-auto text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="ml-auto text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded transition-colors"
                                       aria-label={`Supprimer la vidéo ${v.title}`}
                                     >✕</button>
                                   </div>
