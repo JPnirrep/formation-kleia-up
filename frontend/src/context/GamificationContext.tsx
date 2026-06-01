@@ -10,6 +10,7 @@ interface GamificationContextType {
 }
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
+export { GamificationContext };
 
 const POLLING_INTERVAL = 60_000; // 60 secondes
 

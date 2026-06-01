@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import Card from '@/components/ui/Card';
+import { useState, useEffect, useContext, createContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import EmptyState from '@/components/ui/EmptyState';
 import Loading from '@/components/ui/Loading';
 import Courses from '@/pages/Courses';
@@ -9,7 +8,7 @@ import { getMyEnrollments } from '@/api/enrollments';
 import { getCourses } from '@/api/courses';
 import { isAuthenticated } from '@/api/client';
 import { useAuth } from '@/context/AuthContext';
-import { useGamification } from '@/context/GamificationContext';
+import { GamificationContext } from '@/context/GamificationContext';
 import StreakWidget from '@/components/gamification/StreakWidget';
 import PointsBadge from '@/components/gamification/PointsBadge';
 import type { Course } from '@/api/courses';
@@ -21,19 +20,21 @@ export default function Dashboard() {
   const isAuth = isAuthenticated();
 
   useEffect(() => { document.title = 'Tableau de bord — Kleia-up'; }, []);
-  const { data: enrollments, loading: enrollmentsLoading } = useApi(() => getMyEnrollments(), [isAuth]);
-  const { data: allCourses, loading: coursesLoading } = useApi(() => getCourses({ limit: 50 }), []);
+
+  const { data: enrollments, loading: enrollmentsLoading, error: enrollmentsError } = useApi(
+    () => getMyEnrollments(),
+    [isAuth],
+  );
+
+  const { data: allCourses, loading: coursesLoading, error: coursesError } = useApi(
+    () => getCourses({ limit: 50 }),
+    [],
+  );
+
   const [enrolledCourses, setEnrolledCourses] = useState<(Course & { progress?: number })[]>([]);
 
-  const isLoading = enrollmentsLoading || coursesLoading;
-
-  // Gamification — safe fallback si le provider n'est pas monté
-  let gamificationCtx;
-  try {
-    gamificationCtx = useGamification();
-  } catch {
-    gamificationCtx = null;
-  }
+  // Gamification : contexte safe (pas de try/catch sur les hooks — casse React StrictMode)
+  const gamificationCtx = useContext(GamificationContext);
   const gamification = gamificationCtx?.gamification ?? null;
 
   useEffect(() => {
@@ -45,7 +46,7 @@ export default function Dashboard() {
             const course = courseMap.get(e.course_id);
             return course ? { ...course, progress: e.progress || 0 } : null;
           })
-          .filter(Boolean) as (Course & { progress?: number })[]
+          .filter(Boolean) as (Course & { progress?: number })[],
       );
     }
   }, [enrollments, allCourses]);
@@ -64,12 +65,25 @@ export default function Dashboard() {
 
   const firstName = user?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'apprenant';
 
+  const isLoading = enrollmentsLoading || coursesLoading;
+  const error = enrollmentsError || coursesError;
+
   if (isLoading) {
     return <Loading testId="dashboard-loading" className="py-20" text="Chargement du tableau de bord..." />;
   }
 
   return (
     <div data-testid="dashboard-content" className="max-w-5xl mx-auto space-y-12 py-8 px-4 sm:px-6 lg:px-8">
+      {error && (
+        <div
+          role="alert"
+          aria-live="polite"
+          className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm font-body text-center"
+        >
+          {error}
+        </div>
+      )}
+
       <section className="text-center space-y-4">
         <h1 data-testid="dashboard-title" className="text-4xl md:text-5xl font-extrabold font-heading text-kleia-violet">
           Ton Incarnation, {firstName}
@@ -88,7 +102,6 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Gamification: streak + niveau */}
       {gamification && (
         <div className="flex justify-center items-center gap-6 -mt-6">
           <StreakWidget streakDays={gamification.streak_days} />
@@ -143,7 +156,7 @@ export default function Dashboard() {
             description="Inscrivez-vous à une formation depuis le catalogue pour débuter votre parcours."
             icon="empty"
             actionLabel="Voir le catalogue"
-            onAction={() => navigate('/cours')}
+            onAction={() => navigate('/formations')}
           />
         </section>
       )}
