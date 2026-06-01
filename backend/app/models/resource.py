@@ -1,7 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, Integer, String, Text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import ForeignKey, Integer, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -12,7 +11,7 @@ class LessonResource(Base, TimestampMixin):
     __tablename__ = "lesson_resources"
 
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     resource_type: Mapped[str] = mapped_column(String(50), nullable=False, default="file") # "file" or "markdown"
@@ -30,7 +29,7 @@ class AudioAsset(Base, TimestampMixin):
     __tablename__ = "audio_assets"
 
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -50,7 +49,7 @@ class ResourceAsset(Base, TimestampMixin):
     __tablename__ = "resource_assets"
 
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("lessons.id", ondelete="CASCADE"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)

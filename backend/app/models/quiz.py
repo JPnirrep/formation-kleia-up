@@ -10,9 +10,9 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    Uuid,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -23,7 +23,7 @@ class Quiz(Base, TimestampMixin):
     __tablename__ = "quizzes"
 
     lesson_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        Uuid(as_uuid=True),
         ForeignKey("lessons.id"),
         nullable=False,
         index=True,
@@ -49,7 +49,7 @@ class Question(Base, TimestampMixin):
     __tablename__ = "questions"
 
     quiz_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True
     )
     text: Mapped[str] = mapped_column(Text, nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -67,10 +67,10 @@ class Attempt(Base, TimestampMixin):
     __tablename__ = "attempts"
 
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
     quiz_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("quizzes.id"), nullable=False, index=True
     )
     score_percent: Mapped[float] = mapped_column(Float, nullable=False)
     answers: Mapped[list] = mapped_column(JSON, nullable=False)

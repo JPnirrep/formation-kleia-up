@@ -43,7 +43,7 @@ def _guess_media_category(url: str | None) -> str:
 
 # ── Lesson detail endpoint (GET /api/v1/lessons/{lesson_id}) ─────────────────
 
-@lessons_router.get("/{lesson_id}")
+@lessons_router.get("/{lesson_id}", response_model=dict)
 async def get_lesson_detail(
     lesson_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
@@ -148,7 +148,7 @@ async def get_lesson_detail(
 
 # ── Combined content endpoint (GET /api/v1/lessons/{lesson_id}/content) ──────
 
-@lessons_router.get("/{lesson_id}/content")
+@lessons_router.get("/{lesson_id}/content", response_model=dict)
 async def get_lesson_content(
     lesson_id: uuid.UUID,
     current_user: User = Depends(get_current_user),

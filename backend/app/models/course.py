@@ -8,9 +8,9 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    Uuid,
     func,
 )
-from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -42,7 +42,7 @@ class Course(Base, TimestampMixin):
     is_linear_progression_enforced: Mapped[bool] = mapped_column(default=True)
     
     created_by: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("users.id"), nullable=False, index=True
     )
 
     creator = relationship("User", back_populates="courses", lazy="selectin")
@@ -64,7 +64,7 @@ class Module(Base, TimestampMixin):
     )
 
     course_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("courses.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -87,7 +87,7 @@ class Lesson(Base, TimestampMixin):
     )
 
     module_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("modules.id"), nullable=False, index=True
+        Uuid(as_uuid=True), ForeignKey("modules.id"), nullable=False, index=True
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
