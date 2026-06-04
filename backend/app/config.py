@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     S3_SECRET_KEY: str = ""
 
     # IA
+
+    # Brevo (email marketing)
+    BREVO_API_KEY: str = ""
     MISTRAL_API_KEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")

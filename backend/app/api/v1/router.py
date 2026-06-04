@@ -1,5 +1,7 @@
 from fastapi import APIRouter
 
+
+from app.api.v1 import brevo
 from app.api.v1 import (
     admin,
     admin_quiz,
@@ -73,3 +75,5 @@ api_v1_router.include_router(
     admin_resource.router, prefix="/admin", tags=["Administration"]
 )
 api_v1_router.include_router(uploads.router, prefix="", tags=["Fichiers"])
+
+api_v1_router.include_router(brevo.router, prefix="/brevo", tags=["Brevo"])
