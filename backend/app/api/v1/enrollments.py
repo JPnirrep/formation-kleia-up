@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,10 +33,20 @@ async def create_enrollment(
     current_user: User = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Crée une inscription manuelle (admin uniquement en V1).
-    L'admin attribue l'accès à une formation pour un utilisateur.
-    """
+    """Crée une inscription (admin). Vérifie les doublons."""
+    # Vérifier si l'utilisateur est déjà inscrit à ce cours
+    existing = await db.execute(
+        select(Enrollment).where(
+            Enrollment.user_id == data.user_id,
+            Enrollment.course_id == data.course_id,
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="Cet utilisateur est déjà inscrit à cette formation.",
+        )
+
     enrollment = Enrollment(
         user_id=data.user_id,
         course_id=data.course_id,

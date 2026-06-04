@@ -62,10 +62,11 @@ const LESSON_TYPES = ['video', 'quiz', 'text', 'certificate'];
 
 export default function AdminLessonPanel({
   selectedLesson, courseInfo, youtubeUrl, youtubeTitle,
-  driveAudioUrl, drivePdfUrl, editContent, lessonVideos,
+  driveAudioUrl, drivePdfUrl, driveTitle, resources, editContent, lessonVideos,
   onLessonFieldChange, onCourseFieldChange,
   onYoutubeUrlChange, onYoutubeTitleChange, onAddYoutube,
-  onDriveAudioChange, onDrivePdfChange,
+  onDriveAudioChange, onDrivePdfChange, onDriveTitleChange,
+  onAddResource, onDeleteResource,
   onSaveLesson, onSaveCourse, onDeleteVideo,
   onEditContentChange, onSaveContent, saving,
   hasQuiz = false, onQuizCreated,

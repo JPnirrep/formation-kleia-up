@@ -25,6 +25,7 @@ async def list_courses(
     limit: int = 20,
     level: str | None = None,
     category: str | None = None,
+    search: str | None = None,
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -40,6 +41,9 @@ async def list_courses(
     if category:
         query = query.where(Course.category == category)
         count_query = count_query.where(Course.category == category)
+    if search:
+        query = query.where(Course.title.ilike(f"%{search}%") | Course.description.ilike(f"%{search}%"))
+        count_query = count_query.where(Course.title.ilike(f"%{search}%") | Course.description.ilike(f"%{search}%"))
 
     count_result = await db.execute(count_query)
     total = count_result.scalar_one()

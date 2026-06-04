@@ -23,7 +23,7 @@ from app.schemas.course import (
     ModuleRead,
     ModuleUpdate,
 )
-from app.schemas.enrollment import EnrollmentRead
+from app.schemas.enrollment import EnrollmentRead, EnrollmentStatusUpdate
 from app.schemas.quiz import QuizCreate, QuizRead
 from app.schemas.resource import ResourceAssetCreate, ResourceAssetRead
 from app.schemas.user import UserCreate, UserRead, UserUpdate
@@ -412,15 +412,10 @@ async def admin_delete_enrollment(
 @router.patch("/enrollments/{enrollment_id}", response_model=EnrollmentRead)
 async def admin_update_enrollment_status(
     enrollment_id: UUID,
-    status_field: str = "active",
+    data: EnrollmentStatusUpdate,
     db: AsyncSession = Depends(get_db),
 ):
     """Modifie le statut d'une inscription (admin)."""
-    if status_field not in ("active", "completed", "cancelled"):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Statut invalide. Valeurs : active, completed, cancelled.",
-        )
     stmt = select(Enrollment).where(Enrollment.id == enrollment_id)
     result = await db.execute(stmt)
     enrollment = result.scalar_one_or_none()
@@ -429,7 +424,7 @@ async def admin_update_enrollment_status(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Inscription non trouvée.",
         )
-    enrollment.status = status_field
+    enrollment.status = data.status
     await db.commit()
     await db.refresh(enrollment)
     return EnrollmentRead.model_validate(enrollment)

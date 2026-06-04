@@ -47,13 +47,15 @@ async def get_course_by_id(
 
 
 async def create_course(db: AsyncSession, data: CourseCreate, user_id: UUID) -> Course:
+    # Normaliser le slug avant insertion
+    slug = data.slug.strip()
     # Vérifier si le slug existe déjà
-    existing = await db.execute(select(Course).where(Course.slug == data.slug))
+    existing = await db.execute(select(Course).where(Course.slug == slug))
     if existing.scalar_one_or_none():
         raise HTTPException(
             status_code=409, detail="Ce slug est déjà utilisé par une autre formation."
         )
-    course = Course(**data.model_dump(), created_by=user_id)
+    course = Course(**data.model_dump(), slug=slug, created_by=user_id)
     db.add(course)
     await db.commit()
     await db.refresh(course)

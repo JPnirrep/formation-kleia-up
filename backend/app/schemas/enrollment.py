@@ -1,7 +1,18 @@
 from datetime import datetime
+from enum import Enum
 
 from pydantic import BaseModel
 import uuid
+
+
+class EnrollmentStatus(str, Enum):
+    active = "active"
+    completed = "completed"
+    cancelled = "cancelled"
+
+
+class EnrollmentStatusUpdate(BaseModel):
+    status: EnrollmentStatus
 
 
 class EnrollmentCreate(BaseModel):

@@ -84,7 +84,7 @@ export default function AdminCourseForm() {
         });
       } else {
         const newCourse = await createCourse({ ...form, slug: form.slug || makeSlug(form.title) });
-        navigate(`/admin/courses/${newCourse.slug}`, { replace: true });
+        navigate(`/admin/courses/${newCourse.id}`, { replace: true });
         return;
       }
       navigate('/admin/courses');

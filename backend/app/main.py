@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.config import settings
+from sqlalchemy.exc import IntegrityError
 
 
 import os
@@ -28,8 +29,6 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         if request.method == "OPTIONS":
             response = Response(status_code=200)
-        elif request.url.path == "/docs":
-            return RedirectResponse(url="/api/docs", status_code=301)
         else:
             response = await call_next(request)
 
@@ -50,12 +49,10 @@ class ForceCorsMiddleware(BaseHTTPMiddleware):
 
 
 def create_app() -> FastAPI:
-    if settings.JWT_SECRET == "" or settings.JWT_SECRET == "change-me-in-production":
-        import warnings
-
-        warnings.warn(
-            "\u26a0\ufe0f JWT_SECRET not configured! Using default insecure key.",
-            RuntimeWarning,
+    if settings.JWT_SECRET in ("", "change-me-in-production", "your-secret-key"):
+        raise RuntimeError(
+            "JWT_SECRET is not configured! Set a strong random secret in .env.\n"
+            "Generate with: python3 -c \"import secrets; print(secrets.token_hex(32))\""
         )
 
     app = FastAPI(
@@ -76,6 +73,15 @@ def create_app() -> FastAPI:
             "version": settings.VERSION,
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+
+    # Redirection /docs → /api/docs (hors middleware pour éviter le bug 500)
+    @app.get("/docs", include_in_schema=False)
+    async def docs_redirect():  # pyright: ignore[reportUnusedFunction]
+        return RedirectResponse(url="/api/docs")
+
+    @app.get("/openapi.json", include_in_schema=False)
+    async def openapi_redirect():  # pyright: ignore[reportUnusedFunction]
+        return RedirectResponse(url="/api/openapi.json")
 
     # Exception handlers
     @app.exception_handler(401)
@@ -130,6 +136,14 @@ def create_app() -> FastAPI:
         return JSONResponse(
             status_code=500,
             content={"detail": "Erreur interne du serveur."},
+        )
+
+    @app.exception_handler(IntegrityError)
+    async def integrity_handler(_request: Request, _exc: IntegrityError) -> JSONResponse:  # pyright: ignore[reportUnusedFunction]
+        """Convertit les violations UNIQUE en 409 Conflict."""
+        return JSONResponse(
+            status_code=409,
+            content={"detail": "Cette opération viole une contrainte d'unicité (doublon)."},
         )
 
     # Import et enregistrement des routers

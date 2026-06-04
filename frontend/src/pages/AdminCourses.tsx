@@ -118,7 +118,7 @@ export default function AdminCourses() {
                     variant="primary"
                     size="sm"
                     className="flex-1"
-                    onClick={() => navigate(`/admin/courses/${course.slug}`)}
+                    onClick={() => navigate(`/admin/courses/${course.id}`)}
                     aria-label={`Éditer ${course.title}`}
                   >
                     Éditer
